@@ -1,16 +1,22 @@
-import { getFeaturedProducts } from "@/lib/db/data";
+import { getFeaturedProducts, getNewArrivals } from "@/lib/db/data";
 import LandingView from "@/components/home/landing-view";
 
-// 1. Force dynamic rendering so we always see fresh data (useful during dev)
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // 2. Fetch data directly from the database (via our lib helper)
-  const products = await getFeaturedProducts();
+  console.log("⚡ Server Page: Fetching home data...");
 
-  // Debug Log: Check your terminal to see if this prints "Found X products"
-  console.log(`⚡ Server Page: Fetched ${products.length} products`);
+  const [featuredProducts, newArrivals] = await Promise.all([
+    getFeaturedProducts(),
+    getNewArrivals()
+  ]);
 
-  // 3. Pass the data to the Client Component for rendering & animation
-  return <LandingView products={products} />;
+  console.log(`⚡ Data fetched: ${featuredProducts.length} featured, ${newArrivals.length} new`);
+
+  return (
+    <LandingView
+      featuredProducts={featuredProducts}
+      newArrivals={newArrivals}
+    />
+  );
 }
