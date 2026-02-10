@@ -57,7 +57,7 @@ export default async function ProductPage({ params }: PageProps) {
           Home
         </Link>
 
-        <ChevronRight className="w-4 h-4 mx-2 opacity-50 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 mx-2 opacity-50 shrink-0" />
 
         <Link
           href={`/search?category=${product.category.slug}`}
@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: PageProps) {
           {product.category.name}
         </Link>
 
-        <ChevronRight className="w-4 h-4 mx-2 opacity-50 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 mx-2 opacity-50 shrink-0" />
 
         <span className="font-medium text-base-content truncate">
           {product.name}

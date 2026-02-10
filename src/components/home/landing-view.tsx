@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import {
-  Rocket, ShieldCheck, Gem, Headphones, ArrowRight,
-  Clock, Star, Mail, CheckCircle2
+  Rocket,
+  ShieldCheck,
+  Gem,
+  Headphones,
+  ArrowRight,
+  Clock,
+  Star,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 import ProductCard from "@/components/product/product-card";
 import { Product, Category, Brand } from "../../../generated/prisma/client";
@@ -15,16 +22,25 @@ interface LandingViewProps {
   newArrivals: (Product & { category: Category; brand: Brand | null })[];
 }
 
-export default function LandingView({ featuredProducts, newArrivals }: LandingViewProps) {
+export default function LandingView({
+  featuredProducts,
+  newArrivals,
+}: LandingViewProps) {
   // Countdown Timer Logic for Flash Deals
-  const [timeLeft, setTimeLeft] = useState({ hours: 12, minutes: 45, seconds: 30 });
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 12,
+    minutes: 45,
+    seconds: 30,
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        if (prev.minutes > 0)
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0)
+          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
         return prev;
       });
     }, 1000);
@@ -33,30 +49,41 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
 
   const fadeInUp: Variants = {
     hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
   const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
   return (
     <div className="space-y-24 pb-20">
-
       {/* 1. HERO SECTION */}
       <section className="relative w-full h-[700px] rounded-3xl overflow-hidden shadow-2xl group mx-auto">
         <motion.div
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "linear",
+          }}
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop)' }}
+          style={{
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent"></div>
 
         <motion.div
           initial="hidden"
@@ -65,21 +92,39 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
           variants={staggerContainer}
           className="absolute inset-0 flex flex-col justify-center px-8 md:px-20 max-w-4xl text-white"
         >
-          <motion.div variants={fadeInUp} className="badge badge-primary badge-lg mb-6 uppercase font-bold tracking-widest border-none">
+          <motion.div
+            variants={fadeInUp}
+            className="badge badge-primary badge-lg mb-6 uppercase font-bold tracking-widest border-none"
+          >
             Spring Collection 2025
           </motion.div>
-          <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-6">
+          <motion.h1
+            variants={fadeInUp}
+            className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-6"
+          >
             Elevate Your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Everyday Style.</span>
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-accent">
+              Everyday Style.
+            </span>
           </motion.h1>
-          <motion.p variants={fadeInUp} className="text-lg md:text-xl opacity-90 mb-10 max-w-xl font-light leading-relaxed">
-            Discover the latest trends in fashion and technology. Curated just for you with delivery all across Nepal.
+          <motion.p
+            variants={fadeInUp}
+            className="text-lg md:text-xl opacity-90 mb-10 max-w-xl font-light leading-relaxed"
+          >
+            Discover the latest trends in fashion and technology. Curated just
+            for you with delivery all across Nepal.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-            <Link href="/search" className="btn btn-primary btn-lg rounded-full px-10 shadow-lg shadow-primary/30 border-none hover:scale-105 transition-transform">
+            <Link
+              href="/search"
+              className="btn btn-primary btn-lg rounded-full px-10 shadow-lg shadow-primary/30 border-none hover:scale-105 transition-transform"
+            >
               Shop Now
             </Link>
-            <Link href="/categories" className="btn btn-outline btn-lg text-white rounded-full px-10 hover:bg-white hover:text-black hover:scale-105 transition-transform backdrop-blur-sm">
+            <Link
+              href="/categories"
+              className="btn btn-outline btn-lg text-white rounded-full px-10 hover:bg-white hover:text-black hover:scale-105 transition-transform backdrop-blur-sm"
+            >
               Browse Categories
             </Link>
           </motion.div>
@@ -96,7 +141,10 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
           className="text-center mb-12"
         >
           <h2 className="text-4xl font-black mb-3">Shop by Category</h2>
-          <p className="text-base-content/60 max-w-lg mx-auto">Explore our wide range of collections carefully selected to match your unique taste and needs.</p>
+          <p className="text-base-content/60 max-w-lg mx-auto">
+            Explore our wide range of collections carefully selected to match
+            your unique taste and needs.
+          </p>
         </motion.div>
 
         <motion.div
@@ -107,10 +155,30 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
           className="grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { name: "Electronics", img: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=600&q=80", link: "/search?category=electronics", color: "from-blue-600/80" },
-            { name: "Fashion", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80", link: "/search?category=fashion", color: "from-purple-600/80" },
-            { name: "Home", img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?auto=format&fit=crop&w=600&q=80", link: "/search?category=home", color: "from-emerald-600/80" },
-            { name: "Beauty", img: "https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=600&q=80", link: "/search?category=beauty", color: "from-rose-600/80" },
+            {
+              name: "Electronics",
+              img: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=600&q=80",
+              link: "/search?category=electronics",
+              color: "from-blue-600/80",
+            },
+            {
+              name: "Fashion",
+              img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80",
+              link: "/search?category=fashion",
+              color: "from-purple-600/80",
+            },
+            {
+              name: "Home",
+              img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?auto=format&fit=crop&w=600&q=80",
+              link: "/search?category=home",
+              color: "from-emerald-600/80",
+            },
+            {
+              name: "Beauty",
+              img: "https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=600&q=80",
+              link: "/search?category=beauty",
+              color: "from-rose-600/80",
+            },
           ].map((cat, i) => (
             <Link key={i} href={cat.link}>
               <motion.div
@@ -122,9 +190,13 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
                   className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700 ease-in-out"
                   style={{ backgroundImage: `url(${cat.img})` }}
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${cat.color} to-transparent opacity-80 group-hover:opacity-90 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-linear-to-t ${cat.color} to-transparent opacity-80 group-hover:opacity-90 transition-opacity`}
+                />
                 <div className="absolute bottom-0 left-0 p-6 w-full">
-                  <h3 className="font-bold text-2xl text-white mb-1 group-hover:translate-x-2 transition-transform">{cat.name}</h3>
+                  <h3 className="font-bold text-2xl text-white mb-1 group-hover:translate-x-2 transition-transform">
+                    {cat.name}
+                  </h3>
                   <div className="flex items-center text-white/80 text-sm group-hover:translate-x-2 transition-transform delay-75">
                     <span>Shop Now</span>
                     <ArrowRight size={14} className="ml-1" />
@@ -141,10 +213,16 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
         <div className="flex justify-between items-end mb-10 px-2">
           <div>
             <h2 className="text-4xl font-black mb-2">Best Sellers</h2>
-            <p className="text-base-content/60">Top favorites from our customers</p>
+            <p className="text-base-content/60">
+              Top favorites from our customers
+            </p>
           </div>
-          <Link href="/search?sort=popular" className="btn btn-ghost hover:bg-base-200 rounded-full group">
-            View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+          <Link
+            href="/search?sort=popular"
+            className="btn btn-ghost hover:bg-base-200 rounded-full group"
+          >
+            View All{" "}
+            <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -162,15 +240,21 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
             <h2 className="text-4xl font-black mb-2">New Arrivals</h2>
             <p className="text-base-content/60">Fresh drops just for you</p>
           </div>
-          <Link href="/search?sort=latest" className="btn btn-ghost hover:bg-base-200 rounded-full group">
-            See All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+          <Link
+            href="/search?sort=latest"
+            className="btn btn-ghost hover:bg-base-200 rounded-full group"
+          >
+            See All{" "}
+            <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {newArrivals.slice(0, 4).map((product) => (
             <div key={product.id} className="relative">
-              <div className="absolute -top-2 -left-2 z-20 badge badge-secondary font-bold shadow-md">NEW</div>
+              <div className="absolute -top-2 -left-2 z-20 badge badge-secondary font-bold shadow-md">
+                NEW
+              </div>
               <ProductCard product={product} />
             </div>
           ))}
@@ -187,18 +271,34 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
                 <Clock size={14} /> Flash Deal
               </span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight">Super Sale <br />Up to 50% Off</h2>
-            <p className="text-lg opacity-90 mb-8">Grab the best deals on electronics and fashion. Limited time offer ends soon.</p>
-            <Link href="/deals" className="btn btn-white text-primary btn-lg rounded-full px-10 font-bold border-none hover:scale-105 transition-transform shadow-xl">
+            <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
+              Super Sale <br />
+              Up to 50% Off
+            </h2>
+            <p className="text-lg opacity-90 mb-8">
+              Grab the best deals on electronics and fashion. Limited time offer
+              ends soon.
+            </p>
+            <Link
+              href="/deals"
+              className="btn btn-white text-primary btn-lg rounded-full px-10 font-bold border-none hover:scale-105 transition-transform shadow-xl"
+            >
               Shop The Sale
             </Link>
           </div>
 
           <div className="flex gap-4">
             {Object.entries(timeLeft).map(([unit, value]) => (
-              <div key={unit} className="flex flex-col items-center p-4 bg-white/10 backdrop-blur-md rounded-2xl w-24 h-24 justify-center border border-white/20">
-                <span className="text-3xl font-black font-mono">{String(value).padStart(2, '0')}</span>
-                <span className="text-xs uppercase tracking-widest opacity-80">{unit}</span>
+              <div
+                key={unit}
+                className="flex flex-col items-center p-4 bg-white/10 backdrop-blur-md rounded-2xl w-24 h-24 justify-center border border-white/20"
+              >
+                <span className="text-3xl font-black font-mono">
+                  {String(value).padStart(2, "0")}
+                </span>
+                <span className="text-xs uppercase tracking-widest opacity-80">
+                  {unit}
+                </span>
               </div>
             ))}
           </div>
@@ -215,10 +315,26 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
           className="grid grid-cols-1 md:grid-cols-4 gap-6 px-2"
         >
           {[
-            { Icon: Rocket, title: "Fast Delivery", desc: "All over Nepal within 3-5 days" },
-            { Icon: ShieldCheck, title: "Secure Payment", desc: "eSewa, Khalti & COD available" },
-            { Icon: Gem, title: "Easy Returns", desc: "7-day return policy for all items" },
-            { Icon: Headphones, title: "24/7 Support", desc: "Always here to help you" },
+            {
+              Icon: Rocket,
+              title: "Fast Delivery",
+              desc: "All over Nepal within 3-5 days",
+            },
+            {
+              Icon: ShieldCheck,
+              title: "Secure Payment",
+              desc: "eSewa, Khalti & COD available",
+            },
+            {
+              Icon: Gem,
+              title: "Easy Returns",
+              desc: "7-day return policy for all items",
+            },
+            {
+              Icon: Headphones,
+              title: "24/7 Support",
+              desc: "Always here to help you",
+            },
           ].map((feature, i) => (
             <motion.div
               key={i}
@@ -230,7 +346,9 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
                 <feature.Icon size={40} strokeWidth={1.5} />
               </div>
               <h3 className="font-bold text-xl mb-2">{feature.title}</h3>
-              <p className="text-sm text-base-content/60 leading-relaxed">{feature.desc}</p>
+              <p className="text-sm text-base-content/60 leading-relaxed">
+                {feature.desc}
+              </p>
             </motion.div>
           ))}
         </motion.div>
@@ -240,14 +358,31 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
       <section className="bg-base-200/50 rounded-[3rem] p-10 md:p-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-black mb-3">What Our Customers Say</h2>
-          <p className="text-base-content/60">Real stories from satisfied shoppers</p>
+          <p className="text-base-content/60">
+            Real stories from satisfied shoppers
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { name: "Aarav Sharma", role: "Verified Buyer", text: "The delivery was incredibly fast! Ordered a phone and got it the next day in Kathmandu. Highly recommended.", img: "https://i.pravatar.cc/150?u=1" },
-            { name: "Priya Karki", role: "Fashion Enthusiast", text: "Love the collection here. The quality of the North Face jacket I bought is top-notch and 100% genuine.", img: "https://i.pravatar.cc/150?u=2" },
-            { name: "Suresh Thapa", role: "Tech Geek", text: "Best prices for electronics in Nepal. Customer support was very helpful in guiding me to choose the right laptop.", img: "https://i.pravatar.cc/150?u=3" },
+            {
+              name: "Aarav Sharma",
+              role: "Verified Buyer",
+              text: "The delivery was incredibly fast! Ordered a phone and got it the next day in Kathmandu. Highly recommended.",
+              img: "https://i.pravatar.cc/150?u=1",
+            },
+            {
+              name: "Priya Karki",
+              role: "Fashion Enthusiast",
+              text: "Love the collection here. The quality of the North Face jacket I bought is top-notch and 100% genuine.",
+              img: "https://i.pravatar.cc/150?u=2",
+            },
+            {
+              name: "Suresh Thapa",
+              role: "Tech Geek",
+              text: "Best prices for electronics in Nepal. Customer support was very helpful in guiding me to choose the right laptop.",
+              img: "https://i.pravatar.cc/150?u=3",
+            },
           ].map((review, i) => (
             <motion.div
               key={i}
@@ -258,9 +393,13 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
               className="bg-base-100 p-8 rounded-3xl shadow-lg relative"
             >
               <div className="flex text-warning mb-4">
-                {[...Array(5)].map((_, j) => <Star key={j} size={16} fill="currentColor" />)}
+                {[...Array(5)].map((_, j) => (
+                  <Star key={j} size={16} fill="currentColor" />
+                ))}
               </div>
-              <p className="text-base-content/80 mb-6 italic leading-relaxed">"{review.text}"</p>
+              <p className="text-base-content/80 mb-6 italic leading-relaxed">
+                "{review.text}"
+              </p>
               <div className="flex items-center gap-4">
                 <div className="avatar">
                   <div className="w-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
@@ -280,9 +419,17 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
       {/* 8. LARGE CALL-TO-ACTION SECTION */}
       <section className="relative overflow-hidden rounded-3xl bg-neutral text-neutral-content py-24 px-6 text-center">
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black mb-6">Ready to Upgrade Your Life?</h2>
-          <p className="text-xl opacity-80 mb-10 leading-relaxed">Join thousands of happy customers and experience the new standard of online shopping in Nepal.</p>
-          <Link href="/register" className="btn btn-primary btn-lg rounded-full px-12 shadow-xl hover:scale-105 transition-transform">
+          <h2 className="text-4xl md:text-6xl font-black mb-6">
+            Ready to Upgrade Your Life?
+          </h2>
+          <p className="text-xl opacity-80 mb-10 leading-relaxed">
+            Join thousands of happy customers and experience the new standard of
+            online shopping in Nepal.
+          </p>
+          <Link
+            href="/register"
+            className="btn btn-primary btn-lg rounded-full px-12 shadow-xl hover:scale-105 transition-transform"
+          >
             Start Shopping Today
           </Link>
         </div>
@@ -294,7 +441,7 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
       {/* 9. NEWSLETTER SUBSCRIPTION SECTION */}
       <section className="max-w-4xl mx-auto text-center">
         <div className="bg-base-100 border border-base-200 p-10 md:p-16 rounded-[3rem] shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-accent"></div>
+          <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-primary via-secondary to-accent"></div>
 
           <div className="mb-8 flex justify-center">
             <div className="bg-primary/10 p-4 rounded-full text-primary">
@@ -302,8 +449,13 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Subscribe to our Newsletter</h2>
-          <p className="text-base-content/60 mb-8 max-w-lg mx-auto">Get the latest updates on new products, flash sales, and exclusive offers sent directly to your inbox.</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Subscribe to our Newsletter
+          </h2>
+          <p className="text-base-content/60 mb-8 max-w-lg mx-auto">
+            Get the latest updates on new products, flash sales, and exclusive
+            offers sent directly to your inbox.
+          </p>
 
           <form className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto">
             <input
@@ -321,7 +473,6 @@ export default function LandingView({ featuredProducts, newArrivals }: LandingVi
           </p>
         </div>
       </section>
-
     </div>
   );
 }
