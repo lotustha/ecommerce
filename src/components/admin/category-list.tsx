@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, Edit } from "lucide-react";
-import DeleteCategoryButton from "./_components/delete-button";
+import DeleteCategoryButton from "../../app/(admin)/dashboard/categories/_components/delete-button";
 import { Category } from "../../../generated/prisma/client";
 
 export const dynamic = "force-dynamic";
