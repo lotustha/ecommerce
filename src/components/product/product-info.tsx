@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Product, ProductVariant, Attribute, ProductSpec, Category } from "../../../generated/prisma/client";
-import { ShoppingCart, Heart, Minus, Plus, Check } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Check } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "react-hot-toast";
-
+import WishlistButton from "@/components/product/wishlist-button";
 interface ProductInfoProps {
   product: Product & {
     variants: ProductVariant[];
@@ -58,7 +58,6 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
 
-    // ✅ Custom Toast with Image & Details
     toast.custom((t) => (
       <div className={`bg-base-100 border border-base-200 shadow-xl rounded-2xl p-4 flex items-center gap-4 min-w-[300px] transform transition-all duration-300 ${t.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
         <div className="w-12 h-12 bg-base-200 rounded-xl overflow-hidden shrink-0 border border-base-300">
@@ -146,16 +145,17 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             </button>
           </div>
 
-          {/* Wishlist */}
-          <button className="btn btn-outline btn-circle h-12 w-12 border-base-300">
-            <Heart size={20} />
-          </button>
+          {/* ✅ Wishlist Button */}
+          <WishlistButton
+            productId={product.id}
+            className="btn btn-outline btn-circle h-12 w-12 border-base-300 flex items-center justify-center"
+          />
         </div>
 
         <button
           onClick={handleAddToCart}
           disabled={isAdded || product.stock === 0}
-          className={`btn btn-block h-14 rounded-full text-lg shadow-xl transition-all ${isAdded ? "btn-success text-white" : "btn-primary shadow-primary/20"
+          className={`btn btn-block h-14 rounded-full text-lg shadow-xl transition-all ${isAdded ? "btn-success text-white" : "btn-primary shadow-primary/20 hover:scale-[1.02]"
             }`}
         >
           {isAdded ? (
@@ -175,7 +175,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       {/* Specs / Details */}
       {product.specs.length > 0 && (
         <div className="bg-base-200/50 rounded-2xl p-6 mt-8">
-          <h3 className="font-bold text-lg mb-4">Specifications</h3>
+          <h3 className="font-bold text-lg mb-4">Technical Specifications</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8">
             {product.specs.map((spec) => (
               <div key={spec.id} className="flex justify-between py-2 border-b border-base-content/5">

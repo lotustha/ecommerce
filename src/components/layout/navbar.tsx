@@ -1,93 +1,51 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { logout } from "@/actions/logout";
 import CartButton from "@/components/layout/cart-button";
-import SearchBar from "@/components/layout/search-bar"; // ✅ Import SearchBar
-import { Sun, Moon } from "lucide-react";
-
+import SearchBar from "@/components/layout/search-bar";
+import { Sun, Moon, Heart } from "lucide-react";
+import { prisma } from "@/lib/db/prisma";
+import { MobileMenu, ShopMenu, UserMenu } from "@/components/layout/nav-menus";
 export default async function Navbar() {
   const session = await auth();
   const user = session?.user;
+
+  // ✅ Fetch Top 5 Categories with most items
+  const topCategories = await prisma.category.findMany({
+    take: 5,
+    orderBy: {
+      products: {
+        _count: 'desc'
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      _count: {
+        select: { products: true }
+      }
+    }
+  });
 
   return (
     <div className="navbar bg-base-100/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-base-200 transition-all duration-300">
       {/* --- LEFT: Mobile Menu & Logo --- */}
       <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h8m-8 6h16"
-              />
-            </svg>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-200"
-          >
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-            <li>
-              <a>Categories</a>
-              <ul className="p-2">
-                <li>
-                  <Link href="/search?category=electronics">Electronics</Link>
-                </li>
-                <li>
-                  <Link href="/search?category=fashion">Fashion</Link>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <Link href="/about">About Us</Link>
-            </li>
-          </ul>
-        </div>
-        <Link
-          href="/"
-          className="btn btn-ghost text-xl font-black text-primary tracking-tight hover:bg-transparent"
-        >
+        {/* ✅ Interactive Mobile Menu */}
+        <MobileMenu topCategories={topCategories} />
+
+        <Link href="/" className="btn btn-ghost text-xl font-black text-primary tracking-tight hover:bg-transparent">
           Nepal E-com
         </Link>
       </div>
 
       {/* --- CENTER: Desktop Menu & Search --- */}
       <div className="navbar-center hidden lg:flex items-center gap-4">
-        {/* Added flex-nowrap to ensure Home and Shop stay on the same line */}
         <ul className="menu menu-horizontal px-1 font-medium text-base-content/80 flex-nowrap">
+          <li><Link href="/" className="hover:text-primary">Home</Link></li>
           <li>
-            <Link href="/" className="hover:text-primary">
-              Home
-            </Link>
-          </li>
-          <li>
-            <details>
-              <summary className="hover:text-primary">Shop</summary>
-              <ul className="p-2 w-48 bg-base-100 shadow-lg rounded-box z-20 border border-base-200">
-                <li>
-                  <Link href="/search?category=electronics">Electronics</Link>
-                </li>
-                <li>
-                  <Link href="/search?category=fashion">Fashion</Link>
-                </li>
-                <li>
-                  <Link href="/search?category=groceries">Groceries</Link>
-                </li>
-                <li>
-                  <Link href="/search">All Products</Link>
-                </li>
-              </ul>
-            </details>
+
+            <ShopMenu topCategories={topCategories} />
           </li>
         </ul>
 
@@ -104,67 +62,22 @@ export default async function Navbar() {
           <Moon className="swap-on w-5 h-5" />
         </label>
 
+        {/* ✅ Wishlist Link */}
+        <Link href="/wishlist" className="btn btn-ghost btn-circle btn-sm group tooltip tooltip-bottom" data-tip="Wishlist">
+          <Heart className="w-5 h-5 group-hover:text-error transition-colors" />
+        </Link>
+
         {/* LIVE CART BUTTON */}
         <CartButton />
 
         {/* User Auth State */}
         {!user ? (
-          <Link
-            href="/login"
-            className="btn btn-primary btn-sm px-5 ml-2 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-          >
+          <Link href="/login" className="btn btn-primary btn-sm px-5 ml-2 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
             Login
           </Link>
         ) : (
-          <div className="dropdown dropdown-end ml-2">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar online"
-            >
-              <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                {user.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="User" src={user.image} />
-                ) : (
-                  <div className="bg-neutral text-neutral-content w-full h-full flex items-center justify-center text-sm font-bold">
-                    {user.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                )}
-              </div>
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-xl bg-base-100 rounded-box w-56 border border-base-200"
-            >
-              <li className="menu-title px-4 py-2 opacity-60">
-                Hi, {user.name?.split(" ")[0]}
-              </li>
-              <li>
-                <Link href="/dashboard" className="justify-between">
-                  Dashboard{" "}
-                  <span className="badge badge-sm badge-secondary">New</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/orders">My Orders</Link>
-              </li>
-              <li>
-                <Link href="/profile">Settings</Link>
-              </li>
-              <div className="divider my-1"></div>
-              <li>
-                <form action={logout} className="w-full">
-                  <button
-                    type="submit"
-                    className="text-error font-medium w-full text-left"
-                  >
-                    Logout
-                  </button>
-                </form>
-              </li>
-            </ul>
-          </div>
+
+          <UserMenu user={user} />
         )}
       </div>
     </div>
