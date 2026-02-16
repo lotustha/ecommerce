@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Package, Calendar, Clock, CheckCircle2, XCircle, MapPin, ArrowRight, CreditCard, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -85,7 +85,7 @@ export default function OrderList({ orders = [] }: OrderListProps) {
         }
     };
 
-    const itemVariant = {
+    const itemVariant: Variants = {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
     };
