@@ -7,3 +7,4 @@ DATABASE_HOST="localhost"
 DATABASE_PORT=3306
 //add-end
 AUTH_SECRET="2gFLZJHSuiPwijUceC9lTnh8sMZ8ZNTkPql7ixTn7OM="
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
