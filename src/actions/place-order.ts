@@ -1,114 +1,167 @@
-"use server"
+"use server";
 
-import { auth } from "@/auth"
-import { prisma } from "@/lib/db/prisma"
-import { z } from "zod"
+import { auth } from "@/auth";
+import { prisma } from "@/lib/db/prisma";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
-// Input Schema matches the frontend checkout form + items
+// Input Schema matches the frontend checkout form
 const PlaceOrderSchema = z.object({
-    fullName: z.string(),
-    phone: z.string(),
-    province: z.string(),
-    city: z.string(),
-    street: z.string(),
-    paymentMethod: z.enum(["COD", "ESEWA", "KHALTI"]),
-    items: z.array(z.object({
-        productId: z.string(),
-        variantId: z.string().nullable().optional(),
-        quantity: z.number().min(1),
-    }))
-})
+  fullName: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  province: z.string(),
+  district: z.string(), // New
+  city: z.string(),
+  ward: z.coerce.number(), // New
+  street: z.string(),
+  paymentMethod: z.enum(["COD", "ESEWA", "KHALTI"]),
+  items: z.array(
+    z.object({
+      productId: z.string(),
+      variantId: z.string().nullable().optional(),
+      quantity: z.number().min(1),
+    }),
+  ),
+});
 
 export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
-    const session = await auth()
-    const userId = session?.user?.id
+  const session = await auth();
+  let userId = session?.user?.id;
+  let isNewAccount = false;
 
-    if (!userId) {
-        return { error: "You must be logged in to place an order." }
+  const validated = PlaceOrderSchema.safeParse(values);
+  if (!validated.success) {
+    return { error: "Invalid order data." };
+  }
+
+  const { items, paymentMethod, email, fullName, ...address } = validated.data;
+
+  // --- GUEST CHECKOUT / USER CREATION LOGIC ---
+  if (!userId) {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    if (existingUser) {
+      return {
+        error:
+          "An account with this email already exists. Please log in to continue.",
+      };
     }
 
-    const validated = PlaceOrderSchema.safeParse(values)
-    if (!validated.success) {
-        return { error: "Invalid order data." }
+    // Auto-create new user
+    const randomPassword = crypto.randomBytes(8).toString("hex");
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    // In a real app, send this password via Email (Mocked here)
+    console.log(
+      `📧 MOCK EMAIL: New Account created for ${email}. Password: ${randomPassword}`,
+    );
+
+    const newUser = await prisma.user.create({
+      data: {
+        name: fullName,
+        email,
+        phone: address.phone,
+        password: hashedPassword,
+        role: "USER",
+      },
+    });
+    userId = newUser.id;
+    isNewAccount = true;
+  }
+
+  // --- AUTO SAVE DEFAULT ADDRESS LOGIC ---
+  if (userId) {
+    const addressCount = await prisma.address.count({ where: { userId } });
+
+    // If user has no addresses, save this one as default
+    if (addressCount === 0) {
+      await prisma.address.create({
+        data: {
+          userId,
+          province: address.province,
+          district: address.district,
+          city: address.city,
+          ward: address.ward,
+          street: address.street,
+          phone: address.phone,
+          isDefault: true,
+        },
+      });
+    }
+  }
+
+  // --- PRICE CALCULATION & ORDER CREATION ---
+  let subTotal = 0;
+  const orderItemsData = [];
+
+  for (const item of items) {
+    const product = await prisma.product.findUnique({
+      where: { id: item.productId },
+      include: { variants: true },
+    });
+
+    if (!product) continue;
+
+    let price = Number(product.price);
+
+    if (item.variantId) {
+      const variant = product.variants.find((v) => v.id === item.variantId);
+      if (variant) price = Number(variant.price);
     }
 
-    const { items, paymentMethod, ...address } = validated.data
-
-    // 1. Calculate Totals Server-Side (Security: Don't trust client prices)
-    let subTotal = 0
-    const orderItemsData = []
-
-    for (const item of items) {
-        const product = await prisma.product.findUnique({
-            where: { id: item.productId },
-            include: { variants: true }
-        })
-
-        if (!product) continue // Skip invalid products
-
-        // Determine Price
-        let price = Number(product.price)
-
-        // If variant is selected, check variant price
-        if (item.variantId) {
-            const variant = product.variants.find(v => v.id === item.variantId)
-            if (variant) {
-                price = Number(variant.price)
-            }
-        }
-
-        // Check for Discount (Override if present and lower)
-        if (product.discountPrice) {
-            const discount = Number(product.discountPrice)
-            if (discount < price) price = discount
-        }
-
-        const lineTotal = price * item.quantity
-        subTotal += lineTotal
-
-        orderItemsData.push({
-            productId: item.productId,
-            variantId: item.variantId,
-            quantity: item.quantity,
-            price: price, // Store unit price at time of purchase
-            name: product.name, // Snapshot name
-        })
+    if (product.discountPrice) {
+      const discount = Number(product.discountPrice);
+      if (discount < price) price = discount;
     }
 
-    const shippingCost = 150 // Fixed for now
-    const totalAmount = subTotal + shippingCost
+    const lineTotal = price * item.quantity;
+    subTotal += lineTotal;
 
-    try {
-        // 2. Database Transaction
-        // We create the order and order items in one atomic operation
-        const order = await prisma.order.create({
-            data: {
-                userId,
-                status: "PENDING",
-                paymentStatus: "UNPAID",
-                paymentMethod,
-                deliveryType: "EXTERNAL",
+    orderItemsData.push({
+      productId: item.productId,
+      variantId: item.variantId,
+      quantity: item.quantity,
+      price: price,
+      name: product.name,
+    });
+  }
 
-                // Save Address Snapshot
-                shippingAddress: JSON.stringify(address),
-                phone: address.phone,
+  const shippingCost = 150;
+  const totalAmount = subTotal + shippingCost;
 
-                // Financials
-                subTotal,
-                shippingCost,
-                totalAmount,
+  try {
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        status: "PENDING",
+        paymentStatus: "UNPAID",
+        paymentMethod,
+        deliveryType: "EXTERNAL",
 
-                // Items
-                items: {
-                    create: orderItemsData
-                }
-            }
-        })
+        // Full address snapshot
+        shippingAddress: JSON.stringify({ fullName, email, ...address }),
+        phone: address.phone,
 
-        return { success: "Order placed successfully!", orderId: order.id }
+        subTotal,
+        shippingCost,
+        totalAmount,
 
-    } catch (error) {
-        console.error("Order Placement Error:", error)
-        return { error: "Failed to place order. Please try again." }
-    }
+        items: {
+          create: orderItemsData,
+        },
+      },
+    });
+
+    return {
+      success: "Order placed successfully!",
+      orderId: order.id,
+      isNewAccount,
+    };
+  } catch (error) {
+    console.error("Order Placement Error:", error);
+    return { error: "Failed to place order. Please try again." };
+  }
 }

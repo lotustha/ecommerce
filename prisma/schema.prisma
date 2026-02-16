@@ -347,3 +347,52 @@ model ShippingRate {
   minWeight Decimal? // Optional: for complex calc later
   maxWeight Decimal?
 }
+
+model SystemSetting {
+  id String @id @default("default") // Singleton pattern: only one row exists
+
+  // App Identity
+  appName String  @default("Nepal E-com")
+  appLogo String? @db.Text // URL or Base64 string for the store logo
+
+  // Store Information
+  storeName     String  @default("Nepal E-com")
+  storeSubtitle String? @default("Your quality destination")
+  storeAddress  String? @db.Text
+  storePhone    String?
+  storeEmail    String?
+
+  // Localization & Finance
+  currency String  @default("NPR")
+  taxRate  Decimal @default(0) @db.Decimal(10, 2)
+
+  // Logistics & Shipping
+  shippingCharge        Decimal  @default(150) @db.Decimal(10, 2)
+  freeShippingThreshold Decimal? @db.Decimal(10, 2) // If total > this, shipping is 0
+  deliveryPartners      String?  @default("Pathao, Upaya") // Comma-separated list or JSON
+
+  // Payment Gateway Toggles
+  enableCod    Boolean @default(true)
+  enableEsewa  Boolean @default(false)
+  enableKhalti Boolean @default(false)
+  enableSctPay Boolean @default(false)
+
+  // Payment API Credentials (Sensitive)
+  esewaId      String? // Merchant ID / SCD
+  esewaSecret  String? // Secret Key for signature
+  khaltiSecret String? // Secret Key
+  sctPayKey    String? // SCT Pay API Key
+
+  // Social Links
+  socialFacebook  String?
+  socialInstagram String?
+  socialTiktok    String?
+  socialTwitter   String?
+
+  // Legal Pages (Rich Text / HTML)
+  privacyPolicy      String? @db.MediumText
+  termsAndConditions String? @db.MediumText
+
+  // Metadata
+  updatedAt DateTime @updatedAt
+}

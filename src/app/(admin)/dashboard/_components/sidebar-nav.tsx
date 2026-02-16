@@ -10,6 +10,7 @@ import {
   Settings,
   Layers,
   Shield,
+  Banknote,
 } from "lucide-react";
 
 export default function SidebarNav() {
@@ -21,7 +22,8 @@ export default function SidebarNav() {
     { name: "Products", icon: Package, href: "/dashboard/products" },
     { name: "Categories", icon: Layers, href: "/dashboard/categories" },
     { name: "Customers", icon: Users, href: "/dashboard/customers" },
-    { name: "Staff", icon: Shield, href: "/dashboard/staff" }, // ✅ Added Staff
+    { name: "Staff", icon: Shield, href: "/dashboard/staff" },
+    { name: "Payments", icon: Banknote, href: "/dashboard/payments" }, // ✅ Added Payments
     { name: "Settings", icon: Settings, href: "/dashboard/settings" },
   ];
 

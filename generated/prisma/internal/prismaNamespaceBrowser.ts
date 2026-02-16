@@ -69,7 +69,8 @@ export const ModelName = {
   Review: 'Review',
   Wishlist: 'Wishlist',
   Address: 'Address',
-  ShippingRate: 'ShippingRate'
+  ShippingRate: 'ShippingRate',
+  SystemSetting: 'SystemSetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -340,6 +341,40 @@ export const ShippingRateScalarFieldEnum = {
 export type ShippingRateScalarFieldEnum = (typeof ShippingRateScalarFieldEnum)[keyof typeof ShippingRateScalarFieldEnum]
 
 
+export const SystemSettingScalarFieldEnum = {
+  id: 'id',
+  appName: 'appName',
+  appLogo: 'appLogo',
+  storeName: 'storeName',
+  storeSubtitle: 'storeSubtitle',
+  storeAddress: 'storeAddress',
+  storePhone: 'storePhone',
+  storeEmail: 'storeEmail',
+  currency: 'currency',
+  taxRate: 'taxRate',
+  shippingCharge: 'shippingCharge',
+  freeShippingThreshold: 'freeShippingThreshold',
+  deliveryPartners: 'deliveryPartners',
+  enableCod: 'enableCod',
+  enableEsewa: 'enableEsewa',
+  enableKhalti: 'enableKhalti',
+  enableSctPay: 'enableSctPay',
+  esewaId: 'esewaId',
+  esewaSecret: 'esewaSecret',
+  khaltiSecret: 'khaltiSecret',
+  sctPayKey: 'sctPayKey',
+  socialFacebook: 'socialFacebook',
+  socialInstagram: 'socialInstagram',
+  socialTiktok: 'socialTiktok',
+  socialTwitter: 'socialTwitter',
+  privacyPolicy: 'privacyPolicy',
+  termsAndConditions: 'termsAndConditions',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -558,4 +593,30 @@ export const ShippingRateOrderByRelevanceFieldEnum = {
 } as const
 
 export type ShippingRateOrderByRelevanceFieldEnum = (typeof ShippingRateOrderByRelevanceFieldEnum)[keyof typeof ShippingRateOrderByRelevanceFieldEnum]
+
+
+export const SystemSettingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  appName: 'appName',
+  appLogo: 'appLogo',
+  storeName: 'storeName',
+  storeSubtitle: 'storeSubtitle',
+  storeAddress: 'storeAddress',
+  storePhone: 'storePhone',
+  storeEmail: 'storeEmail',
+  currency: 'currency',
+  deliveryPartners: 'deliveryPartners',
+  esewaId: 'esewaId',
+  esewaSecret: 'esewaSecret',
+  khaltiSecret: 'khaltiSecret',
+  sctPayKey: 'sctPayKey',
+  socialFacebook: 'socialFacebook',
+  socialInstagram: 'socialInstagram',
+  socialTiktok: 'socialTiktok',
+  socialTwitter: 'socialTwitter',
+  privacyPolicy: 'privacyPolicy',
+  termsAndConditions: 'termsAndConditions'
+} as const
+
+export type SystemSettingOrderByRelevanceFieldEnum = (typeof SystemSettingOrderByRelevanceFieldEnum)[keyof typeof SystemSettingOrderByRelevanceFieldEnum]
 

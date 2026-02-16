@@ -402,7 +402,8 @@ export const ModelName = {
   Review: 'Review',
   Wishlist: 'Wishlist',
   Address: 'Address',
-  ShippingRate: 'ShippingRate'
+  ShippingRate: 'ShippingRate',
+  SystemSetting: 'SystemSetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "brand" | "category" | "product" | "productVariant" | "attribute" | "productSpec" | "coupon" | "cart" | "cartItem" | "order" | "orderItem" | "review" | "wishlist" | "address" | "shippingRate"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "brand" | "category" | "product" | "productVariant" | "attribute" | "productSpec" | "coupon" | "cart" | "cartItem" | "order" | "orderItem" | "review" | "wishlist" | "address" | "shippingRate" | "systemSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1676,6 +1677,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SystemSetting: {
+      payload: Prisma.$SystemSettingPayload<ExtArgs>
+      fields: Prisma.SystemSettingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SystemSettingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SystemSettingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        findFirst: {
+          args: Prisma.SystemSettingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SystemSettingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        findMany: {
+          args: Prisma.SystemSettingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>[]
+        }
+        create: {
+          args: Prisma.SystemSettingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        createMany: {
+          args: Prisma.SystemSettingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.SystemSettingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        update: {
+          args: Prisma.SystemSettingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        deleteMany: {
+          args: Prisma.SystemSettingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SystemSettingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.SystemSettingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>
+        }
+        aggregate: {
+          args: Prisma.SystemSettingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSystemSetting>
+        }
+        groupBy: {
+          args: Prisma.SystemSettingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SystemSettingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SystemSettingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SystemSettingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1967,6 +2034,40 @@ export const ShippingRateScalarFieldEnum = {
 export type ShippingRateScalarFieldEnum = (typeof ShippingRateScalarFieldEnum)[keyof typeof ShippingRateScalarFieldEnum]
 
 
+export const SystemSettingScalarFieldEnum = {
+  id: 'id',
+  appName: 'appName',
+  appLogo: 'appLogo',
+  storeName: 'storeName',
+  storeSubtitle: 'storeSubtitle',
+  storeAddress: 'storeAddress',
+  storePhone: 'storePhone',
+  storeEmail: 'storeEmail',
+  currency: 'currency',
+  taxRate: 'taxRate',
+  shippingCharge: 'shippingCharge',
+  freeShippingThreshold: 'freeShippingThreshold',
+  deliveryPartners: 'deliveryPartners',
+  enableCod: 'enableCod',
+  enableEsewa: 'enableEsewa',
+  enableKhalti: 'enableKhalti',
+  enableSctPay: 'enableSctPay',
+  esewaId: 'esewaId',
+  esewaSecret: 'esewaSecret',
+  khaltiSecret: 'khaltiSecret',
+  sctPayKey: 'sctPayKey',
+  socialFacebook: 'socialFacebook',
+  socialInstagram: 'socialInstagram',
+  socialTiktok: 'socialTiktok',
+  socialTwitter: 'socialTwitter',
+  privacyPolicy: 'privacyPolicy',
+  termsAndConditions: 'termsAndConditions',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2187,6 +2288,32 @@ export const ShippingRateOrderByRelevanceFieldEnum = {
 export type ShippingRateOrderByRelevanceFieldEnum = (typeof ShippingRateOrderByRelevanceFieldEnum)[keyof typeof ShippingRateOrderByRelevanceFieldEnum]
 
 
+export const SystemSettingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  appName: 'appName',
+  appLogo: 'appLogo',
+  storeName: 'storeName',
+  storeSubtitle: 'storeSubtitle',
+  storeAddress: 'storeAddress',
+  storePhone: 'storePhone',
+  storeEmail: 'storeEmail',
+  currency: 'currency',
+  deliveryPartners: 'deliveryPartners',
+  esewaId: 'esewaId',
+  esewaSecret: 'esewaSecret',
+  khaltiSecret: 'khaltiSecret',
+  sctPayKey: 'sctPayKey',
+  socialFacebook: 'socialFacebook',
+  socialInstagram: 'socialInstagram',
+  socialTiktok: 'socialTiktok',
+  socialTwitter: 'socialTwitter',
+  privacyPolicy: 'privacyPolicy',
+  termsAndConditions: 'termsAndConditions'
+} as const
+
+export type SystemSettingOrderByRelevanceFieldEnum = (typeof SystemSettingOrderByRelevanceFieldEnum)[keyof typeof SystemSettingOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -2376,6 +2503,7 @@ export type GlobalOmitConfig = {
   wishlist?: Prisma.WishlistOmit
   address?: Prisma.AddressOmit
   shippingRate?: Prisma.ShippingRateOmit
+  systemSetting?: Prisma.SystemSettingOmit
 }
 
 /* Types for Logging */

@@ -134,3 +134,8 @@ export type Address = Prisma.AddressModel
  * 
  */
 export type ShippingRate = Prisma.ShippingRateModel
+/**
+ * Model SystemSetting
+ * 
+ */
+export type SystemSetting = Prisma.SystemSettingModel

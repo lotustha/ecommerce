@@ -16,15 +16,28 @@ export default function StaffFilterBar() {
     const handler = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
 
-      if (text) params.set("q", text);
-      else params.delete("q");
+      const currentQ = searchParams.get("q") || "";
+      const currentRole = searchParams.get("role") || "";
 
-      if (role) params.set("role", role);
-      else params.delete("role");
+      let hasChanged = false;
 
-      params.set("page", "1"); // Reset pagination
+      if (text !== currentQ) {
+        if (text) params.set("q", text);
+        else params.delete("q");
+        hasChanged = true;
+      }
 
-      router.push(`/dashboard/staff?${params.toString()}`);
+      if (role !== currentRole) {
+        if (role) params.set("role", role);
+        else params.delete("role");
+        hasChanged = true;
+      }
+
+      // Only push if changed to avoid loop
+      if (hasChanged) {
+        params.set("page", "1"); // Reset pagination
+        router.push(`/dashboard/staff?${params.toString()}`);
+      }
     }, 500);
 
     return () => clearTimeout(handler);
