@@ -8,6 +8,8 @@ import {
   ShoppingCart,
   Users,
   Settings,
+  Layers,
+  Shield,
 } from "lucide-react";
 
 export default function SidebarNav() {
@@ -17,14 +19,15 @@ export default function SidebarNav() {
     { name: "Overview", icon: LayoutDashboard, href: "/dashboard" },
     { name: "Orders", icon: ShoppingCart, href: "/dashboard/orders" },
     { name: "Products", icon: Package, href: "/dashboard/products" },
+    { name: "Categories", icon: Layers, href: "/dashboard/categories" },
     { name: "Customers", icon: Users, href: "/dashboard/customers" },
+    { name: "Staff", icon: Shield, href: "/dashboard/staff" }, // ✅ Added Staff
     { name: "Settings", icon: Settings, href: "/dashboard/settings" },
   ];
 
   return (
     <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
       {menuItems.map((item) => {
-        // Check if the current path matches the href (exact match for dashboard, startsWith for others)
         const isActive =
           item.href === "/dashboard"
             ? pathname === "/dashboard"

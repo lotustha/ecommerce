@@ -20,8 +20,18 @@ export type AddressModel = runtime.Types.Result.DefaultSelection<Prisma.$Address
 
 export type AggregateAddress = {
   _count: AddressCountAggregateOutputType | null
+  _avg: AddressAvgAggregateOutputType | null
+  _sum: AddressSumAggregateOutputType | null
   _min: AddressMinAggregateOutputType | null
   _max: AddressMaxAggregateOutputType | null
+}
+
+export type AddressAvgAggregateOutputType = {
+  ward: number | null
+}
+
+export type AddressSumAggregateOutputType = {
+  ward: number | null
 }
 
 export type AddressMinAggregateOutputType = {
@@ -30,7 +40,9 @@ export type AddressMinAggregateOutputType = {
   province: string | null
   district: string | null
   city: string | null
+  ward: number | null
   street: string | null
+  postalCode: string | null
   phone: string | null
   isDefault: boolean | null
 }
@@ -41,7 +53,9 @@ export type AddressMaxAggregateOutputType = {
   province: string | null
   district: string | null
   city: string | null
+  ward: number | null
   street: string | null
+  postalCode: string | null
   phone: string | null
   isDefault: boolean | null
 }
@@ -52,12 +66,22 @@ export type AddressCountAggregateOutputType = {
   province: number
   district: number
   city: number
+  ward: number
   street: number
+  postalCode: number
   phone: number
   isDefault: number
   _all: number
 }
 
+
+export type AddressAvgAggregateInputType = {
+  ward?: true
+}
+
+export type AddressSumAggregateInputType = {
+  ward?: true
+}
 
 export type AddressMinAggregateInputType = {
   id?: true
@@ -65,7 +89,9 @@ export type AddressMinAggregateInputType = {
   province?: true
   district?: true
   city?: true
+  ward?: true
   street?: true
+  postalCode?: true
   phone?: true
   isDefault?: true
 }
@@ -76,7 +102,9 @@ export type AddressMaxAggregateInputType = {
   province?: true
   district?: true
   city?: true
+  ward?: true
   street?: true
+  postalCode?: true
   phone?: true
   isDefault?: true
 }
@@ -87,7 +115,9 @@ export type AddressCountAggregateInputType = {
   province?: true
   district?: true
   city?: true
+  ward?: true
   street?: true
+  postalCode?: true
   phone?: true
   isDefault?: true
   _all?: true
@@ -131,6 +161,18 @@ export type AddressAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: AddressAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: AddressSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: AddressMinAggregateInputType
@@ -161,6 +203,8 @@ export type AddressGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: AddressCountAggregateInputType | true
+  _avg?: AddressAvgAggregateInputType
+  _sum?: AddressSumAggregateInputType
   _min?: AddressMinAggregateInputType
   _max?: AddressMaxAggregateInputType
 }
@@ -171,10 +215,14 @@ export type AddressGroupByOutputType = {
   province: string
   district: string
   city: string
+  ward: number | null
   street: string
+  postalCode: string | null
   phone: string | null
   isDefault: boolean
   _count: AddressCountAggregateOutputType | null
+  _avg: AddressAvgAggregateOutputType | null
+  _sum: AddressSumAggregateOutputType | null
   _min: AddressMinAggregateOutputType | null
   _max: AddressMaxAggregateOutputType | null
 }
@@ -203,7 +251,9 @@ export type AddressWhereInput = {
   province?: Prisma.StringFilter<"Address"> | string
   district?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
+  ward?: Prisma.IntNullableFilter<"Address"> | number | null
   street?: Prisma.StringFilter<"Address"> | string
+  postalCode?: Prisma.StringNullableFilter<"Address"> | string | null
   phone?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -215,7 +265,9 @@ export type AddressOrderByWithRelationInput = {
   province?: Prisma.SortOrder
   district?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  ward?: Prisma.SortOrderInput | Prisma.SortOrder
   street?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -231,7 +283,9 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
   province?: Prisma.StringFilter<"Address"> | string
   district?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
+  ward?: Prisma.IntNullableFilter<"Address"> | number | null
   street?: Prisma.StringFilter<"Address"> | string
+  postalCode?: Prisma.StringNullableFilter<"Address"> | string | null
   phone?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -243,12 +297,16 @@ export type AddressOrderByWithAggregationInput = {
   province?: Prisma.SortOrder
   district?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  ward?: Prisma.SortOrderInput | Prisma.SortOrder
   street?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   _count?: Prisma.AddressCountOrderByAggregateInput
+  _avg?: Prisma.AddressAvgOrderByAggregateInput
   _max?: Prisma.AddressMaxOrderByAggregateInput
   _min?: Prisma.AddressMinOrderByAggregateInput
+  _sum?: Prisma.AddressSumOrderByAggregateInput
 }
 
 export type AddressScalarWhereWithAggregatesInput = {
@@ -260,7 +318,9 @@ export type AddressScalarWhereWithAggregatesInput = {
   province?: Prisma.StringWithAggregatesFilter<"Address"> | string
   district?: Prisma.StringWithAggregatesFilter<"Address"> | string
   city?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  ward?: Prisma.IntNullableWithAggregatesFilter<"Address"> | number | null
   street?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  postalCode?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
   isDefault?: Prisma.BoolWithAggregatesFilter<"Address"> | boolean
 }
@@ -270,7 +330,9 @@ export type AddressCreateInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutAddressesInput
@@ -282,7 +344,9 @@ export type AddressUncheckedCreateInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
 }
@@ -292,7 +356,9 @@ export type AddressUpdateInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutAddressesNestedInput
@@ -304,7 +370,9 @@ export type AddressUncheckedUpdateInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -315,7 +383,9 @@ export type AddressCreateManyInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
 }
@@ -325,7 +395,9 @@ export type AddressUpdateManyMutationInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -336,7 +408,9 @@ export type AddressUncheckedUpdateManyInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -363,9 +437,15 @@ export type AddressCountOrderByAggregateInput = {
   province?: Prisma.SortOrder
   district?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  ward?: Prisma.SortOrder
   street?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+}
+
+export type AddressAvgOrderByAggregateInput = {
+  ward?: Prisma.SortOrder
 }
 
 export type AddressMaxOrderByAggregateInput = {
@@ -374,7 +454,9 @@ export type AddressMaxOrderByAggregateInput = {
   province?: Prisma.SortOrder
   district?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  ward?: Prisma.SortOrder
   street?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
 }
@@ -385,9 +467,15 @@ export type AddressMinOrderByAggregateInput = {
   province?: Prisma.SortOrder
   district?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  ward?: Prisma.SortOrder
   street?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+}
+
+export type AddressSumOrderByAggregateInput = {
+  ward?: Prisma.SortOrder
 }
 
 export type AddressCreateNestedManyWithoutUserInput = {
@@ -437,7 +525,9 @@ export type AddressCreateWithoutUserInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
 }
@@ -447,7 +537,9 @@ export type AddressUncheckedCreateWithoutUserInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
 }
@@ -487,7 +579,9 @@ export type AddressScalarWhereInput = {
   province?: Prisma.StringFilter<"Address"> | string
   district?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
+  ward?: Prisma.IntNullableFilter<"Address"> | number | null
   street?: Prisma.StringFilter<"Address"> | string
+  postalCode?: Prisma.StringNullableFilter<"Address"> | string | null
   phone?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
 }
@@ -497,7 +591,9 @@ export type AddressCreateManyUserInput = {
   province: string
   district: string
   city: string
+  ward?: number | null
   street: string
+  postalCode?: string | null
   phone?: string | null
   isDefault?: boolean
 }
@@ -507,7 +603,9 @@ export type AddressUpdateWithoutUserInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -517,7 +615,9 @@ export type AddressUncheckedUpdateWithoutUserInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -527,7 +627,9 @@ export type AddressUncheckedUpdateManyWithoutUserInput = {
   province?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  ward?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   street?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -540,7 +642,9 @@ export type AddressSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   province?: boolean
   district?: boolean
   city?: boolean
+  ward?: boolean
   street?: boolean
+  postalCode?: boolean
   phone?: boolean
   isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -554,12 +658,14 @@ export type AddressSelectScalar = {
   province?: boolean
   district?: boolean
   city?: boolean
+  ward?: boolean
   street?: boolean
+  postalCode?: boolean
   phone?: boolean
   isDefault?: boolean
 }
 
-export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "province" | "district" | "city" | "street" | "phone" | "isDefault", ExtArgs["result"]["address"]>
+export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "province" | "district" | "city" | "ward" | "street" | "postalCode" | "phone" | "isDefault", ExtArgs["result"]["address"]>
 export type AddressInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -575,7 +681,9 @@ export type $AddressPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     province: string
     district: string
     city: string
+    ward: number | null
     street: string
+    postalCode: string | null
     phone: string | null
     isDefault: boolean
   }, ExtArgs["result"]["address"]>
@@ -953,7 +1061,9 @@ export interface AddressFieldRefs {
   readonly province: Prisma.FieldRef<"Address", 'String'>
   readonly district: Prisma.FieldRef<"Address", 'String'>
   readonly city: Prisma.FieldRef<"Address", 'String'>
+  readonly ward: Prisma.FieldRef<"Address", 'Int'>
   readonly street: Prisma.FieldRef<"Address", 'String'>
+  readonly postalCode: Prisma.FieldRef<"Address", 'String'>
   readonly phone: Prisma.FieldRef<"Address", 'String'>
   readonly isDefault: Prisma.FieldRef<"Address", 'Boolean'>
 }

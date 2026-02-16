@@ -326,15 +326,17 @@ model Wishlist {
 }
 
 model Address {
-  id        String  @id @default(cuid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id])
-  province  String
-  district  String
-  city      String
-  street    String
-  phone     String?
-  isDefault Boolean @default(false)
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id])
+  province   String
+  district   String
+  city       String
+  ward       Int?
+  street     String
+  postalCode String?
+  phone      String?
+  isDefault  Boolean @default(false)
 }
 
 model ShippingRate {

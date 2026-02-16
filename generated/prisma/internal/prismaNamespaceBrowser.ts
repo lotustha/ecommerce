@@ -318,7 +318,9 @@ export const AddressScalarFieldEnum = {
   province: 'province',
   district: 'district',
   city: 'city',
+  ward: 'ward',
   street: 'street',
+  postalCode: 'postalCode',
   phone: 'phone',
   isDefault: 'isDefault'
 } as const
@@ -542,6 +544,7 @@ export const AddressOrderByRelevanceFieldEnum = {
   district: 'district',
   city: 'city',
   street: 'street',
+  postalCode: 'postalCode',
   phone: 'phone'
 } as const
 

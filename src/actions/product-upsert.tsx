@@ -14,6 +14,7 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
     return { error: "Unauthorized access" };
   }
 
+  // Validate input data against the schema
   const validated = ProductFormSchema.safeParse(data);
   if (!validated.success) {
     return { error: "Invalid form data" };
@@ -22,6 +23,7 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
   const { images, specs, variants, ...fields } = validated.data;
 
   try {
+    // Check slug uniqueness
     const existingSlug = await prisma.product.findUnique({
       where: { slug: fields.slug },
     });
@@ -31,9 +33,14 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
     }
 
     // 1. Prepare Spec Data
-    const specData: { attributeId: string; value: string }[] = [];
+    interface SpecItem {
+      attributeId: string;
+      value: string;
+    }
+    const specData: SpecItem[] = [];
     if (specs && specs.length > 0) {
       for (const spec of specs) {
+        // Find existing attribute or create new one if it doesn't exist
         let attribute = await prisma.attribute.findFirst({
           where: { name: spec.name },
         });
@@ -51,14 +58,15 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
       }
     }
 
+    // Prepare core product data
     const productPayload = {
       ...fields,
-      images: JSON.stringify(images),
+      images: JSON.stringify(images), // Store images array as JSON string
       hasVariants: variants && variants.length > 0,
     };
 
     if (id) {
-      // Update
+      // --- UPDATE EXISTING PRODUCT ---
       await prisma.$transaction(async (tx) => {
         // 1. Update basic fields
         await tx.product.update({
@@ -66,7 +74,7 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
           data: productPayload,
         });
 
-        // 2. Handle Specs: Delete all existing and re-create
+        // 2. Handle Specs: Delete all existing and re-create (simplest sync strategy)
         if (specs) {
           await tx.productSpec.deleteMany({
             where: { productId: id },
@@ -103,7 +111,7 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
         }
       });
     } else {
-      // Create
+      // --- CREATE NEW PRODUCT ---
       await prisma.product.create({
         data: {
           ...productPayload,
@@ -125,6 +133,7 @@ export async function upsertProduct(data: ProductFormValues, id?: string) {
       });
     }
 
+    // Revalidate paths to update cached data
     revalidatePath("/dashboard/products");
     revalidatePath("/");
     return { success: `Product ${id ? "updated" : "created"} successfully` };

@@ -94,16 +94,21 @@ export default function StaffForm({ initialData }: StaffFormProps) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(result.success ?? "Staff created successfully");
+        toast.success(result.success ?? "Staff member updated successfully");
         router.push("/dashboard/staff");
         router.refresh();
       }
     });
   };
 
+  const onError = (errors: any) => {
+    console.error("Form Errors:", errors);
+    toast.error("Please check the form for errors");
+  };
+
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit, onError)}
       className="space-y-8 max-w-5xl mx-auto pb-20"
     >
       <div className="flex items-center justify-between sticky top-0 z-20 bg-base-200/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-base-content/5">

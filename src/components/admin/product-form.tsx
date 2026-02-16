@@ -9,7 +9,7 @@ import {
 import { upsertProduct } from "@/actions/product-upsert";
 import { createQuickCategory, createQuickBrand } from "@/actions/quick-create";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import {
   Save,
@@ -23,13 +23,24 @@ import {
   Boxes,
   FileText,
   Star,
+  ChevronDown,
+  Search,
+  Check,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
 
+// Interface matching the hierarchy data from the server page
+interface CategoryOption {
+  id: string;
+  name: string; // "Parent > Child"
+  originalName: string; // "Child" (Used for smart matching)
+}
+
 interface ProductFormProps {
   initialData?: any;
-  categories: { id: string; name: string }[];
+  categories: CategoryOption[];
   brands: { id: string; name: string }[];
 }
 
@@ -45,13 +56,40 @@ export default function ProductForm({
   const [categories, setCategories] = useState(initialCategories);
   const [brands, setBrands] = useState(initialBrands);
 
-  // Quick Create UI States
+  // Custom Select States
+  const [catOpen, setCatOpen] = useState(false);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [catSearch, setCatSearch] = useState("");
+  const [brandSearch, setBrandSearch] = useState("");
+
+  // Quick Create States
   const [newCatName, setNewCatName] = useState("");
   const [newBrandName, setNewBrandName] = useState("");
   const [isCreatingCat, setIsCreatingCat] = useState(false);
   const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+  const [autoSelected, setAutoSelected] = useState(false);
 
-  // Parse Initial Data
+  // Refs for click outside
+  const catWrapperRef = useRef<HTMLDivElement>(null);
+  const brandWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        catWrapperRef.current &&
+        !catWrapperRef.current.contains(event.target as Node)
+      )
+        setCatOpen(false);
+      if (
+        brandWrapperRef.current &&
+        !brandWrapperRef.current.contains(event.target as Node)
+      )
+        setBrandOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const defaultImages = initialData?.images
     ? typeof initialData.images === "string"
       ? JSON.parse(initialData.images)
@@ -95,8 +133,6 @@ export default function ProductForm({
     },
   });
 
-  // Field Arrays
-  // Note: 'as any' is used for images because simple string arrays can conflict with strict field array types
   const {
     fields: imageFields,
     append: appendImage,
@@ -132,7 +168,6 @@ export default function ProductForm({
         reader.onload = () => {
           const binaryStr = reader.result;
           if (typeof binaryStr === "string") {
-            // Append image as string (Data URI)
             appendImage(binaryStr as any);
           }
         };
@@ -147,31 +182,72 @@ export default function ProductForm({
     accept: { "image/*": [] },
   });
 
+  // --- SMART SUGGESTION LOGIC ---
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    form.setValue("name", name);
+
+    // Auto-generate slug
+    if (!initialData) {
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      form.setValue("slug", slug);
+
+      // 🧠 Smart Category Pre-selection
+      // Only if category isn't manually set yet
+      if (!form.getValues("categoryId")) {
+        const lowerName = name.toLowerCase();
+        const match = categories.find(
+          (c) =>
+            lowerName.includes(c.originalName?.toLowerCase() || "") ||
+            (c.originalName &&
+              c.originalName.toLowerCase().includes(lowerName)),
+        );
+
+        if (match && name.length > 3) {
+          form.setValue("categoryId", match.id);
+          setAutoSelected(true);
+          // Clear "auto" badge after 3 seconds
+          setTimeout(() => setAutoSelected(false), 3000);
+        }
+      }
+    }
+  };
+
   // --- HANDLERS ---
-  const handleCreateCategory = async () => {
-    if (!newCatName.trim()) return;
+  const handleCreateCategory = async (name: string) => {
+    if (!name.trim()) return;
     setIsCreatingCat(true);
-    const res = await createQuickCategory(newCatName);
+    const res = await createQuickCategory(name);
     setIsCreatingCat(false);
     if (res.success && res.data) {
-      setCategories([...categories, res.data]);
+      const newCat: CategoryOption = {
+        id: res.data.id,
+        name: res.data.name,
+        originalName: res.data.name,
+      };
+      setCategories([...categories, newCat]);
       form.setValue("categoryId", res.data.id);
-      setNewCatName("");
+      setCatSearch("");
+      setCatOpen(false);
       toast.success(`Category created`);
     } else {
       toast.error("Failed to create category");
     }
   };
 
-  const handleCreateBrand = async () => {
-    if (!newBrandName.trim()) return;
+  const handleCreateBrand = async (name: string) => {
+    if (!name.trim()) return;
     setIsCreatingBrand(true);
-    const res = await createQuickBrand(newBrandName);
+    const res = await createQuickBrand(name);
     setIsCreatingBrand(false);
     if (res.success && res.data) {
       setBrands([...brands, res.data]);
       form.setValue("brandId", res.data.id);
-      setNewBrandName("");
+      setBrandSearch("");
+      setBrandOpen(false);
       toast.success(`Brand created`);
     } else {
       toast.error("Failed to create brand");
@@ -189,31 +265,26 @@ export default function ProductForm({
     };
 
     startTransition(async () => {
-      // @ts-ignore - Allow sanitized structure to pass through
+      // @ts-ignore - Allow sanitized structure
       const result = await upsertProduct(sanitizedData, initialData?.id);
 
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(result.success ?? "Product created successfully");
+        toast.success(result.success ?? "Product saved successfully");
         router.push("/dashboard/products");
         router.refresh();
       }
     });
   };
 
-  // Auto-generate slug from name
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    form.setValue("name", name);
-    if (!initialData) {
-      const slug = name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      form.setValue("slug", slug);
-    }
-  };
+  // Filtered Lists
+  const filteredCategories = categories.filter((c) =>
+    c.name.toLowerCase().includes(catSearch.toLowerCase()),
+  );
+  const filteredBrands = brands.filter((b) =>
+    b.name.toLowerCase().includes(brandSearch.toLowerCase()),
+  );
 
   return (
     <form
@@ -248,7 +319,7 @@ export default function ProductForm({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* --- LEFT COLUMN: Content --- */}
+        {/* --- LEFT COLUMN --- */}
         <div className="lg:col-span-2 space-y-6">
           {/* General Info */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
@@ -312,7 +383,7 @@ export default function ProductForm({
                   </label>
                   <textarea
                     {...form.register("description")}
-                    className="textarea textarea-bordered h-48 w-full rounded-xl text-base leading-relaxed p-4 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"
+                    className="textarea textarea-bordered w-full h-48 rounded-xl text-base leading-relaxed p-4 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"
                     placeholder="Write a detailed description of your product..."
                   />
                   <div className="label">
@@ -567,7 +638,7 @@ export default function ProductForm({
           </div>
         </div>
 
-        {/* --- RIGHT COLUMN: Organization --- */}
+        {/* --- RIGHT COLUMN --- */}
         <div className="space-y-6">
           {/* Pricing Card */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
@@ -630,49 +701,76 @@ export default function ProductForm({
               <h2 className="text-lg font-bold mb-4">Organization</h2>
 
               {/* Category Select + Quick Create */}
-              <div className="form-control mb-4">
-                <label className="label font-bold text-sm">Category</label>
-                <div className="flex gap-2">
-                  <select
-                    {...form.register("categoryId")}
-                    className="select select-bordered w-full"
+              <div className="form-control mb-6 relative" ref={catWrapperRef}>
+                <label className="label font-bold text-sm">
+                  Category
+                  {autoSelected && (
+                    <span className="badge badge-accent badge-xs gap-1 animate-pulse">
+                      <Sparkles size={10} /> Auto-selected
+                    </span>
+                  )}
+                </label>
+                <div
+                  onClick={() => setCatOpen(!catOpen)}
+                  className="input input-bordered w-full rounded-lg flex items-center justify-between cursor-pointer"
+                >
+                  <span
+                    className={
+                      form.watch("categoryId")
+                        ? "text-base-content"
+                        : "text-base-content/40"
+                    }
                   >
-                    <option value="">Select Category</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    {categories.find((c) => c.id === form.watch("categoryId"))
+                      ?.name || "Select Category"}
+                  </span>
+                  <ChevronDown size={16} className="opacity-50" />
                 </div>
-                <div className="mt-2 collapse collapse-arrow bg-base-200/50 rounded-lg border border-base-300">
-                  <input type="checkbox" />
-                  <div className="collapse-title text-xs font-medium opacity-70 min-h-0 py-2">
-                    Create new category
-                  </div>
-                  <div className="collapse-content">
-                    <div className="flex gap-2 pt-2">
-                      <input
-                        value={newCatName}
-                        onChange={(e) => setNewCatName(e.target.value)}
-                        placeholder="New Name"
-                        className="input input-sm input-bordered w-full"
+
+                {catOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 border border-base-200 rounded-xl shadow-xl z-50 p-2">
+                    <div className="relative mb-2">
+                      <Search
+                        size={14}
+                        className="absolute left-3 top-3 opacity-50"
                       />
-                      <button
-                        type="button"
-                        onClick={handleCreateCategory}
-                        disabled={isCreatingCat || !newCatName}
-                        className="btn btn-sm btn-square btn-primary"
-                      >
-                        {isCreatingCat ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Plus size={16} />
-                        )}
-                      </button>
+                      <input
+                        autoFocus
+                        value={catSearch}
+                        onChange={(e) => setCatSearch(e.target.value)}
+                        placeholder="Search or create..."
+                        className="input input-sm input-bordered w-full pl-9 rounded-lg"
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto space-y-1">
+                      {filteredCategories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            form.setValue("categoryId", cat.id);
+                            setCatOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-base-200 flex justify-between items-center ${form.watch("categoryId") === cat.id ? "bg-primary/10 text-primary font-bold" : ""}`}
+                        >
+                          {cat.name}
+                          {form.watch("categoryId") === cat.id && (
+                            <Check size={14} />
+                          )}
+                        </button>
+                      ))}
+                      {filteredCategories.length === 0 && catSearch && (
+                        <button
+                          type="button"
+                          onClick={() => handleCreateCategory(catSearch)}
+                          className="w-full text-left px-3 py-2 rounded-lg text-sm bg-primary/5 text-primary hover:bg-primary/10 font-bold flex items-center gap-2"
+                        >
+                          <Plus size={14} /> Create "{catSearch}"
+                        </button>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
                 {form.formState.errors.categoryId && (
                   <span className="text-error text-xs mt-1">
                     {form.formState.errors.categoryId.message}
@@ -681,49 +779,69 @@ export default function ProductForm({
               </div>
 
               {/* Brand Select + Quick Create */}
-              <div className="form-control">
+              <div className="form-control relative" ref={brandWrapperRef}>
                 <label className="label font-bold text-sm">Brand</label>
-                <div className="flex gap-2">
-                  <select
-                    {...form.register("brandId")}
-                    className="select select-bordered w-full"
+                <div
+                  onClick={() => setBrandOpen(!brandOpen)}
+                  className="input input-bordered w-full rounded-lg flex items-center justify-between cursor-pointer"
+                >
+                  <span
+                    className={
+                      form.watch("brandId")
+                        ? "text-base-content"
+                        : "text-base-content/40"
+                    }
                   >
-                    <option value="">Select Brand</option>
-                    {brands.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </select>
+                    {brands.find((b) => b.id === form.watch("brandId"))?.name ||
+                      "Select Brand"}
+                  </span>
+                  <ChevronDown size={16} className="opacity-50" />
                 </div>
-                <div className="mt-2 collapse collapse-arrow bg-base-200/50 rounded-lg border border-base-300">
-                  <input type="checkbox" />
-                  <div className="collapse-title text-xs font-medium opacity-70 min-h-0 py-2">
-                    Create new brand
-                  </div>
-                  <div className="collapse-content">
-                    <div className="flex gap-2 pt-2">
-                      <input
-                        value={newBrandName}
-                        onChange={(e) => setNewBrandName(e.target.value)}
-                        placeholder="New Name"
-                        className="input input-sm input-bordered w-full"
+
+                {brandOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 border border-base-200 rounded-xl shadow-xl z-50 p-2">
+                    <div className="relative mb-2">
+                      <Search
+                        size={14}
+                        className="absolute left-3 top-3 opacity-50"
                       />
-                      <button
-                        type="button"
-                        onClick={handleCreateBrand}
-                        disabled={isCreatingBrand || !newBrandName}
-                        className="btn btn-sm btn-square btn-primary"
-                      >
-                        {isCreatingBrand ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Plus size={16} />
-                        )}
-                      </button>
+                      <input
+                        autoFocus
+                        value={brandSearch}
+                        onChange={(e) => setBrandSearch(e.target.value)}
+                        placeholder="Search or create..."
+                        className="input input-sm input-bordered w-full pl-9 rounded-lg"
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto space-y-1">
+                      {filteredBrands.map((brand) => (
+                        <button
+                          key={brand.id}
+                          type="button"
+                          onClick={() => {
+                            form.setValue("brandId", brand.id);
+                            setBrandOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-base-200 flex justify-between items-center ${form.watch("brandId") === brand.id ? "bg-primary/10 text-primary font-bold" : ""}`}
+                        >
+                          {brand.name}
+                          {form.watch("brandId") === brand.id && (
+                            <Check size={14} />
+                          )}
+                        </button>
+                      ))}
+                      {filteredBrands.length === 0 && brandSearch && (
+                        <button
+                          type="button"
+                          onClick={() => handleCreateBrand(brandSearch)}
+                          className="w-full text-left px-3 py-2 rounded-lg text-sm bg-primary/5 text-primary hover:bg-primary/10 font-bold flex items-center gap-2"
+                        >
+                          <Plus size={14} /> Create "{brandSearch}"
+                        </button>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
