@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Product, ProductVariant, Attribute, ProductSpec, Category } from "../../../generated/prisma/client";
-import { ShoppingCart, Minus, Plus, Check } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Check, Zap } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "react-hot-toast";
 import WishlistButton from "@/components/product/wishlist-button";
+import { useRouter } from "next/navigation";
+
 interface ProductInfoProps {
   product: Product & {
     variants: ProductVariant[];
@@ -15,6 +17,7 @@ interface ProductInfoProps {
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
+  const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     product.variants.length > 0 ? product.variants[0] : null
   );
@@ -22,6 +25,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [isAdded, setIsAdded] = useState(false);
 
   const addToCart = useCartStore((state) => state.addItem);
+  const setCheckoutIds = useCartStore((state) => state.setCheckoutIds);
 
   const basePrice = Number(product.price);
   const variantPrice = selectedVariant ? Number(selectedVariant.price) : basePrice;
@@ -37,14 +41,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     }).format(p);
   };
 
-  const handleAddToCart = () => {
+  // Helper to prepare the cart item object
+  const prepareCartItem = () => {
     let image = "/placeholder.jpg";
     try {
       const images = product.images ? JSON.parse(product.images) : [];
       if (images.length > 0) image = images[0];
     } catch (e) { }
 
-    addToCart({
+    return {
       productId: product.id,
       variantId: selectedVariant?.id || null,
       name: product.name + (selectedVariant ? ` (${selectedVariant.name})` : ""),
@@ -53,7 +58,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       quantity,
       stock: selectedVariant ? selectedVariant.stock : product.stock,
       categoryName: product.category.name,
-    });
+    };
+  };
+
+  const handleAddToCart = () => {
+    const item = prepareCartItem();
+    addToCart(item);
 
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
@@ -62,7 +72,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div className={`bg-base-100 border border-base-200 shadow-xl rounded-2xl p-4 flex items-center gap-4 min-w-[300px] transform transition-all duration-300 ${t.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
         <div className="w-12 h-12 bg-base-200 rounded-xl overflow-hidden shrink-0 border border-base-300">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={product.name} className="w-full h-full object-cover" />
+          <img src={item.image} alt={product.name} className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="font-bold text-sm truncate pr-2">{product.name}</h4>
@@ -77,6 +87,21 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         </div>
       </div>
     ), { position: "bottom-right", duration: 3000 });
+  };
+
+  // ✅ NEW: Fast Purchase Handler
+  const handleBuyNow = () => {
+    const item = prepareCartItem();
+
+    // 1. Add to Cart
+    addToCart(item);
+
+    // 2. Set this specific item as the selected one for checkout
+    const itemKey = `${item.productId}-${item.variantId ?? 'base'}`;
+    setCheckoutIds([itemKey]);
+
+    // 3. Navigate to Checkout
+    router.push("/checkout");
   };
 
   return (
@@ -114,8 +139,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 key={variant.id}
                 onClick={() => setSelectedVariant(variant)}
                 className={`btn btn-sm md:btn-md rounded-full px-6 ${selectedVariant?.id === variant.id
-                  ? "btn-neutral"
-                  : "btn-outline border-base-300 hover:bg-base-200 hover:text-base-content"
+                    ? "btn-neutral"
+                    : "btn-outline border-base-300 hover:bg-base-200 hover:text-base-content"
                   }`}
               >
                 {variant.name}
@@ -145,31 +170,40 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             </button>
           </div>
 
-          {/* ✅ Wishlist Button */}
           <WishlistButton
             productId={product.id}
             className="btn btn-outline btn-circle h-12 w-12 border-base-300 flex items-center justify-center"
           />
         </div>
 
-        <button
-          onClick={handleAddToCart}
-          disabled={isAdded || product.stock === 0}
-          className={`btn btn-block h-14 rounded-full text-lg shadow-xl transition-all ${isAdded ? "btn-success text-white" : "btn-primary shadow-primary/20 hover:scale-[1.02]"
-            }`}
-        >
-          {isAdded ? (
-            <>
-              <Check size={20} className="mr-2" />
-              Added to Cart!
-            </>
-          ) : (
-            <>
-              <ShoppingCart size={20} className="mr-2" />
-              Add to Cart
-            </>
-          )}
-        </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Add to Cart */}
+          <button
+            onClick={handleAddToCart}
+            disabled={isAdded || product.stock === 0}
+            className={`btn h-14 rounded-full text-lg shadow-md transition-all ${isAdded ? "btn-success text-white" : "btn-outline border-primary text-primary hover:bg-primary hover:text-white"
+              }`}
+          >
+            {isAdded ? (
+              <Check size={20} />
+            ) : (
+              <>
+                <ShoppingCart size={20} className="mr-2" />
+                Add to Cart
+              </>
+            )}
+          </button>
+
+          {/* ✅ Buy Now Button (Fast Purchase) */}
+          <button
+            onClick={handleBuyNow}
+            disabled={product.stock === 0}
+            className="btn btn-primary h-14 rounded-full text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all"
+          >
+            <Zap size={20} className="mr-2 fill-current" />
+            Buy Now
+          </button>
+        </div>
       </div>
 
       {/* Specs / Details */}
