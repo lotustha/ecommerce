@@ -148,8 +148,7 @@ export default async function AdminPaymentsPage({
                 <th>Method</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th className="text-right pr-6">Actions</th>{" "}
-                {/* ✅ Added Actions Column */}
+                <th className="text-right pr-6">Actions</th>
               </tr>
             </thead>
             <tbody>

@@ -16,7 +16,6 @@ async function requireAdmin() {
 export async function getSettings() {
   try {
     await requireAdmin();
-    // Singleton pattern: always fetch ID "default"
     const settings = await prisma.systemSetting.findUnique({
       where: { id: "default" },
     });
@@ -33,6 +32,7 @@ export async function updateSettings(data: SettingsFormValues) {
     const validated = SettingsFormSchema.safeParse(data);
     if (!validated.success) return { error: "Invalid settings data" };
 
+    // Upsert ensuring ID is always 'default'
     await prisma.systemSetting.upsert({
       where: { id: "default" },
       update: validated.data,
@@ -42,7 +42,8 @@ export async function updateSettings(data: SettingsFormValues) {
       },
     });
 
-    revalidatePath("/"); // Revalidate everything as app name/currency might change globally
+    revalidatePath("/");
+    revalidatePath("/dashboard/settings");
     return { success: "Settings updated successfully" };
   } catch (error) {
     console.error(error);

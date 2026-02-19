@@ -29,20 +29,23 @@ export type AggregateSystemSetting = {
 export type SystemSettingAvgAggregateOutputType = {
   taxRate: runtime.Decimal | null
   shippingCharge: runtime.Decimal | null
+  shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
 }
 
 export type SystemSettingSumAggregateOutputType = {
   taxRate: runtime.Decimal | null
   shippingCharge: runtime.Decimal | null
+  shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
 }
 
 export type SystemSettingMinAggregateOutputType = {
   id: string | null
   appName: string | null
-  appLogo: string | null
+  storeLogo: string | null
   storeName: string | null
+  storeTaxId: string | null
   storeSubtitle: string | null
   storeAddress: string | null
   storePhone: string | null
@@ -50,11 +53,21 @@ export type SystemSettingMinAggregateOutputType = {
   currency: string | null
   taxRate: runtime.Decimal | null
   shippingCharge: runtime.Decimal | null
+  shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
   deliveryPartners: string | null
+  enableStoreDelivery: boolean | null
+  enablePathao: boolean | null
+  pathaoSandbox: boolean | null
+  pathaoClientId: string | null
+  pathaoClientSecret: string | null
+  pathaoUsername: string | null
+  pathaoPassword: string | null
   enableCod: boolean | null
   enableEsewa: boolean | null
+  esewaSandbox: boolean | null
   enableKhalti: boolean | null
+  khaltiSandbox: boolean | null
   enableSctPay: boolean | null
   esewaId: string | null
   esewaSecret: string | null
@@ -64,6 +77,9 @@ export type SystemSettingMinAggregateOutputType = {
   socialInstagram: string | null
   socialTiktok: string | null
   socialTwitter: string | null
+  aiOpenAiKey: string | null
+  aiGeminiKey: string | null
+  crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
   updatedAt: Date | null
@@ -72,8 +88,9 @@ export type SystemSettingMinAggregateOutputType = {
 export type SystemSettingMaxAggregateOutputType = {
   id: string | null
   appName: string | null
-  appLogo: string | null
+  storeLogo: string | null
   storeName: string | null
+  storeTaxId: string | null
   storeSubtitle: string | null
   storeAddress: string | null
   storePhone: string | null
@@ -81,11 +98,21 @@ export type SystemSettingMaxAggregateOutputType = {
   currency: string | null
   taxRate: runtime.Decimal | null
   shippingCharge: runtime.Decimal | null
+  shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
   deliveryPartners: string | null
+  enableStoreDelivery: boolean | null
+  enablePathao: boolean | null
+  pathaoSandbox: boolean | null
+  pathaoClientId: string | null
+  pathaoClientSecret: string | null
+  pathaoUsername: string | null
+  pathaoPassword: string | null
   enableCod: boolean | null
   enableEsewa: boolean | null
+  esewaSandbox: boolean | null
   enableKhalti: boolean | null
+  khaltiSandbox: boolean | null
   enableSctPay: boolean | null
   esewaId: string | null
   esewaSecret: string | null
@@ -95,6 +122,9 @@ export type SystemSettingMaxAggregateOutputType = {
   socialInstagram: string | null
   socialTiktok: string | null
   socialTwitter: string | null
+  aiOpenAiKey: string | null
+  aiGeminiKey: string | null
+  crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
   updatedAt: Date | null
@@ -103,8 +133,9 @@ export type SystemSettingMaxAggregateOutputType = {
 export type SystemSettingCountAggregateOutputType = {
   id: number
   appName: number
-  appLogo: number
+  storeLogo: number
   storeName: number
+  storeTaxId: number
   storeSubtitle: number
   storeAddress: number
   storePhone: number
@@ -112,11 +143,21 @@ export type SystemSettingCountAggregateOutputType = {
   currency: number
   taxRate: number
   shippingCharge: number
+  shippingMarkup: number
   freeShippingThreshold: number
   deliveryPartners: number
+  enableStoreDelivery: number
+  enablePathao: number
+  pathaoSandbox: number
+  pathaoClientId: number
+  pathaoClientSecret: number
+  pathaoUsername: number
+  pathaoPassword: number
   enableCod: number
   enableEsewa: number
+  esewaSandbox: number
   enableKhalti: number
+  khaltiSandbox: number
   enableSctPay: number
   esewaId: number
   esewaSecret: number
@@ -126,6 +167,9 @@ export type SystemSettingCountAggregateOutputType = {
   socialInstagram: number
   socialTiktok: number
   socialTwitter: number
+  aiOpenAiKey: number
+  aiGeminiKey: number
+  crawlerApiKey: number
   privacyPolicy: number
   termsAndConditions: number
   updatedAt: number
@@ -136,20 +180,23 @@ export type SystemSettingCountAggregateOutputType = {
 export type SystemSettingAvgAggregateInputType = {
   taxRate?: true
   shippingCharge?: true
+  shippingMarkup?: true
   freeShippingThreshold?: true
 }
 
 export type SystemSettingSumAggregateInputType = {
   taxRate?: true
   shippingCharge?: true
+  shippingMarkup?: true
   freeShippingThreshold?: true
 }
 
 export type SystemSettingMinAggregateInputType = {
   id?: true
   appName?: true
-  appLogo?: true
+  storeLogo?: true
   storeName?: true
+  storeTaxId?: true
   storeSubtitle?: true
   storeAddress?: true
   storePhone?: true
@@ -157,11 +204,21 @@ export type SystemSettingMinAggregateInputType = {
   currency?: true
   taxRate?: true
   shippingCharge?: true
+  shippingMarkup?: true
   freeShippingThreshold?: true
   deliveryPartners?: true
+  enableStoreDelivery?: true
+  enablePathao?: true
+  pathaoSandbox?: true
+  pathaoClientId?: true
+  pathaoClientSecret?: true
+  pathaoUsername?: true
+  pathaoPassword?: true
   enableCod?: true
   enableEsewa?: true
+  esewaSandbox?: true
   enableKhalti?: true
+  khaltiSandbox?: true
   enableSctPay?: true
   esewaId?: true
   esewaSecret?: true
@@ -171,6 +228,9 @@ export type SystemSettingMinAggregateInputType = {
   socialInstagram?: true
   socialTiktok?: true
   socialTwitter?: true
+  aiOpenAiKey?: true
+  aiGeminiKey?: true
+  crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
   updatedAt?: true
@@ -179,8 +239,9 @@ export type SystemSettingMinAggregateInputType = {
 export type SystemSettingMaxAggregateInputType = {
   id?: true
   appName?: true
-  appLogo?: true
+  storeLogo?: true
   storeName?: true
+  storeTaxId?: true
   storeSubtitle?: true
   storeAddress?: true
   storePhone?: true
@@ -188,11 +249,21 @@ export type SystemSettingMaxAggregateInputType = {
   currency?: true
   taxRate?: true
   shippingCharge?: true
+  shippingMarkup?: true
   freeShippingThreshold?: true
   deliveryPartners?: true
+  enableStoreDelivery?: true
+  enablePathao?: true
+  pathaoSandbox?: true
+  pathaoClientId?: true
+  pathaoClientSecret?: true
+  pathaoUsername?: true
+  pathaoPassword?: true
   enableCod?: true
   enableEsewa?: true
+  esewaSandbox?: true
   enableKhalti?: true
+  khaltiSandbox?: true
   enableSctPay?: true
   esewaId?: true
   esewaSecret?: true
@@ -202,6 +273,9 @@ export type SystemSettingMaxAggregateInputType = {
   socialInstagram?: true
   socialTiktok?: true
   socialTwitter?: true
+  aiOpenAiKey?: true
+  aiGeminiKey?: true
+  crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
   updatedAt?: true
@@ -210,8 +284,9 @@ export type SystemSettingMaxAggregateInputType = {
 export type SystemSettingCountAggregateInputType = {
   id?: true
   appName?: true
-  appLogo?: true
+  storeLogo?: true
   storeName?: true
+  storeTaxId?: true
   storeSubtitle?: true
   storeAddress?: true
   storePhone?: true
@@ -219,11 +294,21 @@ export type SystemSettingCountAggregateInputType = {
   currency?: true
   taxRate?: true
   shippingCharge?: true
+  shippingMarkup?: true
   freeShippingThreshold?: true
   deliveryPartners?: true
+  enableStoreDelivery?: true
+  enablePathao?: true
+  pathaoSandbox?: true
+  pathaoClientId?: true
+  pathaoClientSecret?: true
+  pathaoUsername?: true
+  pathaoPassword?: true
   enableCod?: true
   enableEsewa?: true
+  esewaSandbox?: true
   enableKhalti?: true
+  khaltiSandbox?: true
   enableSctPay?: true
   esewaId?: true
   esewaSecret?: true
@@ -233,6 +318,9 @@ export type SystemSettingCountAggregateInputType = {
   socialInstagram?: true
   socialTiktok?: true
   socialTwitter?: true
+  aiOpenAiKey?: true
+  aiGeminiKey?: true
+  crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
   updatedAt?: true
@@ -328,8 +416,9 @@ export type SystemSettingGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type SystemSettingGroupByOutputType = {
   id: string
   appName: string
-  appLogo: string | null
+  storeLogo: string | null
   storeName: string
+  storeTaxId: string | null
   storeSubtitle: string | null
   storeAddress: string | null
   storePhone: string | null
@@ -337,11 +426,21 @@ export type SystemSettingGroupByOutputType = {
   currency: string
   taxRate: runtime.Decimal
   shippingCharge: runtime.Decimal
+  shippingMarkup: runtime.Decimal
   freeShippingThreshold: runtime.Decimal | null
   deliveryPartners: string | null
+  enableStoreDelivery: boolean
+  enablePathao: boolean
+  pathaoSandbox: boolean
+  pathaoClientId: string | null
+  pathaoClientSecret: string | null
+  pathaoUsername: string | null
+  pathaoPassword: string | null
   enableCod: boolean
   enableEsewa: boolean
+  esewaSandbox: boolean
   enableKhalti: boolean
+  khaltiSandbox: boolean
   enableSctPay: boolean
   esewaId: string | null
   esewaSecret: string | null
@@ -351,6 +450,9 @@ export type SystemSettingGroupByOutputType = {
   socialInstagram: string | null
   socialTiktok: string | null
   socialTwitter: string | null
+  aiOpenAiKey: string | null
+  aiGeminiKey: string | null
+  crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
   updatedAt: Date
@@ -382,8 +484,9 @@ export type SystemSettingWhereInput = {
   NOT?: Prisma.SystemSettingWhereInput | Prisma.SystemSettingWhereInput[]
   id?: Prisma.StringFilter<"SystemSetting"> | string
   appName?: Prisma.StringFilter<"SystemSetting"> | string
-  appLogo?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  storeLogo?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeName?: Prisma.StringFilter<"SystemSetting"> | string
+  storeTaxId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeAddress?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storePhone?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
@@ -391,11 +494,21 @@ export type SystemSettingWhereInput = {
   currency?: Prisma.StringFilter<"SystemSetting"> | string
   taxRate?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.DecimalNullableFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  enableStoreDelivery?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  enablePathao?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  pathaoSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  pathaoClientId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoClientSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoUsername?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  esewaSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableKhalti?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  khaltiSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableSctPay?: Prisma.BoolFilter<"SystemSetting"> | boolean
   esewaId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   esewaSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
@@ -405,6 +518,9 @@ export type SystemSettingWhereInput = {
   socialInstagram?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   socialTiktok?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   socialTwitter?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  aiOpenAiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  aiGeminiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
@@ -413,8 +529,9 @@ export type SystemSettingWhereInput = {
 export type SystemSettingOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   appName?: Prisma.SortOrder
-  appLogo?: Prisma.SortOrderInput | Prisma.SortOrder
+  storeLogo?: Prisma.SortOrderInput | Prisma.SortOrder
   storeName?: Prisma.SortOrder
+  storeTaxId?: Prisma.SortOrderInput | Prisma.SortOrder
   storeSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
   storeAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   storePhone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -422,11 +539,21 @@ export type SystemSettingOrderByWithRelationInput = {
   currency?: Prisma.SortOrder
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryPartners?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableStoreDelivery?: Prisma.SortOrder
+  enablePathao?: Prisma.SortOrder
+  pathaoSandbox?: Prisma.SortOrder
+  pathaoClientId?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoClientSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoUsername?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoPassword?: Prisma.SortOrderInput | Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
+  esewaSandbox?: Prisma.SortOrder
   enableKhalti?: Prisma.SortOrder
+  khaltiSandbox?: Prisma.SortOrder
   enableSctPay?: Prisma.SortOrder
   esewaId?: Prisma.SortOrderInput | Prisma.SortOrder
   esewaSecret?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -436,6 +563,9 @@ export type SystemSettingOrderByWithRelationInput = {
   socialInstagram?: Prisma.SortOrderInput | Prisma.SortOrder
   socialTiktok?: Prisma.SortOrderInput | Prisma.SortOrder
   socialTwitter?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiOpenAiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiGeminiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -448,8 +578,9 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.SystemSettingWhereInput[]
   NOT?: Prisma.SystemSettingWhereInput | Prisma.SystemSettingWhereInput[]
   appName?: Prisma.StringFilter<"SystemSetting"> | string
-  appLogo?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  storeLogo?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeName?: Prisma.StringFilter<"SystemSetting"> | string
+  storeTaxId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storeAddress?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   storePhone?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
@@ -457,11 +588,21 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   currency?: Prisma.StringFilter<"SystemSetting"> | string
   taxRate?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.DecimalNullableFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  enableStoreDelivery?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  enablePathao?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  pathaoSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  pathaoClientId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoClientSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoUsername?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  pathaoPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  esewaSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableKhalti?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  khaltiSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableSctPay?: Prisma.BoolFilter<"SystemSetting"> | boolean
   esewaId?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   esewaSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
@@ -471,6 +612,9 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   socialInstagram?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   socialTiktok?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   socialTwitter?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  aiOpenAiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  aiGeminiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
@@ -479,8 +623,9 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
 export type SystemSettingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   appName?: Prisma.SortOrder
-  appLogo?: Prisma.SortOrderInput | Prisma.SortOrder
+  storeLogo?: Prisma.SortOrderInput | Prisma.SortOrder
   storeName?: Prisma.SortOrder
+  storeTaxId?: Prisma.SortOrderInput | Prisma.SortOrder
   storeSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
   storeAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   storePhone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -488,11 +633,21 @@ export type SystemSettingOrderByWithAggregationInput = {
   currency?: Prisma.SortOrder
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryPartners?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableStoreDelivery?: Prisma.SortOrder
+  enablePathao?: Prisma.SortOrder
+  pathaoSandbox?: Prisma.SortOrder
+  pathaoClientId?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoClientSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoUsername?: Prisma.SortOrderInput | Prisma.SortOrder
+  pathaoPassword?: Prisma.SortOrderInput | Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
+  esewaSandbox?: Prisma.SortOrder
   enableKhalti?: Prisma.SortOrder
+  khaltiSandbox?: Prisma.SortOrder
   enableSctPay?: Prisma.SortOrder
   esewaId?: Prisma.SortOrderInput | Prisma.SortOrder
   esewaSecret?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -502,6 +657,9 @@ export type SystemSettingOrderByWithAggregationInput = {
   socialInstagram?: Prisma.SortOrderInput | Prisma.SortOrder
   socialTiktok?: Prisma.SortOrderInput | Prisma.SortOrder
   socialTwitter?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiOpenAiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiGeminiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -518,8 +676,9 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   NOT?: Prisma.SystemSettingScalarWhereWithAggregatesInput | Prisma.SystemSettingScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"SystemSetting"> | string
   appName?: Prisma.StringWithAggregatesFilter<"SystemSetting"> | string
-  appLogo?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  storeLogo?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   storeName?: Prisma.StringWithAggregatesFilter<"SystemSetting"> | string
+  storeTaxId?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   storeSubtitle?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   storeAddress?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   storePhone?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
@@ -527,11 +686,21 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   currency?: Prisma.StringWithAggregatesFilter<"SystemSetting"> | string
   taxRate?: Prisma.DecimalWithAggregatesFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalWithAggregatesFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalWithAggregatesFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"SystemSetting"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  enableStoreDelivery?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  enablePathao?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  pathaoSandbox?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  pathaoClientId?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  pathaoClientSecret?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  pathaoUsername?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  pathaoPassword?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  esewaSandbox?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   enableKhalti?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  khaltiSandbox?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   enableSctPay?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   esewaId?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   esewaSecret?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
@@ -541,6 +710,9 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   socialInstagram?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   socialTiktok?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   socialTwitter?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  aiOpenAiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  aiGeminiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  crawlerApiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SystemSetting"> | Date | string
@@ -549,8 +721,9 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
 export type SystemSettingCreateInput = {
   id?: string
   appName?: string
-  appLogo?: string | null
+  storeLogo?: string | null
   storeName?: string
+  storeTaxId?: string | null
   storeSubtitle?: string | null
   storeAddress?: string | null
   storePhone?: string | null
@@ -558,11 +731,21 @@ export type SystemSettingCreateInput = {
   currency?: string
   taxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: string | null
+  enableStoreDelivery?: boolean
+  enablePathao?: boolean
+  pathaoSandbox?: boolean
+  pathaoClientId?: string | null
+  pathaoClientSecret?: string | null
+  pathaoUsername?: string | null
+  pathaoPassword?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
+  esewaSandbox?: boolean
   enableKhalti?: boolean
+  khaltiSandbox?: boolean
   enableSctPay?: boolean
   esewaId?: string | null
   esewaSecret?: string | null
@@ -572,6 +755,9 @@ export type SystemSettingCreateInput = {
   socialInstagram?: string | null
   socialTiktok?: string | null
   socialTwitter?: string | null
+  aiOpenAiKey?: string | null
+  aiGeminiKey?: string | null
+  crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
   updatedAt?: Date | string
@@ -580,8 +766,9 @@ export type SystemSettingCreateInput = {
 export type SystemSettingUncheckedCreateInput = {
   id?: string
   appName?: string
-  appLogo?: string | null
+  storeLogo?: string | null
   storeName?: string
+  storeTaxId?: string | null
   storeSubtitle?: string | null
   storeAddress?: string | null
   storePhone?: string | null
@@ -589,11 +776,21 @@ export type SystemSettingUncheckedCreateInput = {
   currency?: string
   taxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: string | null
+  enableStoreDelivery?: boolean
+  enablePathao?: boolean
+  pathaoSandbox?: boolean
+  pathaoClientId?: string | null
+  pathaoClientSecret?: string | null
+  pathaoUsername?: string | null
+  pathaoPassword?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
+  esewaSandbox?: boolean
   enableKhalti?: boolean
+  khaltiSandbox?: boolean
   enableSctPay?: boolean
   esewaId?: string | null
   esewaSecret?: string | null
@@ -603,6 +800,9 @@ export type SystemSettingUncheckedCreateInput = {
   socialInstagram?: string | null
   socialTiktok?: string | null
   socialTwitter?: string | null
+  aiOpenAiKey?: string | null
+  aiGeminiKey?: string | null
+  crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
   updatedAt?: Date | string
@@ -611,8 +811,9 @@ export type SystemSettingUncheckedCreateInput = {
 export type SystemSettingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appName?: Prisma.StringFieldUpdateOperationsInput | string
-  appLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storePhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -620,11 +821,21 @@ export type SystemSettingUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   taxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableStoreDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enablePathao?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableKhalti?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  khaltiSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableSctPay?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   esewaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -634,6 +845,9 @@ export type SystemSettingUpdateInput = {
   socialInstagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTiktok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTwitter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiOpenAiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiGeminiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -642,8 +856,9 @@ export type SystemSettingUpdateInput = {
 export type SystemSettingUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appName?: Prisma.StringFieldUpdateOperationsInput | string
-  appLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storePhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -651,11 +866,21 @@ export type SystemSettingUncheckedUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   taxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableStoreDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enablePathao?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableKhalti?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  khaltiSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableSctPay?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   esewaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -665,6 +890,9 @@ export type SystemSettingUncheckedUpdateInput = {
   socialInstagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTiktok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTwitter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiOpenAiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiGeminiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -673,8 +901,9 @@ export type SystemSettingUncheckedUpdateInput = {
 export type SystemSettingCreateManyInput = {
   id?: string
   appName?: string
-  appLogo?: string | null
+  storeLogo?: string | null
   storeName?: string
+  storeTaxId?: string | null
   storeSubtitle?: string | null
   storeAddress?: string | null
   storePhone?: string | null
@@ -682,11 +911,21 @@ export type SystemSettingCreateManyInput = {
   currency?: string
   taxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: string | null
+  enableStoreDelivery?: boolean
+  enablePathao?: boolean
+  pathaoSandbox?: boolean
+  pathaoClientId?: string | null
+  pathaoClientSecret?: string | null
+  pathaoUsername?: string | null
+  pathaoPassword?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
+  esewaSandbox?: boolean
   enableKhalti?: boolean
+  khaltiSandbox?: boolean
   enableSctPay?: boolean
   esewaId?: string | null
   esewaSecret?: string | null
@@ -696,6 +935,9 @@ export type SystemSettingCreateManyInput = {
   socialInstagram?: string | null
   socialTiktok?: string | null
   socialTwitter?: string | null
+  aiOpenAiKey?: string | null
+  aiGeminiKey?: string | null
+  crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
   updatedAt?: Date | string
@@ -704,8 +946,9 @@ export type SystemSettingCreateManyInput = {
 export type SystemSettingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appName?: Prisma.StringFieldUpdateOperationsInput | string
-  appLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storePhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -713,11 +956,21 @@ export type SystemSettingUpdateManyMutationInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   taxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableStoreDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enablePathao?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableKhalti?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  khaltiSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableSctPay?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   esewaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -727,6 +980,9 @@ export type SystemSettingUpdateManyMutationInput = {
   socialInstagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTiktok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTwitter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiOpenAiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiGeminiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -735,8 +991,9 @@ export type SystemSettingUpdateManyMutationInput = {
 export type SystemSettingUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appName?: Prisma.StringFieldUpdateOperationsInput | string
-  appLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeLogo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storePhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -744,11 +1001,21 @@ export type SystemSettingUncheckedUpdateManyInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   taxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shippingCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shippingMarkup?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   freeShippingThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   deliveryPartners?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableStoreDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enablePathao?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pathaoClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableKhalti?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  khaltiSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableSctPay?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   esewaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -758,6 +1025,9 @@ export type SystemSettingUncheckedUpdateManyInput = {
   socialInstagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTiktok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socialTwitter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiOpenAiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiGeminiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -772,8 +1042,9 @@ export type SystemSettingOrderByRelevanceInput = {
 export type SystemSettingCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appName?: Prisma.SortOrder
-  appLogo?: Prisma.SortOrder
+  storeLogo?: Prisma.SortOrder
   storeName?: Prisma.SortOrder
+  storeTaxId?: Prisma.SortOrder
   storeSubtitle?: Prisma.SortOrder
   storeAddress?: Prisma.SortOrder
   storePhone?: Prisma.SortOrder
@@ -781,11 +1052,21 @@ export type SystemSettingCountOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
   deliveryPartners?: Prisma.SortOrder
+  enableStoreDelivery?: Prisma.SortOrder
+  enablePathao?: Prisma.SortOrder
+  pathaoSandbox?: Prisma.SortOrder
+  pathaoClientId?: Prisma.SortOrder
+  pathaoClientSecret?: Prisma.SortOrder
+  pathaoUsername?: Prisma.SortOrder
+  pathaoPassword?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
+  esewaSandbox?: Prisma.SortOrder
   enableKhalti?: Prisma.SortOrder
+  khaltiSandbox?: Prisma.SortOrder
   enableSctPay?: Prisma.SortOrder
   esewaId?: Prisma.SortOrder
   esewaSecret?: Prisma.SortOrder
@@ -795,6 +1076,9 @@ export type SystemSettingCountOrderByAggregateInput = {
   socialInstagram?: Prisma.SortOrder
   socialTiktok?: Prisma.SortOrder
   socialTwitter?: Prisma.SortOrder
+  aiOpenAiKey?: Prisma.SortOrder
+  aiGeminiKey?: Prisma.SortOrder
+  crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -803,14 +1087,16 @@ export type SystemSettingCountOrderByAggregateInput = {
 export type SystemSettingAvgOrderByAggregateInput = {
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
 }
 
 export type SystemSettingMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appName?: Prisma.SortOrder
-  appLogo?: Prisma.SortOrder
+  storeLogo?: Prisma.SortOrder
   storeName?: Prisma.SortOrder
+  storeTaxId?: Prisma.SortOrder
   storeSubtitle?: Prisma.SortOrder
   storeAddress?: Prisma.SortOrder
   storePhone?: Prisma.SortOrder
@@ -818,11 +1104,21 @@ export type SystemSettingMaxOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
   deliveryPartners?: Prisma.SortOrder
+  enableStoreDelivery?: Prisma.SortOrder
+  enablePathao?: Prisma.SortOrder
+  pathaoSandbox?: Prisma.SortOrder
+  pathaoClientId?: Prisma.SortOrder
+  pathaoClientSecret?: Prisma.SortOrder
+  pathaoUsername?: Prisma.SortOrder
+  pathaoPassword?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
+  esewaSandbox?: Prisma.SortOrder
   enableKhalti?: Prisma.SortOrder
+  khaltiSandbox?: Prisma.SortOrder
   enableSctPay?: Prisma.SortOrder
   esewaId?: Prisma.SortOrder
   esewaSecret?: Prisma.SortOrder
@@ -832,6 +1128,9 @@ export type SystemSettingMaxOrderByAggregateInput = {
   socialInstagram?: Prisma.SortOrder
   socialTiktok?: Prisma.SortOrder
   socialTwitter?: Prisma.SortOrder
+  aiOpenAiKey?: Prisma.SortOrder
+  aiGeminiKey?: Prisma.SortOrder
+  crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -840,8 +1139,9 @@ export type SystemSettingMaxOrderByAggregateInput = {
 export type SystemSettingMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appName?: Prisma.SortOrder
-  appLogo?: Prisma.SortOrder
+  storeLogo?: Prisma.SortOrder
   storeName?: Prisma.SortOrder
+  storeTaxId?: Prisma.SortOrder
   storeSubtitle?: Prisma.SortOrder
   storeAddress?: Prisma.SortOrder
   storePhone?: Prisma.SortOrder
@@ -849,11 +1149,21 @@ export type SystemSettingMinOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
   deliveryPartners?: Prisma.SortOrder
+  enableStoreDelivery?: Prisma.SortOrder
+  enablePathao?: Prisma.SortOrder
+  pathaoSandbox?: Prisma.SortOrder
+  pathaoClientId?: Prisma.SortOrder
+  pathaoClientSecret?: Prisma.SortOrder
+  pathaoUsername?: Prisma.SortOrder
+  pathaoPassword?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
+  esewaSandbox?: Prisma.SortOrder
   enableKhalti?: Prisma.SortOrder
+  khaltiSandbox?: Prisma.SortOrder
   enableSctPay?: Prisma.SortOrder
   esewaId?: Prisma.SortOrder
   esewaSecret?: Prisma.SortOrder
@@ -863,6 +1173,9 @@ export type SystemSettingMinOrderByAggregateInput = {
   socialInstagram?: Prisma.SortOrder
   socialTiktok?: Prisma.SortOrder
   socialTwitter?: Prisma.SortOrder
+  aiOpenAiKey?: Prisma.SortOrder
+  aiGeminiKey?: Prisma.SortOrder
+  crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -871,6 +1184,7 @@ export type SystemSettingMinOrderByAggregateInput = {
 export type SystemSettingSumOrderByAggregateInput = {
   taxRate?: Prisma.SortOrder
   shippingCharge?: Prisma.SortOrder
+  shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
 }
 
@@ -879,8 +1193,9 @@ export type SystemSettingSumOrderByAggregateInput = {
 export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   appName?: boolean
-  appLogo?: boolean
+  storeLogo?: boolean
   storeName?: boolean
+  storeTaxId?: boolean
   storeSubtitle?: boolean
   storeAddress?: boolean
   storePhone?: boolean
@@ -888,11 +1203,21 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   currency?: boolean
   taxRate?: boolean
   shippingCharge?: boolean
+  shippingMarkup?: boolean
   freeShippingThreshold?: boolean
   deliveryPartners?: boolean
+  enableStoreDelivery?: boolean
+  enablePathao?: boolean
+  pathaoSandbox?: boolean
+  pathaoClientId?: boolean
+  pathaoClientSecret?: boolean
+  pathaoUsername?: boolean
+  pathaoPassword?: boolean
   enableCod?: boolean
   enableEsewa?: boolean
+  esewaSandbox?: boolean
   enableKhalti?: boolean
+  khaltiSandbox?: boolean
   enableSctPay?: boolean
   esewaId?: boolean
   esewaSecret?: boolean
@@ -902,6 +1227,9 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   socialInstagram?: boolean
   socialTiktok?: boolean
   socialTwitter?: boolean
+  aiOpenAiKey?: boolean
+  aiGeminiKey?: boolean
+  crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
   updatedAt?: boolean
@@ -912,8 +1240,9 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
 export type SystemSettingSelectScalar = {
   id?: boolean
   appName?: boolean
-  appLogo?: boolean
+  storeLogo?: boolean
   storeName?: boolean
+  storeTaxId?: boolean
   storeSubtitle?: boolean
   storeAddress?: boolean
   storePhone?: boolean
@@ -921,11 +1250,21 @@ export type SystemSettingSelectScalar = {
   currency?: boolean
   taxRate?: boolean
   shippingCharge?: boolean
+  shippingMarkup?: boolean
   freeShippingThreshold?: boolean
   deliveryPartners?: boolean
+  enableStoreDelivery?: boolean
+  enablePathao?: boolean
+  pathaoSandbox?: boolean
+  pathaoClientId?: boolean
+  pathaoClientSecret?: boolean
+  pathaoUsername?: boolean
+  pathaoPassword?: boolean
   enableCod?: boolean
   enableEsewa?: boolean
+  esewaSandbox?: boolean
   enableKhalti?: boolean
+  khaltiSandbox?: boolean
   enableSctPay?: boolean
   esewaId?: boolean
   esewaSecret?: boolean
@@ -935,12 +1274,15 @@ export type SystemSettingSelectScalar = {
   socialInstagram?: boolean
   socialTiktok?: boolean
   socialTwitter?: boolean
+  aiOpenAiKey?: boolean
+  aiGeminiKey?: boolean
+  crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
   updatedAt?: boolean
 }
 
-export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "appLogo" | "storeName" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "freeShippingThreshold" | "deliveryPartners" | "enableCod" | "enableEsewa" | "enableKhalti" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
+export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
 
 export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemSetting"
@@ -948,8 +1290,9 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     appName: string
-    appLogo: string | null
+    storeLogo: string | null
     storeName: string
+    storeTaxId: string | null
     storeSubtitle: string | null
     storeAddress: string | null
     storePhone: string | null
@@ -957,11 +1300,21 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     currency: string
     taxRate: runtime.Decimal
     shippingCharge: runtime.Decimal
+    shippingMarkup: runtime.Decimal
     freeShippingThreshold: runtime.Decimal | null
     deliveryPartners: string | null
+    enableStoreDelivery: boolean
+    enablePathao: boolean
+    pathaoSandbox: boolean
+    pathaoClientId: string | null
+    pathaoClientSecret: string | null
+    pathaoUsername: string | null
+    pathaoPassword: string | null
     enableCod: boolean
     enableEsewa: boolean
+    esewaSandbox: boolean
     enableKhalti: boolean
+    khaltiSandbox: boolean
     enableSctPay: boolean
     esewaId: string | null
     esewaSecret: string | null
@@ -971,6 +1324,9 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     socialInstagram: string | null
     socialTiktok: string | null
     socialTwitter: string | null
+    aiOpenAiKey: string | null
+    aiGeminiKey: string | null
+    crawlerApiKey: string | null
     privacyPolicy: string | null
     termsAndConditions: string | null
     updatedAt: Date
@@ -1345,8 +1701,9 @@ export interface Prisma__SystemSettingClient<T, Null = never, ExtArgs extends ru
 export interface SystemSettingFieldRefs {
   readonly id: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly appName: Prisma.FieldRef<"SystemSetting", 'String'>
-  readonly appLogo: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly storeLogo: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly storeName: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly storeTaxId: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly storeSubtitle: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly storeAddress: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly storePhone: Prisma.FieldRef<"SystemSetting", 'String'>
@@ -1354,11 +1711,21 @@ export interface SystemSettingFieldRefs {
   readonly currency: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly taxRate: Prisma.FieldRef<"SystemSetting", 'Decimal'>
   readonly shippingCharge: Prisma.FieldRef<"SystemSetting", 'Decimal'>
+  readonly shippingMarkup: Prisma.FieldRef<"SystemSetting", 'Decimal'>
   readonly freeShippingThreshold: Prisma.FieldRef<"SystemSetting", 'Decimal'>
   readonly deliveryPartners: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly enableStoreDelivery: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly enablePathao: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly pathaoSandbox: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly pathaoClientId: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly pathaoClientSecret: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly pathaoUsername: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly pathaoPassword: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly enableCod: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly enableEsewa: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly esewaSandbox: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly enableKhalti: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly khaltiSandbox: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly enableSctPay: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly esewaId: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly esewaSecret: Prisma.FieldRef<"SystemSetting", 'String'>
@@ -1368,6 +1735,9 @@ export interface SystemSettingFieldRefs {
   readonly socialInstagram: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly socialTiktok: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly socialTwitter: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly aiOpenAiKey: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly aiGeminiKey: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly crawlerApiKey: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly privacyPolicy: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly termsAndConditions: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly updatedAt: Prisma.FieldRef<"SystemSetting", 'DateTime'>

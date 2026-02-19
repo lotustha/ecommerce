@@ -349,14 +349,15 @@ model ShippingRate {
 }
 
 model SystemSetting {
-  id String @id @default("default") // Singleton pattern: only one row exists
+  id String @id @default("default")
 
   // App Identity
-  appName String  @default("Nepal E-com")
-  appLogo String? @db.Text // URL or Base64 string for the store logo
+  appName   String  @default("Nepal E-com")
+  storeLogo String? @db.Text
 
   // Store Information
   storeName     String  @default("Nepal E-com")
+  storeTaxId    String?
   storeSubtitle String? @default("Your quality destination")
   storeAddress  String? @db.Text
   storePhone    String?
@@ -368,20 +369,32 @@ model SystemSetting {
 
   // Logistics & Shipping
   shippingCharge        Decimal  @default(150) @db.Decimal(10, 2)
-  freeShippingThreshold Decimal? @db.Decimal(10, 2) // If total > this, shipping is 0
-  deliveryPartners      String?  @default("Pathao, Upaya") // Comma-separated list or JSON
+  shippingMarkup        Decimal  @default(0) @db.Decimal(10, 2)
+  freeShippingThreshold Decimal? @db.Decimal(10, 2)
+  deliveryPartners      String?  @default("Pathao, Upaya")
+
+  // ✅ LOGISTICS CONFIG
+  enableStoreDelivery Boolean @default(true)
+  enablePathao        Boolean @default(false)
+  pathaoSandbox       Boolean @default(true)
+  pathaoClientId      String?
+  pathaoClientSecret  String?
+  pathaoUsername      String?
+  pathaoPassword      String?
 
   // Payment Gateway Toggles
-  enableCod    Boolean @default(true)
-  enableEsewa  Boolean @default(false)
-  enableKhalti Boolean @default(false)
-  enableSctPay Boolean @default(false)
+  enableCod     Boolean @default(true)
+  enableEsewa   Boolean @default(false)
+  esewaSandbox  Boolean @default(true) // ✅ Added
+  enableKhalti  Boolean @default(false)
+  khaltiSandbox Boolean @default(true) // ✅ Added
+  enableSctPay  Boolean @default(false)
 
-  // Payment API Credentials (Sensitive)
-  esewaId      String? // Merchant ID / SCD
-  esewaSecret  String? // Secret Key for signature
-  khaltiSecret String? // Secret Key
-  sctPayKey    String? // SCT Pay API Key
+  // Payment API Credentials
+  esewaId      String?
+  esewaSecret  String?
+  khaltiSecret String?
+  sctPayKey    String?
 
   // Social Links
   socialFacebook  String?
@@ -389,10 +402,12 @@ model SystemSetting {
   socialTiktok    String?
   socialTwitter   String?
 
-  // Legal Pages (Rich Text / HTML)
+  // AI & Legal
+  aiOpenAiKey        String?
+  aiGeminiKey        String?
+  crawlerApiKey      String?
   privacyPolicy      String? @db.MediumText
   termsAndConditions String? @db.MediumText
 
-  // Metadata
   updatedAt DateTime @updatedAt
 }

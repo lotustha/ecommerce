@@ -133,6 +133,7 @@ export default function ProductForm({
     },
   });
 
+  // ✅ FIX 1: Cast 'name' to 'any' to bypass strict object-array check for simple string array
   const {
     fields: imageFields,
     append: appendImage,
@@ -168,6 +169,7 @@ export default function ProductForm({
         reader.onload = () => {
           const binaryStr = reader.result;
           if (typeof binaryStr === "string") {
+            // ✅ FIX 2: Cast to 'any' because append logic got inferred from variants/specs types
             appendImage(binaryStr as any);
           }
         };
@@ -265,7 +267,7 @@ export default function ProductForm({
     };
 
     startTransition(async () => {
-      // @ts-ignore - Allow sanitized structure
+      // @ts-ignore - Allow sanitized structure to pass through
       const result = await upsertProduct(sanitizedData, initialData?.id);
 
       if (result.error) {
@@ -285,6 +287,21 @@ export default function ProductForm({
   const filteredBrands = brands.filter((b) =>
     b.name.toLowerCase().includes(brandSearch.toLowerCase()),
   );
+
+  // ✅ New Handler: Add Variant with Inheritance
+  const handleAddVariant = () => {
+    // Get current values from the main form
+    const currentPrice = form.getValues("price") || 0;
+    const currentStock = form.getValues("stock") || 0;
+
+    // Append new variant pre-filled with these values
+    appendVariant({
+      name: "",
+      sku: "",
+      price: currentPrice, // 👈 Pre-filled
+      stock: currentStock, // 👈 Pre-filled
+    });
+  };
 
   return (
     <form
@@ -319,7 +336,7 @@ export default function ProductForm({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* --- LEFT COLUMN --- */}
+        {/* --- LEFT COLUMN: Content --- */}
         <div className="lg:col-span-2 space-y-6">
           {/* General Info */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
@@ -383,7 +400,7 @@ export default function ProductForm({
                   </label>
                   <textarea
                     {...form.register("description")}
-                    className="textarea textarea-bordered w-full h-48 rounded-xl text-base leading-relaxed p-4 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"
+                    className="textarea textarea-bordered h-48 rounded-xl text-base leading-relaxed p-4 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"
                     placeholder="Write a detailed description of your product..."
                   />
                   <div className="label">
@@ -406,9 +423,7 @@ export default function ProductForm({
                 </h2>
                 <button
                   type="button"
-                  onClick={() =>
-                    appendVariant({ name: "", sku: "", price: 0, stock: 0 })
-                  }
+                  onClick={handleAddVariant}
                   className="btn btn-xs btn-ghost gap-1"
                 >
                   <Plus size={14} /> Add Variant
@@ -638,7 +653,7 @@ export default function ProductForm({
           </div>
         </div>
 
-        {/* --- RIGHT COLUMN --- */}
+        {/* --- RIGHT COLUMN: Organization --- */}
         <div className="space-y-6">
           {/* Pricing Card */}
           <div className="card bg-base-100 shadow-sm border border-base-200">

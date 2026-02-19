@@ -6,15 +6,15 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-// Input Schema matches the frontend checkout form
+// Expanded Schema to include optional Pathao IDs
 const PlaceOrderSchema = z.object({
   fullName: z.string(),
   email: z.string().email(),
   phone: z.string(),
   province: z.string(),
-  district: z.string(), // New
+  district: z.string(),
   city: z.string(),
-  ward: z.coerce.number(), // New
+  ward: z.coerce.number(),
   street: z.string(),
   paymentMethod: z.enum(["COD", "ESEWA", "KHALTI"]),
   items: z.array(
@@ -24,6 +24,10 @@ const PlaceOrderSchema = z.object({
       quantity: z.number().min(1),
     }),
   ),
+  // ✅ New Optional Fields for Logistics
+  pathaoCityId: z.number().optional().nullable(),
+  pathaoZoneId: z.number().optional().nullable(),
+  pathaoAreaId: z.number().optional().nullable(),
 });
 
 export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
@@ -36,28 +40,28 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     return { error: "Invalid order data." };
   }
 
-  const { items, paymentMethod, email, fullName, ...address } = validated.data;
+  const {
+    items,
+    paymentMethod,
+    email,
+    fullName,
+    pathaoCityId,
+    pathaoZoneId,
+    pathaoAreaId,
+    ...address
+  } = validated.data;
 
-  // --- GUEST CHECKOUT / USER CREATION LOGIC ---
+  // --- GUEST CHECKOUT / USER CREATION ---
   if (!userId) {
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
-
     if (existingUser) {
       return {
         error:
           "An account with this email already exists. Please log in to continue.",
       };
     }
-
-    // Auto-create new user
     const randomPassword = crypto.randomBytes(8).toString("hex");
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
-
-    // In a real app, send this password via Email (Mocked here)
-    console.log(
-      `📧 MOCK EMAIL: New Account created for ${email}. Password: ${randomPassword}`,
-    );
 
     const newUser = await prisma.user.create({
       data: {
@@ -72,11 +76,9 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     isNewAccount = true;
   }
 
-  // --- AUTO SAVE DEFAULT ADDRESS LOGIC ---
+  // --- AUTO SAVE DEFAULT ADDRESS ---
   if (userId) {
     const addressCount = await prisma.address.count({ where: { userId } });
-
-    // If user has no addresses, save this one as default
     if (addressCount === 0) {
       await prisma.address.create({
         data: {
@@ -93,7 +95,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     }
   }
 
-  // --- PRICE CALCULATION & ORDER CREATION ---
+  // --- PRICE CALCULATION ---
   let subTotal = 0;
   const orderItemsData = [];
 
@@ -102,16 +104,13 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
       where: { id: item.productId },
       include: { variants: true },
     });
-
     if (!product) continue;
 
     let price = Number(product.price);
-
     if (item.variantId) {
       const variant = product.variants.find((v) => v.id === item.variantId);
       if (variant) price = Number(variant.price);
     }
-
     if (product.discountPrice) {
       const discount = Number(product.discountPrice);
       if (discount < price) price = discount;
@@ -141,8 +140,17 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         paymentMethod,
         deliveryType: "EXTERNAL",
 
-        // Full address snapshot
-        shippingAddress: JSON.stringify({ fullName, email, ...address }),
+        // ✅ Store Pathao IDs in the snapshot for Admin use
+        shippingAddress: JSON.stringify({
+          fullName,
+          email,
+          ...address,
+          logistics: {
+            pathaoCityId,
+            pathaoZoneId,
+            pathaoAreaId,
+          },
+        }),
         phone: address.phone,
 
         subTotal,
