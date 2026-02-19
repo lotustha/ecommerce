@@ -1,18 +1,34 @@
-// ✅ UPDATED: Correct Sandbox URL (dev.khalti.com)
-const KHALTI_TEST_URL = "https://dev.khalti.com/api/v2/epayment/initiate/";
-const KHALTI_VERIFY_URL = "https://dev.khalti.com/api/v2/epayment/lookup/";
+import { prisma } from "@/lib/db/prisma";
 
-// Test Secret Key (Default provided by Khalti docs for sandbox)
-const KHALTI_SECRET_KEY =
-  process.env.KHALTI_SECRET_KEY || "Key 8685b8c3866d4006a868478498705f42";
+async function getKhaltiConfig() {
+  const settings = await prisma.systemSetting.findUnique({
+    where: { id: "default" },
+  });
+  const isSandbox = settings?.khaltiSandbox ?? true;
+
+  return {
+    initUrl: isSandbox
+      ? "https://dev.khalti.com/api/v2/epayment/initiate/"
+      : "https://khalti.com/api/v2/epayment/initiate/",
+    verifyUrl: isSandbox
+      ? "https://dev.khalti.com/api/v2/epayment/lookup/"
+      : "https://khalti.com/api/v2/epayment/lookup/",
+    secretKey:
+      !isSandbox && settings?.khaltiSecret
+        ? settings.khaltiSecret
+        : process.env.KHALTI_SECRET_KEY ||
+          "Key 8685b8c3866d4006a868478498705f42",
+  };
+}
 
 export async function initiateKhaltiPayment(
   amount: number,
   orderId: string,
   customerInfo: { name: string; email: string; phone: string },
 ) {
+  const config = await getKhaltiConfig();
+
   const payload = {
-    // ✅ Ensure return_url matches your callback route
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback?gateway=khalti`,
     website_url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     amount: amount * 100, // Convert to Paisa (Rs 1 = 100 Paisa)
@@ -26,12 +42,12 @@ export async function initiateKhaltiPayment(
   };
 
   try {
-    console.log("🔵 Initializing Khalti Payment...", payload);
+    console.log(`🔵 Initializing Khalti Payment on ${config.initUrl}`);
 
-    const response = await fetch(KHALTI_TEST_URL, {
+    const response = await fetch(config.initUrl, {
       method: "POST",
       headers: {
-        Authorization: KHALTI_SECRET_KEY, // Ensure this env var includes "Key " prefix if not using default
+        Authorization: config.secretKey, // Ensure this env var includes "Key " prefix if not using default
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -44,7 +60,7 @@ export async function initiateKhaltiPayment(
       return null;
     }
 
-    return data; // Returns { pidx, payment_url, ... }
+    return data;
   } catch (error) {
     console.error("🔴 Khalti Init Exception:", error);
     return null;
@@ -53,17 +69,18 @@ export async function initiateKhaltiPayment(
 
 export async function verifyKhaltiPayment(pidx: string) {
   try {
-    const response = await fetch(KHALTI_VERIFY_URL, {
+    const config = await getKhaltiConfig();
+
+    const response = await fetch(config.verifyUrl, {
       method: "POST",
       headers: {
-        Authorization: KHALTI_SECRET_KEY,
+        Authorization: config.secretKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ pidx }),
     });
 
     const data = await response.json();
-    // Khalti V2 status is "Completed" for success
     return data.status === "Completed" || data.status === "Refunded";
   } catch (error) {
     console.error("🔴 Khalti Verify Error:", error);

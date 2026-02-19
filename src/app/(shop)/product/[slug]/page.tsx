@@ -6,7 +6,13 @@ import Reviews from "@/components/product/reviews";
 import ReviewForm from "@/components/product/review-form";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Home, Star, ShoppingBag, ArrowRight } from "lucide-react";
+import {
+  ChevronRight,
+  Home,
+  Star,
+  ShoppingBag,
+  ArrowRight,
+} from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 
@@ -50,14 +56,17 @@ export default async function ProductPage({ params }: PageProps) {
       where: {
         userId: session.user.id,
         status: "DELIVERED",
-        items: { some: { productId: product.id } }
-      }
+        items: { some: { productId: product.id } },
+      },
     });
     hasPurchased = !!order;
   }
 
   // Fetch similar products based on the current product's category
-  const similarProducts = await getSimilarProducts(product.categoryId, product.id);
+  const similarProducts = await getSimilarProducts(
+    product.categoryId,
+    product.id,
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
@@ -71,7 +80,7 @@ export default async function ProductPage({ params }: PageProps) {
           Home
         </Link>
 
-        <ChevronRight className="w-4 h-4 mx-2 opacity-50 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 mx-2 opacity-50 shrink-0" />
 
         <Link
           href={`/search?category=${product.category.slug}`}
@@ -80,7 +89,7 @@ export default async function ProductPage({ params }: PageProps) {
           {product.category.name}
         </Link>
 
-        <ChevronRight className="w-4 h-4 mx-2 opacity-50 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 mx-2 opacity-50 shrink-0" />
 
         <span className="font-medium text-base-content truncate">
           {product.name}
@@ -106,7 +115,6 @@ export default async function ProductPage({ params }: PageProps) {
       {/* --- REVIEWS SECTION --- */}
       <div className="border-t border-base-200 pt-16 mt-16" id="reviews">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
           {/* Left: Summary & Form */}
           <div className="lg:col-span-4 space-y-8">
             <div>
@@ -117,7 +125,9 @@ export default async function ProductPage({ params }: PageProps) {
                     <Star key={star} size={20} fill="currentColor" />
                   ))}
                 </div>
-                <span className="text-sm font-medium opacity-60">4.8 out of 5</span>
+                <span className="text-sm font-medium opacity-60">
+                  4.8 out of 5
+                </span>
               </div>
               <p className="text-base-content/60 text-sm">
                 Share your thoughts with other customers.
@@ -132,17 +142,25 @@ export default async function ProductPage({ params }: PageProps) {
                   <div className="w-12 h-12 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-3">
                     <ShoppingBag size={20} className="opacity-40" />
                   </div>
-                  <h4 className="font-bold text-sm mb-1">Verified Purchase Required</h4>
+                  <h4 className="font-bold text-sm mb-1">
+                    Verified Purchase Required
+                  </h4>
                   <p className="text-xs text-base-content/60">
-                    You can only review products you have purchased and received.
+                    You can only review products you have purchased and
+                    received.
                   </p>
                 </div>
               )
             ) : (
               <div className="bg-base-200/50 p-8 rounded-3xl text-center border border-base-200">
                 <p className="font-bold mb-2">Have you used this product?</p>
-                <p className="text-sm text-base-content/60 mb-6">Log in to leave a review and help others.</p>
-                <Link href={`/login?callbackUrl=/product/${product.slug}`} className="btn btn-outline btn-block rounded-xl">
+                <p className="text-sm text-base-content/60 mb-6">
+                  Log in to leave a review and help others.
+                </p>
+                <Link
+                  href={`/login?callbackUrl=/product/${product.slug}`}
+                  className="btn btn-outline btn-block rounded-xl"
+                >
                   Login to Review
                 </Link>
               </div>
@@ -154,7 +172,6 @@ export default async function ProductPage({ params }: PageProps) {
             <h3 className="text-xl font-bold mb-6">Recent Reviews</h3>
             <Reviews productId={product.id} />
           </div>
-
         </div>
       </div>
 
@@ -164,13 +181,16 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
             <div>
               <h2 className="text-3xl font-black mb-2">Related Products</h2>
-              <p className="text-base-content/60">Other items you might be interested in</p>
+              <p className="text-base-content/60">
+                Other items you might be interested in
+              </p>
             </div>
             <Link
               href={`/search?category=${product.category.slug}`}
               className="btn btn-ghost hover:bg-base-200 rounded-full group"
             >
-              View More <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              View More{" "}
+              <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 

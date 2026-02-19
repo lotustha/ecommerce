@@ -29,15 +29,15 @@ export async function preparePayment(
 
   // 2. Prepare Config
   if (paymentMethod === "ESEWA") {
-    // ⚡ FIX: Generate a unique transaction ID for every attempt to avoid "Duplicate UUID" error
-    // Format: ORDERID_TIMESTAMP
+    // Generate a unique transaction ID for every attempt to avoid "Duplicate UUID" error
     const uniqueTransactionId = `${orderId}_${Date.now()}`;
 
-    // Generate signature using this UNIQUE ID
-    const config = getEsewaConfig(
+    // ✅ Add await here since getEsewaConfig now fetches database settings
+    const config = await getEsewaConfig(
       Number(order.totalAmount),
       uniqueTransactionId,
     );
+
     return { success: true, config, method: "ESEWA" };
   }
 

@@ -1,35 +1,37 @@
 import crypto from "crypto";
+import { prisma } from "@/lib/db/prisma";
 
-const ESEWA_TEST_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
-const ESEWA_SCD = "EPAYTEST";
+export async function getEsewaConfig(amount: number, orderId: string) {
+  const settings = await prisma.systemSetting.findUnique({
+    where: { id: "default" },
+  });
 
-export function generateEsewaSignature(
-  totalAmount: string,
-  transactionUuid: string,
-  productCode: string,
-) {
+  const isSandbox = settings?.esewaSandbox ?? true;
+
+  // Switch URLs based on Sandbox flag
+  const URL = isSandbox
+    ? "https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+    : "https://epay.esewa.com.np/api/epay/main/v2/form";
+
+  // Use Production Keys if Sandbox is off AND keys are provided
+  const merchantId =
+    !isSandbox && settings?.esewaId ? settings.esewaId : "EPAYTEST";
+  const secret =
+    !isSandbox && settings?.esewaSecret
+      ? settings.esewaSecret
+      : "8gBm/:&EnhH.1/q";
+
+  const totalAmount = amount.toString();
+  const transactionUuid = orderId;
+  const productCode = merchantId;
+
   const signatureString = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
-  const secret = "8gBm/:&EnhH.1/q"; // Default Test Secret for EPAYTEST
-
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(signatureString);
-  return hmac.digest("base64");
-}
-
-export function getEsewaConfig(amount: number, orderId: string) {
-  console.log(process.env.NEXT_PUBLIC_APP_URL);
-  const totalAmount = amount.toString();
-  const transactionUuid = orderId; // Use Order ID as UUID
-  const productCode = ESEWA_SCD;
-
-  const signature = generateEsewaSignature(
-    totalAmount,
-    transactionUuid,
-    productCode,
-  );
+  const signature = hmac.digest("base64");
 
   return {
-    url: ESEWA_TEST_URL,
+    url: URL,
     params: {
       amount: totalAmount,
       tax_amount: "0",
@@ -44,4 +46,29 @@ export function getEsewaConfig(amount: number, orderId: string) {
       signature: signature,
     },
   };
+}
+
+export async function verifyEsewaSignature(
+  totalAmount: string,
+  transactionUuid: string,
+  productCode: string,
+  signature: string,
+) {
+  const settings = await prisma.systemSetting.findUnique({
+    where: { id: "default" },
+  });
+  const isSandbox = settings?.esewaSandbox ?? true;
+
+  const secret =
+    !isSandbox && settings?.esewaSecret
+      ? settings.esewaSecret
+      : "8gBm/:&EnhH.1/q";
+
+  const signatureString = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(signatureString)
+    .digest("base64");
+
+  return signature === expectedSignature;
 }

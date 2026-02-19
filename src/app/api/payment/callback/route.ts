@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { verifyKhaltiPayment, generateEsewaSignature } from "@/lib/payment"; // Import from index or specific files
+import { verifyKhaltiPayment, verifyEsewaSignature } from "@/lib/payment"; // ✅ Updated Import
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,6 @@ export async function GET(req: NextRequest) {
     // ---------------------------------------------------------
     else if (gateway === "esewa") {
       if (status === "failure") {
-        // Try to extract orderId if possible, or just fail generic
         return NextResponse.redirect(new URL(`/orders?status=failed`, req.url));
       }
 
@@ -43,19 +42,16 @@ export async function GET(req: NextRequest) {
           const { total_amount, transaction_uuid, product_code, signature } =
             decodedData;
 
-          // ✅ Extract Real Order ID (Remove timestamp suffix)
-          // Format was: ORDERID_TIMESTAMP
+          // Extract Real Order ID
           orderId = transaction_uuid.split("_")[0];
 
-          const expectedSignature = generateEsewaSignature(
+          // ✅ Verify Signature asynchronously via helper (Checks DB if Live/Sandbox)
+          isVerified = await verifyEsewaSignature(
             total_amount,
             transaction_uuid,
             product_code,
+            signature,
           );
-
-          if (signature === expectedSignature) {
-            isVerified = true;
-          }
         }
       }
     }

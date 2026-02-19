@@ -4,7 +4,8 @@ import SettingsForm from "@/components/admin/settings-form";
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const settings = await getSettings();
+  const rawSettings = await getSettings();
+  const settings = JSON.parse(JSON.stringify(rawSettings));
 
   // Pass settings to form, or empty object if null
   return <SettingsForm initialData={settings || {}} />;

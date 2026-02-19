@@ -30,6 +30,7 @@ import {
   Facebook,
   Instagram,
   Globe,
+  Info,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
@@ -40,21 +41,17 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(SettingsFormSchema) as any,
     defaultValues: {
-      // Branding
       appName: initialData?.appName || "Nepal E-com",
       storeLogo: initialData?.storeLogo || "",
-
-      // Localization
       currency: initialData?.currency || "NPR",
       taxRate: Number(initialData?.taxRate) || 0,
 
-      // --- LOGISTICS ---
+      // Logistics
       enableStoreDelivery: initialData?.enableStoreDelivery ?? true,
       shippingCharge: Number(initialData?.shippingCharge) || 150,
       freeShippingThreshold: initialData?.freeShippingThreshold
         ? Number(initialData.freeShippingThreshold)
         : undefined,
-
       enablePathao: initialData?.enablePathao ?? false,
       pathaoSandbox: initialData?.pathaoSandbox ?? true,
       pathaoClientId: initialData?.pathaoClientId || "",
@@ -67,7 +64,7 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
       // Store Info
       storeName: initialData?.storeName || "Nepal E-com",
       storeTaxId: initialData?.storeTaxId || "",
-      storeDescription: initialData?.storeDescription || "",
+      storeSubtitle: initialData?.storeSubtitle || "",
       storeAddress: initialData?.storeAddress || "",
       storePhone: initialData?.storePhone || "",
       storeEmail: initialData?.storeEmail || "",
@@ -78,18 +75,15 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
       socialTiktok: initialData?.socialTiktok || "",
       socialTwitter: initialData?.socialTwitter || "",
 
-      // --- PAYMENTS ---
+      // Payments
       enableCod: initialData?.enableCod ?? true,
-
       enableEsewa: initialData?.enableEsewa ?? false,
       esewaSandbox: initialData?.esewaSandbox ?? true,
       esewaId: initialData?.esewaId || "",
       esewaSecret: initialData?.esewaSecret || "",
-
       enableKhalti: initialData?.enableKhalti ?? false,
       khaltiSandbox: initialData?.khaltiSandbox ?? true,
       khaltiSecret: initialData?.khaltiSecret || "",
-
       sctPayKey: initialData?.sctPayKey || "",
       enableSctPay: initialData?.enableSctPay ?? false,
 
@@ -135,6 +129,19 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
     });
   };
 
+  // ✅ More resilient error handler
+  const onError = (errors: any) => {
+    console.error("Settings Validation Failed:", errors);
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const firstKey = errorKeys[0];
+      const firstErrorMsg = errors[firstKey]?.message || "Invalid field";
+      toast.error(`Form Error (${firstKey}): ${firstErrorMsg}`);
+    } else {
+      toast.error("Please check the form for validation errors.");
+    }
+  };
+
   const tabs = [
     { id: "general", label: "General", icon: SettingsIcon },
     { id: "store", label: "Store Info", icon: Store },
@@ -155,8 +162,11 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
           </h1>
           <p className="text-sm opacity-60">Configure your store globally</p>
         </div>
+
+        {/* ✅ Use type="submit" and form="settings-form" instead of external onClick */}
         <button
-          onClick={form.handleSubmit(onSubmit)}
+          type="submit"
+          form="settings-form"
           disabled={isPending}
           className="btn btn-primary rounded-xl shadow-lg"
         >
@@ -187,7 +197,12 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
         </div>
 
         <div className="lg:col-span-3">
-          <form className="space-y-6">
+          {/* ✅ Attached id and handleSubmit exactly to the form itself */}
+          <form
+            id="settings-form"
+            onSubmit={form.handleSubmit(onSubmit, onError)}
+            className="space-y-6"
+          >
             {/* GENERAL TAB */}
             {activeTab === "general" && (
               <div className="card bg-base-100 shadow-sm border border-base-200">
@@ -196,7 +211,6 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                     Application Config
                   </h2>
 
-                  {/* Logo Upload */}
                   <div className="form-control">
                     <label className="label font-bold text-sm">
                       Store Logo
@@ -234,7 +248,11 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                         {currentLogo && (
                           <button
                             type="button"
-                            onClick={() => form.setValue("storeLogo", "")}
+                            onClick={() =>
+                              form.setValue("storeLogo", "", {
+                                shouldDirty: true,
+                              })
+                            }
                             className="btn btn-xs btn-ghost text-error"
                           >
                             <Trash2 size={14} /> Remove Logo
@@ -269,6 +287,11 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                         className="input input-bordered"
                         placeholder="NPR, $, etc."
                       />
+                      {form.formState.errors.currency && (
+                        <span className="text-error text-xs">
+                          {form.formState.errors.currency.message}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -302,18 +325,22 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                           {...form.register("storeName")}
                           className="input input-bordered"
                         />
+                        {form.formState.errors.storeName && (
+                          <span className="text-error text-xs">
+                            {form.formState.errors.storeName.message}
+                          </span>
+                        )}
                       </div>
                       <div className="form-control">
                         <label className="label font-bold text-sm">
-                          Store Tagline
+                          Tagline
                         </label>
                         <input
-                          {...form.register("storeDescription")}
+                          {...form.register("storeSubtitle")}
                           className="input input-bordered"
                           placeholder="Best electronics in Nepal"
                         />
                       </div>
-
                       <div className="form-control">
                         <label className="label font-bold text-sm">
                           VAT / PAN Number
@@ -369,7 +396,7 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                         </label>
                         <input
                           {...form.register("storeAddress")}
-                          className="input input-bordered w-full"
+                          className="input input-bordered"
                           placeholder="New Road, Kathmandu"
                         />
                       </div>
@@ -397,6 +424,11 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                               className="grow"
                             />
                           </label>
+                          {form.formState.errors.storeEmail && (
+                            <span className="text-error text-xs mt-1">
+                              {form.formState.errors.storeEmail.message}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -550,47 +582,57 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                           </label>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="form-control">
-                            <label className="label font-bold text-sm">
-                              Client ID
-                            </label>
-                            <input
-                              type="password"
-                              {...form.register("pathaoClientId")}
-                              className="input input-bordered font-mono text-sm"
-                            />
+                        {!form.watch("pathaoSandbox") ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Client ID
+                              </label>
+                              <input
+                                type="password"
+                                {...form.register("pathaoClientId")}
+                                className="input input-bordered font-mono text-sm"
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Client Secret
+                              </label>
+                              <input
+                                type="password"
+                                {...form.register("pathaoClientSecret")}
+                                className="input input-bordered font-mono text-sm"
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Username / Email
+                              </label>
+                              <input
+                                {...form.register("pathaoUsername")}
+                                className="input input-bordered font-mono text-sm"
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Password
+                              </label>
+                              <input
+                                type="password"
+                                {...form.register("pathaoPassword")}
+                                className="input input-bordered font-mono text-sm"
+                              />
+                            </div>
                           </div>
-                          <div className="form-control">
-                            <label className="label font-bold text-sm">
-                              Client Secret
-                            </label>
-                            <input
-                              type="password"
-                              {...form.register("pathaoClientSecret")}
-                              className="input input-bordered font-mono text-sm"
-                            />
+                        ) : (
+                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
+                            <Info size={16} className="shrink-0" />
+                            <span>
+                              Sandbox mode is ON. Predefined test credentials
+                              will be used automatically.
+                            </span>
                           </div>
-                          <div className="form-control">
-                            <label className="label font-bold text-sm">
-                              Username / Email
-                            </label>
-                            <input
-                              {...form.register("pathaoUsername")}
-                              className="input input-bordered font-mono text-sm"
-                            />
-                          </div>
-                          <div className="form-control">
-                            <label className="label font-bold text-sm">
-                              Password
-                            </label>
-                            <input
-                              type="password"
-                              {...form.register("pathaoPassword")}
-                              className="input input-bordered font-mono text-sm"
-                            />
-                          </div>
-                        </div>
+                        )}
 
                         <div className="form-control">
                           <label className="label font-bold text-sm">
@@ -604,7 +646,6 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                           <label className="label">
                             <span className="label-text-alt opacity-60">
                               Add extra amount to Pathao API rates
-                              (Profit/Handling)
                             </span>
                           </label>
                         </div>
@@ -678,26 +719,39 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                             </span>
                           </label>
                         </div>
-                        <div className="form-control">
-                          <label className="label font-bold text-sm">
-                            Merchant ID (SCD)
-                          </label>
-                          <input
-                            {...form.register("esewaId")}
-                            className="input input-bordered font-mono"
-                            placeholder="EPAYTEST"
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label font-bold text-sm">
-                            Secret Key
-                          </label>
-                          <input
-                            type="password"
-                            {...form.register("esewaSecret")}
-                            className="input input-bordered font-mono"
-                          />
-                        </div>
+
+                        {!form.watch("esewaSandbox") ? (
+                          <>
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Merchant ID (SCD)
+                              </label>
+                              <input
+                                {...form.register("esewaId")}
+                                className="input input-bordered font-mono"
+                                placeholder="EPAYTEST"
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label font-bold text-sm">
+                                Secret Key
+                              </label>
+                              <input
+                                type="password"
+                                {...form.register("esewaSecret")}
+                                className="input input-bordered font-mono"
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
+                            <Info size={16} className="shrink-0" />
+                            <span>
+                              Sandbox mode is ON. Default EPAYTEST credentials
+                              will be used automatically.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -739,16 +793,27 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                             </span>
                           </label>
                         </div>
-                        <div className="form-control">
-                          <label className="label font-bold text-sm">
-                            Live Secret Key
-                          </label>
-                          <input
-                            type="password"
-                            {...form.register("khaltiSecret")}
-                            className="input input-bordered font-mono"
-                          />
-                        </div>
+
+                        {!form.watch("khaltiSandbox") ? (
+                          <div className="form-control">
+                            <label className="label font-bold text-sm">
+                              Live Secret Key
+                            </label>
+                            <input
+                              type="password"
+                              {...form.register("khaltiSecret")}
+                              className="input input-bordered font-mono"
+                            />
+                          </div>
+                        ) : (
+                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
+                            <Info size={16} className="shrink-0" />
+                            <span>
+                              Sandbox mode is ON. Default testing keys will be
+                              used automatically.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -764,8 +829,7 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                     <Cpu size={16} /> AI Configuration
                   </h2>
                   <p className="text-xs opacity-60">
-                    Configure API keys to enable smart features like product
-                    crawling, description generation, and auto-categorization.
+                    Configure API keys to enable smart features.
                   </p>
 
                   <div className="form-control">
@@ -790,23 +854,6 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
                       className="input input-bordered font-mono"
                       placeholder="AIza..."
                     />
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label font-bold text-sm">
-                      Crawler / Proxy Key
-                    </label>
-                    <input
-                      type="password"
-                      {...form.register("crawlerApiKey")}
-                      className="input input-bordered font-mono"
-                      placeholder="Optional"
-                    />
-                    <label className="label">
-                      <span className="label-text-alt opacity-60">
-                        Used for scraping product data from external URLs.
-                      </span>
-                    </label>
                   </div>
                 </div>
               </div>

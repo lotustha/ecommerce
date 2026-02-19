@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { Product, Category, Brand } from "../../../generated/prisma/client";
@@ -30,7 +30,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   const price = Number(product.price);
-  const discountPrice = product.discountPrice ? Number(product.discountPrice) : null;
+  const discountPrice = product.discountPrice
+    ? Number(product.discountPrice)
+    : null;
   const finalPrice = discountPrice || price;
   const isOnSale = discountPrice && discountPrice < price;
   const discountPercent = isOnSale
@@ -38,9 +40,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     : 0;
 
   const formatPrice = (p: number) => {
-    return new Intl.NumberFormat('en-NP', {
-      style: 'currency',
-      currency: 'NPR',
+    return new Intl.NumberFormat("en-NP", {
+      style: "currency",
+      currency: "NPR",
       maximumFractionDigits: 0,
     }).format(p);
   };
@@ -63,25 +65,34 @@ export default function ProductCard({ product }: ProductCardProps) {
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
 
-    toast.custom((t) => (
-      <div className={`bg-base-100 border border-base-200 shadow-xl rounded-2xl p-4 flex items-center gap-4 min-w-[300px] transform transition-all duration-300 ${t.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-        <div className="w-12 h-12 bg-base-200 rounded-xl overflow-hidden shrink-0 border border-base-300">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={mainImage} alt={product.name} className="w-full h-full object-cover" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-sm truncate pr-2">{product.name}</h4>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="badge badge-sm badge-success text-white gap-1 px-1.5 h-5">
-              <Check size={10} /> Added
-            </span>
-            <span className="text-xs text-base-content/60">
-              Qty: <strong className="text-base-content">1</strong>
-            </span>
+    toast.custom(
+      (t) => (
+        <div
+          className={`bg-base-100 border border-base-200 shadow-xl rounded-2xl p-4 flex items-center gap-4 min-w-[300px] transform transition-all duration-300 ${t.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+        >
+          <div className="w-12 h-12 bg-base-200 rounded-xl overflow-hidden shrink-0 border border-base-300">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={mainImage}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-bold text-sm truncate pr-2">{product.name}</h4>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="badge badge-sm badge-success text-white gap-1 px-1.5 h-5">
+                <Check size={10} /> Added
+              </span>
+              <span className="text-xs text-base-content/60">
+                Qty: <strong className="text-base-content">1</strong>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    ), { position: "bottom-right", duration: 2500 });
+      ),
+      { position: "bottom-right", duration: 2500 },
+    );
   };
 
   return (
@@ -94,7 +105,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className="group relative"
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-base-200">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-base-200">
         <Link href={`/product/${product.slug}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -120,10 +131,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             disabled={isAdded || product.stock === 0}
-            className={`btn btn-sm w-full max-w-[90%] rounded-full shadow-lg gap-2 backdrop-blur-md border-none text-white transition-all ${isAdded
-              ? "bg-success hover:bg-success"
-              : "bg-primary/90 hover:bg-primary"
-              }`}
+            className={`btn btn-sm w-full max-w-[90%] rounded-full shadow-lg gap-2 backdrop-blur-md border-none text-white transition-all ${
+              isAdded
+                ? "bg-success hover:bg-success"
+                : "bg-primary/90 hover:bg-primary"
+            }`}
           >
             {isAdded ? <Check size={16} /> : <ShoppingCart size={16} />}
             {isAdded ? "Added" : "Add to Cart"}
@@ -149,9 +161,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="mt-4 flex justify-between items-start gap-2">
         <div className="flex flex-col gap-1">
           <h3 className="text-sm font-semibold text-base-content/90 leading-tight group-hover:text-primary transition-colors line-clamp-2">
-            <Link href={`/product/${product.slug}`}>
-              {product.name}
-            </Link>
+            <Link href={`/product/${product.slug}`}>{product.name}</Link>
           </h3>
           <p className="text-xs text-base-content/50 font-medium uppercase tracking-wide">
             {product.category.name}
@@ -159,7 +169,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="flex flex-col items-end text-right">
-          <p className="text-sm font-bold text-base-content">{formatPrice(finalPrice)}</p>
+          <p className="text-sm font-bold text-base-content">
+            {formatPrice(finalPrice)}
+          </p>
           {isOnSale && (
             <p className="text-xs text-base-content/40 line-through font-medium">
               {formatPrice(price)}

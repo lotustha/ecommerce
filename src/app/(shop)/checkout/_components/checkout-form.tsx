@@ -1,30 +1,23 @@
 "use client";
 
 import { useCartStore } from "@/store/cart-store";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   MapPin,
-  Phone,
   User,
   Truck,
-  CreditCard,
   CheckCircle2,
   Wallet,
-  Mail,
-  Building,
   AlertTriangle,
-  Check,
   Loader2,
-  Calculator,
-  Info,
   Clock,
   Zap,
+  FileText,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { placeOrder } from "@/actions/place-order";
@@ -36,7 +29,6 @@ import {
 } from "@/actions/public-delivery";
 import { calculateShipping } from "@/actions/delivery-actions";
 
-// --- NEPAL LOCATIONS DATA ---
 const NEPAL_LOCATIONS: Record<string, string[]> = {
   Koshi: [
     "Bhojpur",
@@ -153,6 +145,7 @@ interface CheckoutFormProps {
     phone?: string | null;
   } | null;
   defaultAddress?: any;
+  settings?: any;
 }
 
 interface DeliveryOption {
@@ -161,60 +154,53 @@ interface DeliveryOption {
   description: string;
   price: number;
   time: string;
-  logo?: any;
   recommended?: boolean;
+  isTest?: boolean; // ✅ Added field specifically for test mode badges
 }
 
 export default function CheckoutForm({
   user,
   defaultAddress,
+  settings,
 }: CheckoutFormProps) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
-  // Pathao Logistics State
-  const [verifyingLoc, setVerifyingLoc] = useState(false);
-  const [pathaoStatus, setPathaoStatus] = useState<
-    "MATCHED" | "UNMATCHED" | "PENDING"
-  >("PENDING");
-  const [pathaoCityId, setPathaoCityId] = useState<number | null>(null);
-  const [pathaoZoneId, setPathaoZoneId] = useState<number | null>(null);
-  const [pathaoAreaId, setPathaoAreaId] = useState<number | null>(null);
+  // ✅ Safe boolean accessors with explicit fail-safe defaults (Default to Test Mode for security)
+  const isCodEnabled = settings?.enableCod ?? true;
+  const isEsewaEnabled = settings?.enableEsewa ?? false;
+  const isKhaltiEnabled = settings?.enableKhalti ?? false;
+  const isStoreDeliveryEnabled = settings?.enableStoreDelivery ?? true;
+  const isPathaoEnabled = settings?.enablePathao ?? false;
 
-  // Dynamic Delivery Options
-  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([
-    {
-      id: "STORE",
-      name: "Standard Delivery",
-      description: "Store Courier",
-      price: 150,
-      time: "3-5 Days",
-    },
-    {
-      id: "PATHAO",
-      name: "Pathao",
-      description: "Fast Delivery",
-      price: 0,
-      time: "1-2 Days",
-      recommended: true,
-    },
-  ]);
-  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  const isPathaoSandbox = settings?.pathaoSandbox ?? true;
+  const isEsewaSandbox = settings?.esewaSandbox ?? true;
+  const isKhaltiSandbox = settings?.khaltiSandbox ?? true;
 
-  // Manual Selection Lists
-  const [pCities, setPCities] = useState<any[]>([]);
-  const [pZones, setPZones] = useState<any[]>([]);
-  const [pAreas, setPAreas] = useState<any[]>([]);
+  // Determine initial payment method based on settings priority
+  const defaultPayment = isCodEnabled
+    ? "COD"
+    : isEsewaEnabled
+      ? "ESEWA"
+      : isKhaltiEnabled
+        ? "KHALTI"
+        : "";
 
-  // Store Data
+  // Determine initial delivery partner
+  const defaultPartner = isStoreDeliveryEnabled
+    ? "STORE"
+    : isPathaoEnabled
+      ? "PATHAO"
+      : "";
+
+  // Determine standard shipping logic
   const items = useCartStore((state) => state.items);
   const checkoutIds = useCartStore((state) => state.checkoutIds);
   const removeItem = useCartStore((state) => state.removeItem);
   const setCheckoutIds = useCartStore((state) => state.setCheckoutIds);
 
-  // ✅ MEMOIZED: checkoutItems is now stable across renders unless dependencies change
   const checkoutItems = useMemo(
     () =>
       items.filter((item) =>
@@ -227,6 +213,64 @@ export default function CheckoutForm({
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
+
+  // Base shipping cost with free shipping logic applied
+  const standardCost = Number(settings?.shippingCharge ?? 150);
+  const freeThreshold = settings?.freeShippingThreshold
+    ? Number(settings.freeShippingThreshold)
+    : null;
+  const isFreeShipping = freeThreshold !== null && subTotal >= freeThreshold;
+  const finalStandardCost = isFreeShipping ? 0 : standardCost;
+
+  // Pathao Logistics State
+  const [verifyingLoc, setVerifyingLoc] = useState(false);
+  const [pathaoStatus, setPathaoStatus] = useState<
+    "MATCHED" | "UNMATCHED" | "PENDING"
+  >("PENDING");
+  const [pathaoCityId, setPathaoCityId] = useState<number | null>(null);
+  const [pathaoZoneId, setPathaoZoneId] = useState<number | null>(null);
+  const [pathaoAreaId, setPathaoAreaId] = useState<number | null>(null);
+
+  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([]);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+
+  // ✅ Dynamically build delivery options based on exact state of settings
+  useEffect(() => {
+    const options: DeliveryOption[] = [];
+    if (isStoreDeliveryEnabled) {
+      options.push({
+        id: "STORE",
+        name: "Standard Delivery",
+        description: isFreeShipping ? "Free Delivery!" : "Store Courier",
+        price: finalStandardCost,
+        time: "3-5 Days",
+      });
+    }
+
+    if (isPathaoEnabled) {
+      options.push({
+        id: "PATHAO",
+        name: "Pathao",
+        description: isPathaoSandbox ? "Test Mode Active" : "Fast Delivery",
+        price: 0,
+        time: "1-2 Days",
+        recommended: true,
+        isTest: isPathaoSandbox,
+      });
+    }
+    setDeliveryOptions(options);
+  }, [
+    isStoreDeliveryEnabled,
+    isPathaoEnabled,
+    finalStandardCost,
+    isFreeShipping,
+    isPathaoSandbox,
+  ]);
+
+  // Manual Selection Lists
+  const [pCities, setPCities] = useState<any[]>([]);
+  const [pZones, setPZones] = useState<any[]>([]);
+  const [pAreas, setPAreas] = useState<any[]>([]);
 
   const formatPrice = (p: number) => {
     return new Intl.NumberFormat("en-NP", {
@@ -247,8 +291,8 @@ export default function CheckoutForm({
       city: defaultAddress?.city || "",
       ward: defaultAddress?.ward || undefined,
       street: defaultAddress?.street || "",
-      paymentMethod: "COD",
-      deliveryPartner: "STORE",
+      paymentMethod: defaultPayment as any,
+      deliveryPartner: defaultPartner as any,
     },
   });
 
@@ -268,12 +312,20 @@ export default function CheckoutForm({
     ? NEPAL_LOCATIONS[selectedProvince] || []
     : [];
 
-  // Determine current shipping cost based on selection
-  const currentOption =
-    deliveryOptions.find((o) => o.id === selectedPartner) || deliveryOptions[0];
+  const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) ||
+    deliveryOptions[0] || { price: 0 };
+
+  // Final calculation
   const total = subTotal + currentOption.price;
 
-  // Watch fields for location verification
+  // Tax Calculation (INCLUSIVE Pricing)
+  const taxRate = settings?.taxRate ? Number(settings.taxRate) : 0;
+  let taxAmount = 0;
+
+  if (taxRate > 0) {
+    taxAmount = subTotal - subTotal / (1 + taxRate / 100);
+  }
+
   const watchDistrict = useWatch({ control, name: "district" });
   const watchCity = useWatch({ control, name: "city" });
   const watchStreet = useWatch({ control, name: "street" });
@@ -289,15 +341,15 @@ export default function CheckoutForm({
         city: defaultAddress?.city || "",
         ward: defaultAddress?.ward || undefined,
         street: defaultAddress?.street || "",
-        paymentMethod: "COD",
-        deliveryPartner: "STORE",
+        paymentMethod: defaultPayment as any,
+        deliveryPartner: defaultPartner as any,
       });
     }
-  }, [user, defaultAddress, reset]);
+  }, [user, defaultAddress, reset, defaultPayment, defaultPartner]);
 
-  // ✅ Auto-Verify Location & Zone Logic
+  // Auto-Verify Location & Zone Logic (Only if Pathao is enabled)
   useEffect(() => {
-    if (isOrderPlaced) return; // Stop logic if order placed
+    if (isOrderPlaced || !isPathaoEnabled) return;
 
     const timer = setTimeout(async () => {
       if (watchDistrict && watchCity) {
@@ -317,15 +369,12 @@ export default function CheckoutForm({
           );
           if (matchZone) {
             setPathaoZoneId(matchZone.zone_id);
-
             const areas = await getPublicAreas(matchZone.zone_id);
             setPAreas(areas);
             const matchArea = areas.find((a: any) =>
               addressString.includes(a.area_name.toLowerCase()),
             );
-            if (matchArea) {
-              setPathaoAreaId(matchArea.area_id);
-            }
+            if (matchArea) setPathaoAreaId(matchArea.area_id);
           } else {
             setPathaoZoneId(null);
             setPathaoAreaId(null);
@@ -344,28 +393,24 @@ export default function CheckoutForm({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [watchDistrict, watchCity, watchStreet, isOrderPlaced]);
+  }, [watchDistrict, watchCity, watchStreet, isOrderPlaced, isPathaoEnabled]);
 
-  // ✅ Auto-Fetch Areas
   useEffect(() => {
-    if (isOrderPlaced) return;
+    if (isOrderPlaced || !isPathaoEnabled) return;
     if (pathaoZoneId) {
-      if (pAreas.length === 0) {
+      if (pAreas.length === 0)
         getPublicAreas(pathaoZoneId).then(setPAreas).catch(console.error);
-      }
     } else {
       setPAreas([]);
       setPathaoAreaId(null);
     }
-  }, [pathaoZoneId, isOrderPlaced]);
+  }, [pathaoZoneId, isOrderPlaced, isPathaoEnabled]);
 
-  // ✅ Smart Calculation: Update Delivery Options List
   useEffect(() => {
-    if (isOrderPlaced) return;
+    if (isOrderPlaced || !isPathaoEnabled) return;
 
     if (pathaoCityId && pathaoZoneId) {
       setIsCalculatingShipping(true);
-
       calculateShipping({
         recipient_city: pathaoCityId,
         recipient_zone: pathaoZoneId,
@@ -377,41 +422,51 @@ export default function CheckoutForm({
         .then((res) => {
           if (res.success && res.cost) {
             setDeliveryOptions((prev) => {
-              const pathaoExists = prev.some(
-                (o) => o.id === "PATHAO" && o.price === Number(res.cost),
-              );
-              if (pathaoExists) return prev;
-
               const others = prev.filter((o) => o.id !== "PATHAO");
-              const pathaoOption: DeliveryOption = {
-                id: "PATHAO",
-                name: "Pathao",
-                description: "Fast Delivery",
-                price: Number(res.cost),
-                time: "1-2 Days",
-                recommended: true,
-              };
-              return [...others, pathaoOption];
+              return [
+                ...others,
+                {
+                  id: "PATHAO",
+                  name: "Pathao",
+                  description: isPathaoSandbox
+                    ? "Test Mode Active"
+                    : "Fast Delivery",
+                  price: Number(res.cost),
+                  time: "1-2 Days",
+                  recommended: true,
+                  isTest: isPathaoSandbox,
+                },
+              ];
             });
           }
         })
-        .catch((err) => {
-          console.error("Shipping calc failed", err);
-        })
-        .finally(() => {
-          setIsCalculatingShipping(false);
-        });
+        .catch(console.error)
+        .finally(() => setIsCalculatingShipping(false));
     } else {
       setDeliveryOptions((prev) => {
-        const pathao = prev.find((o) => o.id === "PATHAO");
-        if (pathao) {
-          const others = prev.filter((o) => o.id !== "PATHAO");
-          return [...others, { ...pathao, price: 0 }];
-        }
-        return prev;
+        const others = prev.filter((o) => o.id !== "PATHAO");
+        return [
+          ...others,
+          {
+            id: "PATHAO",
+            name: "Pathao",
+            description: isPathaoSandbox ? "Test Mode Active" : "Fast Delivery",
+            price: 0,
+            time: "1-2 Days",
+            recommended: true,
+            isTest: isPathaoSandbox,
+          },
+        ];
       });
     }
-  }, [pathaoCityId, pathaoZoneId, checkoutItems, isOrderPlaced]);
+  }, [
+    pathaoCityId,
+    pathaoZoneId,
+    checkoutItems,
+    isOrderPlaced,
+    isPathaoEnabled,
+    isPathaoSandbox,
+  ]);
 
   const handlePCityChange = async (cid: number) => {
     setPathaoCityId(cid);
@@ -419,7 +474,6 @@ export default function CheckoutForm({
     const zones = await getPublicZones(cid);
     setPZones(zones);
   };
-
   const handlePZoneChange = (zid: number) => {
     setPathaoZoneId(zid);
     setPathaoAreaId(null);
@@ -433,19 +487,20 @@ export default function CheckoutForm({
     }
   }, [items.length, checkoutIds.length, router, isOrderPlaced]);
 
-  // ✅ Defined isPathaoInvalid before use
   const isPathaoInvalid =
     selectedPartner === "PATHAO" &&
     (!pathaoCityId || !pathaoZoneId || (pAreas.length > 0 && !pathaoAreaId));
 
+  const hasNoDeliveryMethods = deliveryOptions.length === 0;
+  const hasNoPaymentMethods =
+    !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
+
   const onSubmit = async (data: CheckoutFormValues) => {
-    if (isPathaoInvalid) {
-      toast.error(
+    if (hasNoDeliveryMethods || hasNoPaymentMethods) return;
+    if (isPathaoInvalid && isPathaoEnabled)
+      return toast.error(
         "Please verify or select your specific delivery location for Pathao.",
       );
-      return;
-    }
-
     setIsProcessing(true);
 
     const orderData = {
@@ -458,7 +513,7 @@ export default function CheckoutForm({
       pathaoCityId: pathaoCityId || null,
       pathaoZoneId: pathaoZoneId || null,
       pathaoAreaId: pathaoAreaId || null,
-      shippingCost: currentOption.price,
+      shippingCost: currentOption?.price || 0,
     };
 
     const result = await placeOrder(orderData);
@@ -485,30 +540,20 @@ export default function CheckoutForm({
       );
       setCheckoutIds([]);
 
-      if (data.paymentMethod === "COD") {
-        router.push("/orders");
-      } else {
-        router.push(`/payment/${result.orderId}?auto=true`);
-      }
+      if (data.paymentMethod === "COD") router.push("/orders");
+      else router.push(`/payment/${result.orderId}?auto=true`);
     }
   };
 
   if (!mounted) return null;
-
   if (isOrderPlaced) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
         <h2 className="text-xl font-bold">Processing Order...</h2>
-        <p className="text-base-content/60">
-          {selectedPayment === "COD"
-            ? "Redirecting to your orders."
-            : "Redirecting to payment gateway."}
-        </p>
       </div>
     );
   }
-
   if (checkoutItems.length === 0 && !isProcessing) return null;
 
   return (
@@ -611,7 +656,6 @@ export default function CheckoutForm({
                   </span>
                 )}
               </div>
-
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content/60 uppercase">
                   District
@@ -634,7 +678,6 @@ export default function CheckoutForm({
                   </span>
                 )}
               </div>
-
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content/60 uppercase">
                   Municipality / City
@@ -650,7 +693,6 @@ export default function CheckoutForm({
                   </span>
                 )}
               </div>
-
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content/60 uppercase">
                   Ward No
@@ -666,7 +708,6 @@ export default function CheckoutForm({
                   </span>
                 )}
               </div>
-
               <div className="form-control md:col-span-2">
                 <label className="label text-xs font-bold text-base-content/60 uppercase">
                   Street / Tole
@@ -685,8 +726,8 @@ export default function CheckoutForm({
             </div>
           </div>
 
-          {/* --- LOCATION CHECK UI --- */}
-          {watchCity && watchDistrict && (
+          {/* --- LOCATION CHECK UI (Pathao) --- */}
+          {isPathaoEnabled && watchCity && watchDistrict && (
             <div className="mt-4 flex items-center justify-between bg-base-200/50 p-3 rounded-lg border border-base-200">
               <div className="flex items-center gap-2 text-sm">
                 {verifyingLoc ? (
@@ -717,8 +758,9 @@ export default function CheckoutForm({
           )}
 
           {/* --- MANUAL FALLBACK SELECTORS --- */}
-          {(pathaoStatus === "UNMATCHED" ||
-            (pathaoStatus === "MATCHED" && !pathaoAreaId)) &&
+          {isPathaoEnabled &&
+            (pathaoStatus === "UNMATCHED" ||
+              (pathaoStatus === "MATCHED" && !pathaoAreaId)) &&
             selectedPartner === "PATHAO" && (
               <div className="mt-4 p-4 bg-warning/5 rounded-xl border border-warning/20 space-y-3">
                 {pathaoStatus === "UNMATCHED" ? (
@@ -728,12 +770,11 @@ export default function CheckoutForm({
                   </p>
                 ) : (
                   <p className="text-xs text-info font-bold flex gap-2">
-                    <Info size={14} /> Please select your specific Area/Tole:
+                    <MapPin size={14} /> Please select your specific Area/Tole:
                   </p>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {/* Only show City/Zone if not auto-matched */}
                   {pathaoStatus !== "MATCHED" && (
                     <>
                       <select
@@ -767,8 +808,6 @@ export default function CheckoutForm({
                       </select>
                     </>
                   )}
-
-                  {/* Area always visible for refinement */}
                   <div className="md:col-span-2">
                     <select
                       className="select select-bordered select-sm w-full"
@@ -776,9 +815,7 @@ export default function CheckoutForm({
                       onChange={(e) => setPathaoAreaId(Number(e.target.value))}
                       disabled={!pathaoZoneId}
                     >
-                      <option value="">
-                        Select Area <span className="text-error">*</span>
-                      </option>
+                      <option value="">Select Area *</option>
                       {pAreas.map((a: any) => (
                         <option key={a.area_id} value={a.area_id}>
                           {a.area_name}
@@ -800,88 +837,77 @@ export default function CheckoutForm({
             Delivery Method
           </h2>
 
-          <div className="space-y-4">
-            {deliveryOptions.map((option) => (
-              <div
-                key={option.id}
-                onClick={() => setValue("deliveryPartner", option.id)}
-                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 flex items-center justify-between group ${
-                  selectedPartner === option.id
-                    ? "border-primary bg-primary/5"
-                    : "border-base-200"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedPartner === option.id ? "bg-primary text-white" : "bg-base-200 text-base-content/40"}`}
-                  >
-                    <Truck size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base flex items-center gap-2">
-                      {option.name}
-                      {option.recommended && (
-                        <span className="badge badge-sm badge-accent text-white gap-1">
-                          <Zap size={10} /> Recommended
+          {hasNoDeliveryMethods ? (
+            <div className="alert alert-warning text-sm rounded-xl">
+              <AlertTriangle size={18} />
+              <span>
+                No delivery options are currently available. Please contact
+                support.
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {deliveryOptions.map((option) => (
+                <div
+                  key={option.id}
+                  onClick={() => setValue("deliveryPartner", option.id as any)}
+                  className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 flex items-center justify-between group ${selectedPartner === option.id ? "border-primary bg-primary/5" : "border-base-200"}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedPartner === option.id ? "bg-primary text-white" : "bg-base-200 text-base-content/40"}`}
+                    >
+                      <Truck size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base flex items-center gap-2">
+                        {option.name}
+                        {option.recommended && (
+                          <span className="badge badge-sm badge-accent text-white gap-1">
+                            <Zap size={10} /> Recommended
+                          </span>
+                        )}
+                      </h3>
+                      <div className="flex items-center gap-3 text-xs opacity-60 mt-1">
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} /> {option.time}
                         </span>
-                      )}
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs opacity-60 mt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} /> {option.time}
-                      </span>
-                      <span>•</span>
-                      <span>{option.description}</span>
+                        <span>•</span>
+                        {/* ✅ Bright Test Mode Indicator for Delivery */}
+                        <span
+                          className={
+                            option.isTest
+                              ? "text-warning font-bold flex items-center gap-1"
+                              : ""
+                          }
+                        >
+                          {option.isTest && <AlertTriangle size={12} />}
+                          {option.description}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <div className="text-right">
+                    {option.id === "PATHAO" && option.price === 0 ? (
+                      <span className="text-xs text-warning font-bold flex items-center gap-1">
+                        <AlertTriangle size={10} /> Check Location
+                      </span>
+                    ) : (
+                      <p className="font-bold text-lg">
+                        {formatPrice(option.price)}
+                      </p>
+                    )}
+                    {isCalculatingShipping && option.id === "PATHAO" && (
+                      <p className="text-[10px] opacity-60 flex items-center justify-end gap-1">
+                        <Loader2 size={10} className="animate-spin" />{" "}
+                        Calculating...
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  {/* Handle 0 price or missing calculation */}
-                  {option.id === "PATHAO" && option.price === 0 ? (
-                    <span className="text-xs text-warning font-bold flex items-center gap-1">
-                      <AlertTriangle size={10} /> Check Location
-                    </span>
-                  ) : (
-                    <p className="font-bold text-lg">
-                      {formatPrice(option.price)}
-                    </p>
-                  )}
-
-                  {isCalculatingShipping && option.id === "PATHAO" && (
-                    <p className="text-[10px] opacity-60 flex items-center justify-end gap-1">
-                      <Loader2 size={10} className="animate-spin" />{" "}
-                      Calculating...
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Force Pathao Area Selector if Matched but not selected */}
-            {selectedPartner === "PATHAO" &&
-              pathaoStatus === "MATCHED" &&
-              pathaoZoneId && (
-                <div className="mt-2 pl-4 border-l-2 border-primary/20 bg-base-200/30 p-3 rounded-r-xl">
-                  <label className="label py-1">
-                    <span className="label-text-alt font-bold opacity-60">
-                      Select Specific Area <span className="text-error">*</span>
-                    </span>
-                  </label>
-                  <select
-                    className="select select-bordered select-sm w-full max-w-xs"
-                    onChange={(e) => setPathaoAreaId(Number(e.target.value))}
-                    value={pathaoAreaId || ""}
-                  >
-                    <option value="">Select Area...</option>
-                    {pAreas.map((a: any) => (
-                      <option key={a.area_id} value={a.area_id}>
-                        {a.area_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* 3. Payment Method */}
@@ -892,40 +918,75 @@ export default function CheckoutForm({
             </span>
             Payment Method
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div
-              onClick={() => setValue("paymentMethod", "COD")}
-              className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 transition-all ${selectedPayment === "COD" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-base-200 hover:border-base-300"}`}
-            >
-              <Truck
-                size={32}
-                className={
-                  selectedPayment === "COD"
-                    ? "text-primary"
-                    : "text-base-content/40"
-                }
-              />
-              <span className="font-bold text-sm">COD</span>
+
+          {hasNoPaymentMethods ? (
+            <div className="alert alert-warning text-sm rounded-xl">
+              <AlertTriangle size={18} />
+              <span>
+                No payment methods are currently available. Please contact
+                support.
+              </span>
             </div>
-            <div
-              onClick={() => setValue("paymentMethod", "ESEWA")}
-              className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 transition-all ${selectedPayment === "ESEWA" ? "border-success bg-success/5 ring-1 ring-success" : "border-base-200 hover:border-base-300"}`}
-            >
-              <Wallet size={32} className="text-success" />
-              <span className="font-bold text-sm">eSewa</span>
-            </div>
-            <div
-              onClick={() => setValue("paymentMethod", "KHALTI")}
-              className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 transition-all ${selectedPayment === "KHALTI" ? "border-info bg-info/5 ring-1 ring-info" : "border-base-200 hover:border-base-300"}`}
-            >
-              <Wallet size={32} className="text-info" />
-              <span className="font-bold text-sm">Khalti</span>
-            </div>
-          </div>
-          {errors.paymentMethod && (
-            <span className="text-error text-xs mt-2 block text-center">
-              {errors.paymentMethod.message}
-            </span>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {isCodEnabled && (
+                  <div
+                    onClick={() => setValue("paymentMethod", "COD")}
+                    className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all ${selectedPayment === "COD" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-base-200 hover:border-base-300"}`}
+                  >
+                    <Truck
+                      size={32}
+                      className={
+                        selectedPayment === "COD"
+                          ? "text-primary"
+                          : "text-base-content/40"
+                      }
+                    />
+                    <span className="font-bold text-sm">COD</span>
+                  </div>
+                )}
+                {isEsewaEnabled && (
+                  <div
+                    onClick={() => setValue("paymentMethod", "ESEWA")}
+                    className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all ${selectedPayment === "ESEWA" ? "border-success bg-success/5 ring-1 ring-success" : "border-base-200 hover:border-base-300"}`}
+                  >
+                    <Wallet size={32} className="text-success" />
+                    <div className="flex flex-col items-center">
+                      <span className="font-bold text-sm">eSewa</span>
+                      {/* ✅ Bright Test Mode Indicator for eSewa */}
+                      {isEsewaSandbox && (
+                        <span className="badge badge-warning text-warning-content badge-xs py-2 mt-1.5 gap-1 shadow-sm border-none font-bold uppercase">
+                          <AlertTriangle size={10} /> Test
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {isKhaltiEnabled && (
+                  <div
+                    onClick={() => setValue("paymentMethod", "KHALTI")}
+                    className={`cursor-pointer border rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all ${selectedPayment === "KHALTI" ? "border-info bg-info/5 ring-1 ring-info" : "border-base-200 hover:border-base-300"}`}
+                  >
+                    <Wallet size={32} className="text-info" />
+                    <div className="flex flex-col items-center">
+                      <span className="font-bold text-sm">Khalti</span>
+                      {/* ✅ Bright Test Mode Indicator for Khalti */}
+                      {isKhaltiSandbox && (
+                        <span className="badge badge-warning text-warning-content badge-xs py-2 mt-1.5 gap-1 shadow-sm border-none font-bold uppercase">
+                          <AlertTriangle size={10} /> Test
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {errors.paymentMethod && (
+                <span className="text-error text-xs mt-2 block text-center">
+                  Please select a valid payment method
+                </span>
+              )}
+            </>
           )}
         </section>
       </div>
@@ -973,6 +1034,7 @@ export default function CheckoutForm({
               <span className="text-base-content/70">Subtotal</span>
               <span className="font-bold">{formatPrice(subTotal)}</span>
             </div>
+
             <div className="flex justify-between text-sm">
               <span className="text-base-content/70 flex items-center gap-1">
                 Shipping{" "}
@@ -981,9 +1043,22 @@ export default function CheckoutForm({
                 )}
               </span>
               <span className="font-bold">
-                {formatPrice(currentOption.price)}
+                {formatPrice(currentOption?.price || 0)}
               </span>
             </div>
+
+            {/* Tax Breakdown UI */}
+            {taxRate > 0 && (
+              <div className="flex justify-between items-center text-base-content/50 pt-2 border-t border-base-200 border-dashed mt-2">
+                <span className="flex items-center gap-2 text-xs">
+                  <FileText size={14} /> Includes {taxRate}% VAT
+                </span>
+                <span className="font-medium text-xs">
+                  {formatPrice(taxAmount)}
+                </span>
+              </div>
+            )}
+
             <div className="flex justify-between text-lg font-black mt-4">
               <span>Total</span>
               <span className="text-primary">{formatPrice(total)}</span>
@@ -993,7 +1068,10 @@ export default function CheckoutForm({
           <button
             type="submit"
             disabled={
-              isProcessing || (selectedPartner === "PATHAO" && isPathaoInvalid)
+              isProcessing ||
+              (selectedPartner === "PATHAO" && isPathaoInvalid) ||
+              hasNoDeliveryMethods ||
+              hasNoPaymentMethods
             }
             className="btn btn-primary btn-block rounded-xl h-14 text-lg shadow-xl shadow-primary/25 disabled:opacity-50 disabled:bg-base-300 disabled:text-base-content/40"
           >
@@ -1002,15 +1080,9 @@ export default function CheckoutForm({
             ) : selectedPayment === "COD" ? (
               "Place Order"
             ) : (
-              `Pay with ${selectedPayment}`
+              `Pay with ${selectedPayment || "Card"}`
             )}
           </button>
-          {isPathaoInvalid && selectedPartner === "PATHAO" && (
-            <p className="text-xs text-center text-error mt-2">
-              <AlertTriangle size={12} className="inline mr-1" />
-              Please complete delivery details above
-            </p>
-          )}
           <p className="text-xs text-center text-base-content/40 mt-4">
             By placing an order, you agree to our Terms.
           </p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -13,14 +13,19 @@ import {
   Twitter,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { getPublicSettings } from "@/actions/public-settings";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    getPublicSettings().then(setSettings);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
     toast.success("Message sent successfully! We'll get back to you soon.");
     setIsSubmitting(false);
@@ -67,10 +72,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">Visit Us</h3>
-                  <p className="text-base-content/70 mt-1">
-                    New Road, Kathmandu
-                    <br />
-                    Nepal
+                  <p className="text-base-content/70 mt-1 whitespace-pre-line">
+                    {settings?.storeAddress || "New Road, Kathmandu\nNepal"}
                   </p>
                 </div>
               </div>
@@ -82,9 +85,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-lg">Email Us</h3>
                   <p className="text-base-content/70 mt-1">
-                    support@nepalecom.com
-                    <br />
-                    info@nepalecom.com
+                    {settings?.storeEmail || "support@nepalecom.com"}
                   </p>
                 </div>
               </div>
@@ -96,14 +97,12 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-lg">Call Us</h3>
                   <p className="text-base-content/70 mt-1">
-                    +977 9800000000
-                    <br />
-                    +977 01-4200000
+                    {settings?.storePhone || "+977 9800000000"}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
+              {/* <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
                   <Clock size={24} />
                 </div>
@@ -115,24 +114,46 @@ export default function ContactPage() {
                     Saturday: Closed
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Follow Us</h2>
-            <div className="flex gap-4">
-              <button className="btn btn-circle btn-outline hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-colors">
-                <Facebook size={20} />
-              </button>
-              <button className="btn btn-circle btn-outline hover:bg-pink-600 hover:border-pink-600 hover:text-white transition-colors">
-                <Instagram size={20} />
-              </button>
-              <button className="btn btn-circle btn-outline hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors">
-                <Twitter size={20} />
-              </button>
+          {(settings?.socialFacebook ||
+            settings?.socialInstagram ||
+            settings?.socialTwitter) && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Follow Us</h2>
+              <div className="flex gap-4">
+                {settings.socialFacebook && (
+                  <a
+                    href={settings.socialFacebook}
+                    target="_blank"
+                    className="btn btn-circle btn-outline hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-colors"
+                  >
+                    <Facebook size={20} />
+                  </a>
+                )}
+                {settings.socialInstagram && (
+                  <a
+                    href={settings.socialInstagram}
+                    target="_blank"
+                    className="btn btn-circle btn-outline hover:bg-pink-600 hover:border-pink-600 hover:text-white transition-colors"
+                  >
+                    <Instagram size={20} />
+                  </a>
+                )}
+                {settings.socialTwitter && (
+                  <a
+                    href={settings.socialTwitter}
+                    target="_blank"
+                    className="btn btn-circle btn-outline hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors"
+                  >
+                    <Twitter size={20} />
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </motion.div>
 
         {/* Contact Form */}
