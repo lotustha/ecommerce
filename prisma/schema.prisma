@@ -133,16 +133,25 @@ model Product {
   variants    ProductVariant[]
   specs       ProductSpec[] // Technical specs (RAM, CPU)
 
-  // Social
+  // ✅ NEW: SEO Fields
+  metaTitle       String? @db.VarChar(255)
+  metaDescription String? @db.Text
+  keywords        String? @db.Text
+
+  // ✅ NEW: Cross-Selling (Self-relation for "Frequently Bought Together")
+  crossSells    Product[] @relation("CrossSells")
+  crossSelledBy Product[] @relation("CrossSells")
+
+  // Social & Transactions
   reviews       Review[]
   wishlistItems Wishlist[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
 
-  isFeatured Boolean     @default(false)
-  isArchived Boolean     @default(false)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  isFeatured Boolean  @default(false)
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model ProductVariant {
@@ -155,9 +164,15 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  // ✅ NEW: Color tracking for smart UI rendering
+  colorCode String? @db.VarChar(50) // e.g. "#FF0000"
+
   // Variants can be in cart/orders
   cartItems  CartItem[]
   orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Tech Specs for Comparison (e.g., Attribute: "Screen Type", Value: "OLED")

@@ -30,97 +30,13 @@ import {
 import { calculateShipping } from "@/actions/delivery-actions";
 
 const NEPAL_LOCATIONS: Record<string, string[]> = {
-  Koshi: [
-    "Bhojpur",
-    "Dhankuta",
-    "Ilam",
-    "Jhapa",
-    "Khotang",
-    "Morang",
-    "Okhaldhunga",
-    "Panchthar",
-    "Sankhuwasabha",
-    "Solukhumbu",
-    "Sunsari",
-    "Taplejung",
-    "Terhathum",
-    "Udayapur",
-  ],
-  Madhesh: [
-    "Bara",
-    "Dhanusha",
-    "Mahottari",
-    "Parsa",
-    "Rautahat",
-    "Saptari",
-    "Sarlahi",
-    "Siraha",
-  ],
-  Bagmati: [
-    "Bhaktapur",
-    "Chitwan",
-    "Dhading",
-    "Dolakha",
-    "Kathmandu",
-    "Kavrepalanchok",
-    "Lalitpur",
-    "Makwanpur",
-    "Nuwakot",
-    "Ramechhap",
-    "Rasuwa",
-    "Sindhuli",
-    "Sindhupalchok",
-  ],
-  Gandaki: [
-    "Baglung",
-    "Gorkha",
-    "Kaski",
-    "Lamjung",
-    "Manang",
-    "Mustang",
-    "Myagdi",
-    "Nawalpur",
-    "Parbat",
-    "Syangja",
-    "Tanahun",
-  ],
-  Lumbini: [
-    "Arghakhanchi",
-    "Banke",
-    "Bardiya",
-    "Dang",
-    "Gulmi",
-    "Kapilvastu",
-    "Parasi",
-    "Palpa",
-    "Pyuthan",
-    "Rolpa",
-    "Rukum East",
-    "Rupandehi",
-  ],
-  Karnali: [
-    "Dailekh",
-    "Dolpa",
-    "Humla",
-    "Jajarkot",
-    "Jumla",
-    "Kalikot",
-    "Mugu",
-    "Salyan",
-    "Surkhet",
-    "Rukum West",
-  ],
-  Sudurpashchim: [
-    "Achham",
-    "Baitadi",
-    "Bajhang",
-    "Bajura",
-    "Dadeldhura",
-    "Darchula",
-    "Doti",
-    "Kailali",
-    "Kanchanpur",
-  ],
+  Koshi: ["Bhojpur", "Dhankuta", "Ilam", "Jhapa", "Khotang", "Morang", "Okhaldhunga", "Panchthar", "Sankhuwasabha", "Solukhumbu", "Sunsari", "Taplejung", "Terhathum", "Udayapur"],
+  Madhesh: ["Bara", "Dhanusha", "Mahottari", "Parsa", "Rautahat", "Saptari", "Sarlahi", "Siraha"],
+  Bagmati: ["Bhaktapur", "Chitwan", "Dhading", "Dolakha", "Kathmandu", "Kavrepalanchok", "Lalitpur", "Makwanpur", "Nuwakot", "Ramechhap", "Rasuwa", "Sindhuli", "Sindhupalchok"],
+  Gandaki: ["Baglung", "Gorkha", "Kaski", "Lamjung", "Manang", "Mustang", "Myagdi", "Nawalpur", "Parbat", "Syangja", "Tanahun"],
+  Lumbini: ["Arghakhanchi", "Banke", "Bardiya", "Dang", "Gulmi", "Kapilvastu", "Parasi", "Palpa", "Pyuthan", "Rolpa", "Rukum East", "Rupandehi"],
+  Karnali: ["Dailekh", "Dolpa", "Humla", "Jajarkot", "Jumla", "Kalikot", "Mugu", "Salyan", "Surkhet", "Rukum West"],
+  Sudurpashchim: ["Achham", "Baitadi", "Bajhang", "Bajura", "Dadeldhura", "Darchula", "Doti", "Kailali", "Kanchanpur"],
 };
 
 const CheckoutSchema = z.object({
@@ -155,7 +71,7 @@ interface DeliveryOption {
   price: number;
   time: string;
   recommended?: boolean;
-  isTest?: boolean; // ✅ Added field specifically for test mode badges
+  isTest?: boolean;
 }
 
 export default function CheckoutForm({
@@ -168,10 +84,11 @@ export default function CheckoutForm({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
-  // ✅ Safe boolean accessors with explicit fail-safe defaults (Default to Test Mode for security)
+  // Safe boolean accessors
   const isCodEnabled = settings?.enableCod ?? true;
   const isEsewaEnabled = settings?.enableEsewa ?? false;
   const isKhaltiEnabled = settings?.enableKhalti ?? false;
+
   const isStoreDeliveryEnabled = settings?.enableStoreDelivery ?? true;
   const isPathaoEnabled = settings?.enablePathao ?? false;
 
@@ -179,23 +96,9 @@ export default function CheckoutForm({
   const isEsewaSandbox = settings?.esewaSandbox ?? true;
   const isKhaltiSandbox = settings?.khaltiSandbox ?? true;
 
-  // Determine initial payment method based on settings priority
-  const defaultPayment = isCodEnabled
-    ? "COD"
-    : isEsewaEnabled
-      ? "ESEWA"
-      : isKhaltiEnabled
-        ? "KHALTI"
-        : "";
+  const defaultPayment = isCodEnabled ? "COD" : isEsewaEnabled ? "ESEWA" : isKhaltiEnabled ? "KHALTI" : "";
+  const defaultPartner = isStoreDeliveryEnabled ? "STORE" : isPathaoEnabled ? "PATHAO" : "";
 
-  // Determine initial delivery partner
-  const defaultPartner = isStoreDeliveryEnabled
-    ? "STORE"
-    : isPathaoEnabled
-      ? "PATHAO"
-      : "";
-
-  // Determine standard shipping logic
   const items = useCartStore((state) => state.items);
   const checkoutIds = useCartStore((state) => state.checkoutIds);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -214,29 +117,26 @@ export default function CheckoutForm({
     0,
   );
 
-  // Base shipping cost with free shipping logic applied
+  // ✅ BUG FIX: Properly parses "0" and safely evaluates Free Shipping logic
   const standardCost = Number(settings?.shippingCharge ?? 150);
-  const freeThreshold = settings?.freeShippingThreshold
-    ? Number(settings.freeShippingThreshold)
-    : null;
-  const isFreeShipping = freeThreshold !== null && subTotal >= freeThreshold;
+  const freeThreshold = Number(settings?.freeShippingThreshold || 0);
+  const isFreeShipping = freeThreshold > 0 && subTotal >= freeThreshold;
   const finalStandardCost = isFreeShipping ? 0 : standardCost;
 
   // Pathao Logistics State
   const [verifyingLoc, setVerifyingLoc] = useState(false);
-  const [pathaoStatus, setPathaoStatus] = useState<
-    "MATCHED" | "UNMATCHED" | "PENDING"
-  >("PENDING");
+  const [pathaoStatus, setPathaoStatus] = useState<"MATCHED" | "UNMATCHED" | "PENDING">("PENDING");
   const [pathaoCityId, setPathaoCityId] = useState<number | null>(null);
   const [pathaoZoneId, setPathaoZoneId] = useState<number | null>(null);
   const [pathaoAreaId, setPathaoAreaId] = useState<number | null>(null);
 
-  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([]);
+  const [pathaoCalculatedCost, setPathaoCalculatedCost] = useState<number | null>(null);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
 
-  // ✅ Dynamically build delivery options based on exact state of settings
-  useEffect(() => {
+  // ✅ BUG FIX: Completely eliminated useEffect arrays to prevent "Store" from ghosting
+  const deliveryOptions: DeliveryOption[] = useMemo(() => {
     const options: DeliveryOption[] = [];
+
     if (isStoreDeliveryEnabled) {
       options.push({
         id: "STORE",
@@ -252,20 +152,15 @@ export default function CheckoutForm({
         id: "PATHAO",
         name: "Pathao",
         description: isPathaoSandbox ? "Test Mode Active" : "Fast Delivery",
-        price: 0,
+        price: pathaoCalculatedCost ?? 0,
         time: "1-2 Days",
         recommended: true,
         isTest: isPathaoSandbox,
       });
     }
-    setDeliveryOptions(options);
-  }, [
-    isStoreDeliveryEnabled,
-    isPathaoEnabled,
-    finalStandardCost,
-    isFreeShipping,
-    isPathaoSandbox,
-  ]);
+
+    return options;
+  }, [isStoreDeliveryEnabled, isPathaoEnabled, finalStandardCost, isFreeShipping, isPathaoSandbox, pathaoCalculatedCost]);
 
   // Manual Selection Lists
   const [pCities, setPCities] = useState<any[]>([]);
@@ -305,23 +200,19 @@ export default function CheckoutForm({
     reset,
     formState: { errors },
   } = form;
+
   const selectedPayment = watch("paymentMethod");
   const selectedPartner = watch("deliveryPartner");
   const selectedProvince = useWatch({ control, name: "province" });
-  const districtOptions = selectedProvince
-    ? NEPAL_LOCATIONS[selectedProvince] || []
-    : [];
+  const districtOptions = selectedProvince ? NEPAL_LOCATIONS[selectedProvince] || [] : [];
 
-  const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) ||
-    deliveryOptions[0] || { price: 0 };
+  const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) || deliveryOptions[0] || { price: 0 };
 
-  // Final calculation
   const total = subTotal + currentOption.price;
 
   // Tax Calculation (INCLUSIVE Pricing)
   const taxRate = settings?.taxRate ? Number(settings.taxRate) : 0;
   let taxAmount = 0;
-
   if (taxRate > 0) {
     taxAmount = subTotal - subTotal / (1 + taxRate / 100);
   }
@@ -362,18 +253,14 @@ export default function CheckoutForm({
           const zones = await getPublicZones(res.cityId);
           setPZones(zones);
 
-          const addressString =
-            `${watchStreet} ${watchCity} ${watchDistrict}`.toLowerCase();
-          const matchZone = zones.find((z: any) =>
-            addressString.includes(z.zone_name.toLowerCase()),
-          );
+          const addressString = `${watchStreet} ${watchCity} ${watchDistrict}`.toLowerCase();
+          const matchZone = zones.find((z: any) => addressString.includes(z.zone_name.toLowerCase()));
+
           if (matchZone) {
             setPathaoZoneId(matchZone.zone_id);
             const areas = await getPublicAreas(matchZone.zone_id);
             setPAreas(areas);
-            const matchArea = areas.find((a: any) =>
-              addressString.includes(a.area_name.toLowerCase()),
-            );
+            const matchArea = areas.find((a: any) => addressString.includes(a.area_name.toLowerCase()));
             if (matchArea) setPathaoAreaId(matchArea.area_id);
           } else {
             setPathaoZoneId(null);
@@ -406,6 +293,7 @@ export default function CheckoutForm({
     }
   }, [pathaoZoneId, isOrderPlaced, isPathaoEnabled]);
 
+  // ✅ Clean Pathao Calculation Effect
   useEffect(() => {
     if (isOrderPlaced || !isPathaoEnabled) return;
 
@@ -420,53 +308,18 @@ export default function CheckoutForm({
         })),
       })
         .then((res) => {
-          if (res.success && res.cost) {
-            setDeliveryOptions((prev) => {
-              const others = prev.filter((o) => o.id !== "PATHAO");
-              return [
-                ...others,
-                {
-                  id: "PATHAO",
-                  name: "Pathao",
-                  description: isPathaoSandbox
-                    ? "Test Mode Active"
-                    : "Fast Delivery",
-                  price: Number(res.cost),
-                  time: "1-2 Days",
-                  recommended: true,
-                  isTest: isPathaoSandbox,
-                },
-              ];
-            });
+          if (res.success && res.cost !== undefined) {
+            setPathaoCalculatedCost(Number(res.cost));
+          } else {
+            setPathaoCalculatedCost(null);
           }
         })
         .catch(console.error)
         .finally(() => setIsCalculatingShipping(false));
     } else {
-      setDeliveryOptions((prev) => {
-        const others = prev.filter((o) => o.id !== "PATHAO");
-        return [
-          ...others,
-          {
-            id: "PATHAO",
-            name: "Pathao",
-            description: isPathaoSandbox ? "Test Mode Active" : "Fast Delivery",
-            price: 0,
-            time: "1-2 Days",
-            recommended: true,
-            isTest: isPathaoSandbox,
-          },
-        ];
-      });
+      setPathaoCalculatedCost(null);
     }
-  }, [
-    pathaoCityId,
-    pathaoZoneId,
-    checkoutItems,
-    isOrderPlaced,
-    isPathaoEnabled,
-    isPathaoSandbox,
-  ]);
+  }, [pathaoCityId, pathaoZoneId, checkoutItems, isOrderPlaced, isPathaoEnabled]);
 
   const handlePCityChange = async (cid: number) => {
     setPathaoCityId(cid);
@@ -474,6 +327,7 @@ export default function CheckoutForm({
     const zones = await getPublicZones(cid);
     setPZones(zones);
   };
+
   const handlePZoneChange = (zid: number) => {
     setPathaoZoneId(zid);
     setPathaoAreaId(null);
@@ -487,20 +341,14 @@ export default function CheckoutForm({
     }
   }, [items.length, checkoutIds.length, router, isOrderPlaced]);
 
-  const isPathaoInvalid =
-    selectedPartner === "PATHAO" &&
-    (!pathaoCityId || !pathaoZoneId || (pAreas.length > 0 && !pathaoAreaId));
-
+  const isPathaoInvalid = selectedPartner === "PATHAO" && (!pathaoCityId || !pathaoZoneId || (pAreas.length > 0 && !pathaoAreaId));
   const hasNoDeliveryMethods = deliveryOptions.length === 0;
-  const hasNoPaymentMethods =
-    !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
+  const hasNoPaymentMethods = !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
 
   const onSubmit = async (data: CheckoutFormValues) => {
     if (hasNoDeliveryMethods || hasNoPaymentMethods) return;
-    if (isPathaoInvalid && isPathaoEnabled)
-      return toast.error(
-        "Please verify or select your specific delivery location for Pathao.",
-      );
+    if (isPathaoInvalid && isPathaoEnabled) return toast.error("Please verify or select your specific delivery location for Pathao.");
+
     setIsProcessing(true);
 
     const orderData = {
@@ -526,18 +374,13 @@ export default function CheckoutForm({
 
     if (result.success && result.orderId) {
       setIsOrderPlaced(true);
-      if (data.paymentMethod === "COD")
-        toast.success("Order placed successfully! 🎉");
+      if (data.paymentMethod === "COD") toast.success("Order placed successfully! 🎉");
       else toast.success("Order initiated! Redirecting to payment...");
 
       if ((result as any).isNewAccount)
-        toast.success("Account created! Check email for login.", {
-          duration: 6000,
-        });
+        toast.success("Account created! Check email for login.", { duration: 6000 });
 
-      checkoutItems.forEach((item) =>
-        removeItem(item.productId, item.variantId),
-      );
+      checkoutItems.forEach((item) => removeItem(item.productId, item.variantId));
       setCheckoutIds([]);
 
       if (data.paymentMethod === "COD") router.push("/orders");
@@ -562,7 +405,7 @@ export default function CheckoutForm({
       className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
     >
       <div className="lg:col-span-7 space-y-8">
-        <section className="bg-base-100 rounded-4xl border border-base-200 p-6 md:p-8 shadow-sm">
+        <section className="bg-base-100 rounded-[2rem] border border-base-200 p-6 md:p-8 shadow-sm">
           <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
             <span className="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm">
               1
@@ -829,7 +672,7 @@ export default function CheckoutForm({
         </section>
 
         {/* 2. Delivery Method */}
-        <section className="bg-base-100 rounded-4xl border border-base-200 p-6 md:p-8 shadow-sm">
+        <section className="bg-base-100 rounded-[2rem] border border-base-200 p-6 md:p-8 shadow-sm">
           <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
             <span className="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm">
               2
@@ -893,8 +736,8 @@ export default function CheckoutForm({
                         <AlertTriangle size={10} /> Check Location
                       </span>
                     ) : (
-                      <p className="font-bold text-lg">
-                        {formatPrice(option.price)}
+                      <p className={`font-bold text-lg ${option.price === 0 ? 'text-success' : ''}`}>
+                        {option.price === 0 ? "Free" : formatPrice(option.price)}
                       </p>
                     )}
                     {isCalculatingShipping && option.id === "PATHAO" && (
@@ -911,7 +754,7 @@ export default function CheckoutForm({
         </section>
 
         {/* 3. Payment Method */}
-        <section className="bg-base-100 rounded-4xl border border-base-200 p-6 md:p-8 shadow-sm">
+        <section className="bg-base-100 rounded-[2rem] border border-base-200 p-6 md:p-8 shadow-sm">
           <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
             <span className="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm">
               3
@@ -954,7 +797,6 @@ export default function CheckoutForm({
                     <Wallet size={32} className="text-success" />
                     <div className="flex flex-col items-center">
                       <span className="font-bold text-sm">eSewa</span>
-                      {/* ✅ Bright Test Mode Indicator for eSewa */}
                       {isEsewaSandbox && (
                         <span className="badge badge-warning text-warning-content badge-xs py-2 mt-1.5 gap-1 shadow-sm border-none font-bold uppercase">
                           <AlertTriangle size={10} /> Test
@@ -971,7 +813,6 @@ export default function CheckoutForm({
                     <Wallet size={32} className="text-info" />
                     <div className="flex flex-col items-center">
                       <span className="font-bold text-sm">Khalti</span>
-                      {/* ✅ Bright Test Mode Indicator for Khalti */}
                       {isKhaltiSandbox && (
                         <span className="badge badge-warning text-warning-content badge-xs py-2 mt-1.5 gap-1 shadow-sm border-none font-bold uppercase">
                           <AlertTriangle size={10} /> Test
@@ -993,7 +834,7 @@ export default function CheckoutForm({
 
       {/* --- RIGHT COLUMN: Order Summary --- */}
       <div className="lg:col-span-5 lg:sticky lg:top-24">
-        <div className="bg-base-100 border border-base-200 rounded-4xl p-6 md:p-8 shadow-xl">
+        <div className="bg-base-100 border border-base-200 rounded-[2rem] p-6 md:p-8 shadow-xl">
           <h2 className="text-xl font-bold mb-6">Order Summary</h2>
           <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
             {checkoutItems.map((item) => (
@@ -1042,8 +883,8 @@ export default function CheckoutForm({
                   <Loader2 size={10} className="animate-spin" />
                 )}
               </span>
-              <span className="font-bold">
-                {formatPrice(currentOption?.price || 0)}
+              <span className={`font-bold ${(currentOption?.price || 0) === 0 ? 'text-success' : ''}`}>
+                {(currentOption?.price || 0) === 0 ? "Free" : formatPrice(currentOption?.price || 0)}
               </span>
             </div>
 

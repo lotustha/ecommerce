@@ -1,7 +1,7 @@
 "use client"
 
 import { updateOrderStatus } from "@/actions/order-actions"
-import { OrderStatus } from "../../../../../generated/prisma/enums"
+import { OrderStatus } from "../../../../../../generated/prisma/enums"
 import { useState, useTransition } from "react"
 import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
