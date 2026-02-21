@@ -177,6 +177,7 @@ export const ProductScalarFieldEnum = {
   categoryId: 'categoryId',
   brandId: 'brandId',
   hasVariants: 'hasVariants',
+  options: 'options',
   metaTitle: 'metaTitle',
   metaDescription: 'metaDescription',
   keywords: 'keywords',
@@ -197,6 +198,7 @@ export const ProductVariantScalarFieldEnum = {
   stock: 'stock',
   productId: 'productId',
   colorCode: 'colorCode',
+  image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -486,6 +488,7 @@ export const ProductOrderByRelevanceFieldEnum = {
   images: 'images',
   categoryId: 'categoryId',
   brandId: 'brandId',
+  options: 'options',
   metaTitle: 'metaTitle',
   metaDescription: 'metaDescription',
   keywords: 'keywords'
@@ -499,7 +502,8 @@ export const ProductVariantOrderByRelevanceFieldEnum = {
   sku: 'sku',
   name: 'name',
   productId: 'productId',
-  colorCode: 'colorCode'
+  colorCode: 'colorCode',
+  image: 'image'
 } as const
 
 export type ProductVariantOrderByRelevanceFieldEnum = (typeof ProductVariantOrderByRelevanceFieldEnum)[keyof typeof ProductVariantOrderByRelevanceFieldEnum]

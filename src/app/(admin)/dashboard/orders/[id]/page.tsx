@@ -2,7 +2,6 @@ import { prisma } from "@/lib/db/prisma";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
-  User,
   MapPin,
   CreditCard,
   Package,
@@ -16,6 +15,7 @@ import {
 import Link from "next/link";
 import DeliveryAssignment from "../_components/delivery-assignment";
 import PaymentStatusSelect from "../_components/payment-status-select";
+import PrintInvoiceButton from "../_components/print-invoice-button";
 import { getAvailableRiders } from "@/actions/delivery-actions";
 
 export default async function AdminOrderDetailPage({
@@ -25,44 +25,38 @@ export default async function AdminOrderDetailPage({
 }) {
   const { id } = await params;
 
-  const [order, riders, settings] = await Promise.all([
-    prisma.order.findUnique({
-      where: { id },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                name: true,
-                slug: true,
-                images: true,
-                category: { select: { name: true } },
-              },
+  // 1. Fetch the order
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: {
+      items: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              slug: true,
+              images: true,
+              category: { select: { name: true } },
             },
           },
         },
-        user: { select: { name: true, email: true } },
       },
-    }),
-    getAvailableRiders(),
-    prisma.systemSetting.findUnique({ where: { id: "default" } }),
-  ]);
+      user: { select: { name: true, email: true } },
+      rider: { select: { name: true } },
+    },
+  });
 
   if (!order) notFound();
 
-  const partners = ["Pathao", "Upaya", "Manual"];
+  // 2. Fetch settings
+  const settings = await prisma.systemSetting.findUnique({
+    where: { id: "default" },
+  });
+
+  // 3. Fetch riders
+  const riders = await getAvailableRiders();
+
   const shipping = JSON.parse(order.shippingAddress as string);
-
-  const senderInfo = {
-    name: settings?.storeName || "Nepal E-com",
-    address: settings?.storeAddress || "Kathmandu, Nepal",
-    phone: settings?.storePhone || "+977-9800000000",
-  };
-
-  const codAmount =
-    order.paymentMethod === "COD" && order.paymentStatus !== "PAID"
-      ? Number(order.totalAmount)
-      : 0;
 
   const formatPrice = (p: number) => {
     return new Intl.NumberFormat("en-NP", {
@@ -113,6 +107,14 @@ export default async function AdminOrderDetailPage({
             </p>
           </div>
         </div>
+
+        {/* ✅ INVOICE BUTTON */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <PrintInvoiceButton
+            order={JSON.parse(JSON.stringify(order))}
+            settings={JSON.parse(JSON.stringify(settings))}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -128,6 +130,7 @@ export default async function AdminOrderDetailPage({
                 {order.items.length} Items
               </span>
             </div>
+
             <div className="overflow-x-auto">
               <table className="table">
                 <thead>
@@ -158,6 +161,7 @@ export default async function AdminOrderDetailPage({
                 </tbody>
               </table>
             </div>
+
             {/* Totals */}
             <div className="p-6 bg-base-200/30 border-t border-base-200 space-y-2">
               <div className="flex justify-between text-sm">
@@ -243,18 +247,8 @@ export default async function AdminOrderDetailPage({
         <div className="space-y-6">
           {/* 1. LOGISTICS (Top) */}
           <DeliveryAssignment
-            orderId={order.id}
-            currentStatus={order.status}
-            riders={riders}
-            partners={partners}
-            shippingInfo={shipping}
-            existingTracking={order.trackingCode}
-            existingCourier={order.courier}
-            existingRiderId={order.riderId}
-            codAmount={codAmount}
-            senderInfo={senderInfo}
-            paymentStatus={order.paymentStatus} // ✅ Added
-            paymentMethod={order.paymentMethod} // ✅ Added
+            order={JSON.parse(JSON.stringify(order))}
+            riders={JSON.parse(JSON.stringify(riders))}
           />
 
           {/* 2. CUSTOMER & ADDRESS */}

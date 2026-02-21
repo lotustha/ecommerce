@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* Include the official typography plugin for rich text formatting */
+@plugin "@tailwindcss/typography";
+
+/* Configure DaisyUI themes */
 @plugin "daisyui" {
   themes: emerald --default, forest --prefersdark, emerald --preferslight;
+}
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* Dark mode overrides if needed, though DaisyUI handles themes automatically */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }

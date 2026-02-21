@@ -12,22 +12,33 @@ export const ProductFormSchema = z.object({
   stock: z.coerce.number().int().min(0),
   categoryId: z.string().min(1, "Category is required"),
   brandId: z.string().optional().nullable(),
-  images: z
-    .array(z.string())
-    .refine(
-      (items) =>
-        items.every(
-          (item) => item.startsWith("http") || item.startsWith("data:image"),
-        ),
-      {
-        message: "Must be valid image URLs or uploaded files",
-      },
-    ),
+  images: z.array(z.string()).refine(
+    (items) =>
+      items.every(
+        (item) =>
+          item.startsWith("http") ||
+          item.startsWith("data:image") ||
+          item.startsWith("/") || // Allow relative paths
+          item.startsWith("blob:"), // Allow local blob previews
+      ),
+    {
+      message: "Must be valid image URLs, relative paths, or uploaded files",
+    },
+  ),
   isFeatured: z.boolean().default(false),
   isArchived: z.boolean().default(false),
 
-  // ✅ Variants: Purchasable items (Specific Price/Stock/SKU)
-  // If price is not set in UI, frontend should default it to base price before submitting
+  // SEO Fields
+  metaTitle: z.string().optional().nullable(),
+  metaDescription: z.string().optional().nullable(),
+  keywords: z.string().optional().nullable(),
+
+  // Cross Sells
+  crossSells: z.array(z.string()).optional().default([]),
+
+  // ✅ FIX: Added options to schema so it doesn't get stripped out
+  options: z.string().optional().nullable(),
+
   variants: z
     .array(
       z.object({
@@ -35,11 +46,12 @@ export const ProductFormSchema = z.object({
         sku: z.string().min(1, "SKU required"),
         price: z.coerce.number().min(0, "Price must be positive"),
         stock: z.coerce.number().int().min(0, "Stock must be 0 or more"),
+        colorCode: z.string().optional().nullable(),
+        image: z.string().optional().nullable(),
       }),
     )
     .optional(),
 
-  // ✅ Specifications: Informational details (Comparison/Metadata)
   specs: z
     .array(
       z.object({

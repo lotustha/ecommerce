@@ -129,14 +129,14 @@ model Product {
   brand      Brand?   @relation(fields: [brandId], references: [id])
 
   // Variants & Specs
-  hasVariants Boolean          @default(false)
-  variants    ProductVariant[]
-  specs       ProductSpec[] // Technical specs (RAM, CPU)
-
+  hasVariants     Boolean          @default(false)
+  variants        ProductVariant[]
+  specs           ProductSpec[] // Technical specs (RAM, CPU)
+  options         String?          @db.Text
   // ✅ NEW: SEO Fields
-  metaTitle       String? @db.VarChar(255)
-  metaDescription String? @db.Text
-  keywords        String? @db.Text
+  metaTitle       String?          @db.VarChar(255)
+  metaDescription String?          @db.Text
+  keywords        String?          @db.Text
 
   // ✅ NEW: Cross-Selling (Self-relation for "Frequently Bought Together")
   crossSells    Product[] @relation("CrossSells")
@@ -165,7 +165,8 @@ model ProductVariant {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   // ✅ NEW: Color tracking for smart UI rendering
-  colorCode String? @db.VarChar(50) // e.g. "#FF0000"
+  colorCode String? @db.VarChar(50)
+  image     String? @db.LongText
 
   // Variants can be in cart/orders
   cartItems  CartItem[]

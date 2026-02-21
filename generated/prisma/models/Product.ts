@@ -50,6 +50,7 @@ export type ProductMinAggregateOutputType = {
   categoryId: string | null
   brandId: string | null
   hasVariants: boolean | null
+  options: string | null
   metaTitle: string | null
   metaDescription: string | null
   keywords: string | null
@@ -71,6 +72,7 @@ export type ProductMaxAggregateOutputType = {
   categoryId: string | null
   brandId: string | null
   hasVariants: boolean | null
+  options: string | null
   metaTitle: string | null
   metaDescription: string | null
   keywords: string | null
@@ -92,6 +94,7 @@ export type ProductCountAggregateOutputType = {
   categoryId: number
   brandId: number
   hasVariants: number
+  options: number
   metaTitle: number
   metaDescription: number
   keywords: number
@@ -127,6 +130,7 @@ export type ProductMinAggregateInputType = {
   categoryId?: true
   brandId?: true
   hasVariants?: true
+  options?: true
   metaTitle?: true
   metaDescription?: true
   keywords?: true
@@ -148,6 +152,7 @@ export type ProductMaxAggregateInputType = {
   categoryId?: true
   brandId?: true
   hasVariants?: true
+  options?: true
   metaTitle?: true
   metaDescription?: true
   keywords?: true
@@ -169,6 +174,7 @@ export type ProductCountAggregateInputType = {
   categoryId?: true
   brandId?: true
   hasVariants?: true
+  options?: true
   metaTitle?: true
   metaDescription?: true
   keywords?: true
@@ -277,6 +283,7 @@ export type ProductGroupByOutputType = {
   categoryId: string
   brandId: string | null
   hasVariants: boolean
+  options: string | null
   metaTitle: string | null
   metaDescription: string | null
   keywords: string | null
@@ -321,6 +328,7 @@ export type ProductWhereInput = {
   categoryId?: Prisma.StringFilter<"Product"> | string
   brandId?: Prisma.StringNullableFilter<"Product"> | string | null
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
+  options?: Prisma.StringNullableFilter<"Product"> | string | null
   metaTitle?: Prisma.StringNullableFilter<"Product"> | string | null
   metaDescription?: Prisma.StringNullableFilter<"Product"> | string | null
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -352,6 +360,7 @@ export type ProductOrderByWithRelationInput = {
   categoryId?: Prisma.SortOrder
   brandId?: Prisma.SortOrderInput | Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
+  options?: Prisma.SortOrderInput | Prisma.SortOrder
   metaTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   keywords?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -387,6 +396,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   categoryId?: Prisma.StringFilter<"Product"> | string
   brandId?: Prisma.StringNullableFilter<"Product"> | string | null
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
+  options?: Prisma.StringNullableFilter<"Product"> | string | null
   metaTitle?: Prisma.StringNullableFilter<"Product"> | string | null
   metaDescription?: Prisma.StringNullableFilter<"Product"> | string | null
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -418,6 +428,7 @@ export type ProductOrderByWithAggregationInput = {
   categoryId?: Prisma.SortOrder
   brandId?: Prisma.SortOrderInput | Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
+  options?: Prisma.SortOrderInput | Prisma.SortOrder
   metaTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   keywords?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -447,6 +458,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   categoryId?: Prisma.StringWithAggregatesFilter<"Product"> | string
   brandId?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   hasVariants?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
+  options?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   metaTitle?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   metaDescription?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   keywords?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
@@ -466,6 +478,7 @@ export type ProductCreateInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -497,6 +510,7 @@ export type ProductUncheckedCreateInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -524,6 +538,7 @@ export type ProductUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -555,6 +570,7 @@ export type ProductUncheckedUpdateInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -584,6 +600,7 @@ export type ProductCreateManyInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -603,6 +620,7 @@ export type ProductUpdateManyMutationInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -624,6 +642,7 @@ export type ProductUncheckedUpdateManyInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -661,6 +680,7 @@ export type ProductCountOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
+  options?: Prisma.SortOrder
   metaTitle?: Prisma.SortOrder
   metaDescription?: Prisma.SortOrder
   keywords?: Prisma.SortOrder
@@ -688,6 +708,7 @@ export type ProductMaxOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
+  options?: Prisma.SortOrder
   metaTitle?: Prisma.SortOrder
   metaDescription?: Prisma.SortOrder
   keywords?: Prisma.SortOrder
@@ -709,6 +730,7 @@ export type ProductMinOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
+  options?: Prisma.SortOrder
   metaTitle?: Prisma.SortOrder
   metaDescription?: Prisma.SortOrder
   keywords?: Prisma.SortOrder
@@ -1011,6 +1033,7 @@ export type ProductCreateWithoutBrandInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1040,6 +1063,7 @@ export type ProductUncheckedCreateWithoutBrandInput = {
   images?: string | null
   categoryId: string
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1098,6 +1122,7 @@ export type ProductScalarWhereInput = {
   categoryId?: Prisma.StringFilter<"Product"> | string
   brandId?: Prisma.StringNullableFilter<"Product"> | string | null
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
+  options?: Prisma.StringNullableFilter<"Product"> | string | null
   metaTitle?: Prisma.StringNullableFilter<"Product"> | string | null
   metaDescription?: Prisma.StringNullableFilter<"Product"> | string | null
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -1117,6 +1142,7 @@ export type ProductCreateWithoutCategoryInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1146,6 +1172,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   images?: string | null
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1199,6 +1226,7 @@ export type ProductCreateWithoutCrossSelledByInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1229,6 +1257,7 @@ export type ProductUncheckedCreateWithoutCrossSelledByInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1260,6 +1289,7 @@ export type ProductCreateWithoutCrossSellsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1290,6 +1320,7 @@ export type ProductUncheckedCreateWithoutCrossSellsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1353,6 +1384,7 @@ export type ProductCreateWithoutVariantsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1383,6 +1415,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1425,6 +1458,7 @@ export type ProductUpdateWithoutVariantsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1455,6 +1489,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1481,6 +1516,7 @@ export type ProductCreateWithoutSpecsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1511,6 +1547,7 @@ export type ProductUncheckedCreateWithoutSpecsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1553,6 +1590,7 @@ export type ProductUpdateWithoutSpecsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1583,6 +1621,7 @@ export type ProductUncheckedUpdateWithoutSpecsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1609,6 +1648,7 @@ export type ProductCreateWithoutCartItemsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1639,6 +1679,7 @@ export type ProductUncheckedCreateWithoutCartItemsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1681,6 +1722,7 @@ export type ProductUpdateWithoutCartItemsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1711,6 +1753,7 @@ export type ProductUncheckedUpdateWithoutCartItemsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1737,6 +1780,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1767,6 +1811,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1809,6 +1854,7 @@ export type ProductUpdateWithoutOrderItemsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1839,6 +1885,7 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1865,6 +1912,7 @@ export type ProductCreateWithoutReviewsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1895,6 +1943,7 @@ export type ProductUncheckedCreateWithoutReviewsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -1937,6 +1986,7 @@ export type ProductUpdateWithoutReviewsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1967,6 +2017,7 @@ export type ProductUncheckedUpdateWithoutReviewsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1993,6 +2044,7 @@ export type ProductCreateWithoutWishlistItemsInput = {
   stock?: number
   images?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -2023,6 +2075,7 @@ export type ProductUncheckedCreateWithoutWishlistItemsInput = {
   categoryId: string
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -2065,6 +2118,7 @@ export type ProductUpdateWithoutWishlistItemsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2095,6 +2149,7 @@ export type ProductUncheckedUpdateWithoutWishlistItemsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2122,6 +2177,7 @@ export type ProductCreateManyBrandInput = {
   images?: string | null
   categoryId: string
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -2141,6 +2197,7 @@ export type ProductUpdateWithoutBrandInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2170,6 +2227,7 @@ export type ProductUncheckedUpdateWithoutBrandInput = {
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2198,6 +2256,7 @@ export type ProductUncheckedUpdateManyWithoutBrandInput = {
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2218,6 +2277,7 @@ export type ProductCreateManyCategoryInput = {
   images?: string | null
   brandId?: string | null
   hasVariants?: boolean
+  options?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   keywords?: string | null
@@ -2237,6 +2297,7 @@ export type ProductUpdateWithoutCategoryInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2266,6 +2327,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2294,6 +2356,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2313,6 +2376,7 @@ export type ProductUpdateWithoutCrossSelledByInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2343,6 +2407,7 @@ export type ProductUncheckedUpdateWithoutCrossSelledByInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2371,6 +2436,7 @@ export type ProductUncheckedUpdateManyWithoutCrossSelledByInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2390,6 +2456,7 @@ export type ProductUpdateWithoutCrossSellsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2420,6 +2487,7 @@ export type ProductUncheckedUpdateWithoutCrossSellsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2448,6 +2516,7 @@ export type ProductUncheckedUpdateManyWithoutCrossSellsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2563,6 +2632,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   categoryId?: boolean
   brandId?: boolean
   hasVariants?: boolean
+  options?: boolean
   metaTitle?: boolean
   metaDescription?: boolean
   keywords?: boolean
@@ -2597,6 +2667,7 @@ export type ProductSelectScalar = {
   categoryId?: boolean
   brandId?: boolean
   hasVariants?: boolean
+  options?: boolean
   metaTitle?: boolean
   metaDescription?: boolean
   keywords?: boolean
@@ -2606,7 +2677,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "discountPrice" | "stock" | "images" | "categoryId" | "brandId" | "hasVariants" | "metaTitle" | "metaDescription" | "keywords" | "isFeatured" | "isArchived" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "discountPrice" | "stock" | "images" | "categoryId" | "brandId" | "hasVariants" | "options" | "metaTitle" | "metaDescription" | "keywords" | "isFeatured" | "isArchived" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   brand?: boolean | Prisma.Product$brandArgs<ExtArgs>
@@ -2647,6 +2718,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     categoryId: string
     brandId: string | null
     hasVariants: boolean
+    options: string | null
     metaTitle: string | null
     metaDescription: string | null
     keywords: string | null
@@ -3044,6 +3116,7 @@ export interface ProductFieldRefs {
   readonly categoryId: Prisma.FieldRef<"Product", 'String'>
   readonly brandId: Prisma.FieldRef<"Product", 'String'>
   readonly hasVariants: Prisma.FieldRef<"Product", 'Boolean'>
+  readonly options: Prisma.FieldRef<"Product", 'String'>
   readonly metaTitle: Prisma.FieldRef<"Product", 'String'>
   readonly metaDescription: Prisma.FieldRef<"Product", 'String'>
   readonly keywords: Prisma.FieldRef<"Product", 'String'>

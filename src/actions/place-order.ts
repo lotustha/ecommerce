@@ -6,10 +6,10 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-// Expanded Schema to include optional Pathao IDs
+// Expanded Schema to include optional Pathao IDs and Dynamic Shipping Cost
 const PlaceOrderSchema = z.object({
   fullName: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   phone: z.string(),
   province: z.string(),
   district: z.string(),
@@ -24,10 +24,11 @@ const PlaceOrderSchema = z.object({
       quantity: z.number().min(1),
     }),
   ),
-  // ✅ New Optional Fields for Logistics
+  // Optional Fields for Logistics
   pathaoCityId: z.number().optional().nullable(),
   pathaoZoneId: z.number().optional().nullable(),
   pathaoAreaId: z.number().optional().nullable(),
+  shippingCost: z.coerce.number().optional().default(150),
 });
 
 export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
@@ -48,6 +49,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     pathaoCityId,
     pathaoZoneId,
     pathaoAreaId,
+    shippingCost,
     ...address
   } = validated.data;
 
@@ -128,7 +130,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     });
   }
 
-  const shippingCost = 150;
+  // ✅ FIX: Use the shippingCost directly from the validated frontend data instead of hardcoding 150
   const totalAmount = subTotal + shippingCost;
 
   try {
@@ -140,7 +142,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         paymentMethod,
         deliveryType: "EXTERNAL",
 
-        // ✅ Store Pathao IDs in the snapshot for Admin use
+        // Store Pathao IDs in the snapshot for Admin use
         shippingAddress: JSON.stringify({
           fullName,
           email,
@@ -154,7 +156,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         phone: address.phone,
 
         subTotal,
-        shippingCost,
+        shippingCost, // ✅ Saves the dynamic cost accurately
         totalAmount,
 
         items: {

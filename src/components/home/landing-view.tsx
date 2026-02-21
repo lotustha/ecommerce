@@ -12,6 +12,7 @@ import {
   Star,
   Mail,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import ProductCard from "@/components/product/product-card";
 import { Product, Category, Brand } from "../../../generated/prisma/client";
@@ -56,7 +57,7 @@ export default function LandingView({
     },
   };
 
-  const staggerContainer: Variants = {
+  const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -79,8 +80,7 @@ export default function LandingView({
           }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop)",
+            backgroundImage: "url(/placeholder.jpeg",
           }}
         />
         <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent"></div>
@@ -251,9 +251,15 @@ export default function LandingView({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {newArrivals.slice(0, 4).map((product) => (
-            <div key={product.id} className="relative">
-              <div className="absolute -top-2 -left-2 z-20 badge badge-secondary font-bold shadow-md">
-                NEW
+            <div key={product.id} className="relative group/new">
+              {/* Fancy "NEW" Tag on Top Right */}
+              <div className="absolute -top-3 -right-3 z-30">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-linear-to-r from-secondary to-primary blur opacity-60 rounded-full animate-pulse"></div>
+                  <span className="relative flex items-center gap-1 bg-linear-to-r from-secondary to-primary text-white text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 sm:px-4 py-1.5 rounded-full shadow-xl transform rotate-6 group-hover/new:rotate-0 transition-transform duration-300 border border-white/20">
+                    <Sparkles size={14} className="animate-pulse" /> New
+                  </span>
+                </div>
               </div>
               <ProductCard product={product} />
             </div>
