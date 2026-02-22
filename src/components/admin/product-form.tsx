@@ -161,7 +161,7 @@ export default function ProductForm({
             name: o.name,
             values: o.values.join(", "),
           }));
-        } catch (e) {}
+        } catch (e) { }
       }
       return [{ name: "", values: "" }];
     },
@@ -202,19 +202,19 @@ export default function ProductForm({
     : [];
   const defaultSpecs = initialData?.specs
     ? initialData.specs.map((s: any) => ({
-        name: s.attribute.name,
-        value: s.value,
-      }))
+      name: s.attribute.name,
+      value: s.value,
+    }))
     : [];
   const defaultVariants = initialData?.variants
     ? initialData.variants.map((v: any) => ({
-        name: v.name,
-        sku: v.sku,
-        price: Number(v.price),
-        stock: v.stock,
-        colorCode: v.colorCode,
-        image: v.image,
-      }))
+      name: v.name,
+      sku: v.sku,
+      price: Number(v.price),
+      stock: v.stock,
+      colorCode: v.colorCode,
+      image: v.image,
+    }))
     : [];
   const defaultCrossSells = initialData?.crossSells
     ? initialData.crossSells.map((c: any) => c.id)
@@ -1992,10 +1992,10 @@ export default function ProductForm({
                   ))}
                   {(!form.watch("images") ||
                     form.watch("images").length === 0) && (
-                    <div className="col-span-full text-center py-8 opacity-50 border border-dashed rounded-xl border-base-300">
-                      No images uploaded yet.
-                    </div>
-                  )}
+                      <div className="col-span-full text-center py-8 opacity-50 border border-dashed rounded-xl border-base-300">
+                        No images uploaded yet.
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
