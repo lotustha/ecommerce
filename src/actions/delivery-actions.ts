@@ -29,7 +29,7 @@ export async function calculateShipping(data: {
   recipient_city: number;
   recipient_zone: number;
   items: { productId: string; quantity: number }[];
-  override_weight?: number; // ✅ ADDED: Accept manual weight override
+  override_weight?: number; // Accept manual weight override
 }) {
   try {
     const settings = await prisma.systemSetting.findUnique({
@@ -40,7 +40,7 @@ export async function calculateShipping(data: {
 
     let totalWeight = 0;
 
-    // ✅ If override weight is provided, use it. Otherwise, fetch from specs.
+    // If override weight is provided, use it. Otherwise, fetch from specs.
     if (data.override_weight !== undefined && data.override_weight > 0) {
       totalWeight = data.override_weight;
     } else {
@@ -112,9 +112,7 @@ export async function calculateShipping(data: {
     console.error("Shipping Calc Error:", error);
 
     // Safe Fallback to DB Flat Rate if API fails
-    const settingsFallback = await prisma.systemSetting.findUnique({
-      where: { id: "default" },
-    });
+    const settingsFallback = await prisma.systemSetting.findUnique({ where: { id: "default" } });
     const fallbackCost = Number(settingsFallback?.shippingCharge) || 150;
 
     return {
@@ -179,27 +177,28 @@ export async function assignDelivery(orderId: string, data: any) {
 
     // --- PATHAO ASSIGNMENT ---
     if (data.method === "PATHAO") {
-      // CRITICAL: Only collect money if it's COD and has NOT been paid yet
-      const amountToCollect =
-        order.paymentMethod === "COD" && order.paymentStatus !== "PAID"
-          ? Number(order.totalAmount)
-          : 0;
+      // ✅ FIX: Strictly enforce COD amount based on database truth, never frontend input
+      let finalAmountToCollect = (order.paymentMethod === "COD" && order.paymentStatus !== "PAID")
+        ? Number(order.totalAmount)
+        : 0;
+
+      // Pathao requires a strict integer without decimals
+      finalAmountToCollect = Math.round(finalAmountToCollect);
 
       const payload = {
         merchant_order_id: order.id,
         recipient_name: data.recipient_name,
         recipient_phone: data.recipient_phone,
         recipient_address: data.recipient_address,
-        recipient_city: data.recipient_city,
-        recipient_zone: data.recipient_zone,
-        recipient_area: data.recipient_area,
-        item_weight: data.item_weight,
+        recipient_city: Number(data.recipient_city),
+        recipient_zone: Number(data.recipient_zone),
+        recipient_area: Number(data.recipient_area),
+        item_weight: Number(data.item_weight) || 1,
         item_quantity: 1,
-        amount_to_collect: amountToCollect,
+        amount_to_collect: finalAmountToCollect,
         item_type: 2,
         delivery_type: 48,
-        item_description:
-          data.item_description || `Order #${order.id.slice(-6)}`,
+        item_description: data.item_description || `Order #${order.id.slice(-6)}`,
       };
 
       const res = await createPathaoOrder(payload);
@@ -222,8 +221,7 @@ export async function assignDelivery(orderId: string, data: any) {
 
     // --- OTHER / MANUAL ASSIGNMENT ---
     else if (data.method === "OTHER") {
-      if (!data.courierName || !data.trackingId)
-        return { error: "Courier name and tracking ID are required." };
+      if (!data.courierName || !data.trackingId) return { error: "Courier name and tracking ID are required." }
       updateData.deliveryType = "EXTERNAL";
       updateData.courier = data.courierName;
       updateData.trackingCode = data.trackingId;
@@ -235,6 +233,7 @@ export async function assignDelivery(orderId: string, data: any) {
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath(`/dashboard/orders`);
     return { success: "Delivery assigned successfully" };
+
   } catch (error: any) {
     console.error("Delivery Assign Error:", error);
     return { error: error.message || "Internal Server Error" };

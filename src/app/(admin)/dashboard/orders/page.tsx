@@ -93,7 +93,7 @@ export default async function AdminOrdersPage({
               <tr>
                 <th className="pl-6">Order ID</th>
                 <th>Customer</th>
-                <th>Items</th> {/* ✅ Changed from Details to visual Items */}
+                <th>Items</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th className="pr-6 text-right">Actions</th>
@@ -104,7 +104,7 @@ export default async function AdminOrdersPage({
                 let shipping = { fullName: "Unknown", city: "N/A" };
                 try {
                   shipping = JSON.parse(order.shippingAddress as string);
-                } catch (e) {}
+                } catch (e) { }
 
                 return (
                   <tr key={order.id} className="hover group transition-colors">
@@ -152,7 +152,7 @@ export default async function AdminOrdersPage({
                               ? JSON.parse(item.product.images)
                               : [];
                             if (imgs.length > 0) imageUrl = imgs[0];
-                          } catch (e) {}
+                          } catch (e) { }
                           return (
                             <div
                               key={item.id}
@@ -185,13 +185,12 @@ export default async function AdminOrdersPage({
                         {formatPrice(Number(order.totalAmount))}
                       </div>
                       <div
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit mt-1 border ${
-                          order.paymentStatus === "PAID"
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit mt-1 border ${order.paymentStatus === "PAID"
                             ? "bg-success/10 text-success border-success/20"
                             : order.paymentStatus === "FAILED"
                               ? "bg-error/10 text-error border-error/20"
                               : "bg-warning/10 text-warning-content border-warning/20"
-                        }`}
+                          }`}
                       >
                         {order.paymentMethod}
                       </div>

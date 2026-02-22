@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { calculateShipping } from "@/actions/delivery-actions";
 import { updateOrderShippingCost } from "@/actions/order-actions";
+import { getPublicSettings } from "@/actions/public-settings";
 
 interface Rider {
   id: string;
@@ -97,13 +98,14 @@ export default function DeliveryAssignment({
   const [debouncedWeight, setDebouncedWeight] = useState<number | "">("");
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [customCod, setCustomCod] = useState<number | "">("");
+
+  const [settings, setSettings] = useState<any>(null);
 
   const paymentMethod = order.paymentMethod;
   const paymentStatus = order.paymentStatus;
   const totalAmount = order.totalAmount;
 
-  // Calculate the default COD amount the system expects
+  // Calculate the fixed COD amount
   const defaultCodAmount = (paymentMethod === "COD" && paymentStatus !== "PAID") ? Number(totalAmount) : 0;
 
   // Check if order is already processed
@@ -116,12 +118,9 @@ export default function DeliveryAssignment({
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    getPublicSettings().then(setSettings);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    setCustomCod(defaultCodAmount);
-  }, [defaultCodAmount]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedWeight(weight), 500);
@@ -210,9 +209,6 @@ export default function DeliveryAssignment({
 
   const confirmPushToPathao = () => {
     startTransition(async () => {
-      // ✅ FIX: Force parse to an integer (Math.round) to satisfy API validation
-      const finalCodAmount = Math.round(Number(customCod) || 0);
-
       const res = await assignDelivery(order.id, {
         method: "PATHAO",
         recipient_name: shippingAddress.fullName || order.user?.name || "Customer",
@@ -222,7 +218,7 @@ export default function DeliveryAssignment({
         recipient_zone: Number(selectedZone),
         recipient_area: Number(selectedArea),
         item_weight: weight !== "" ? Number(weight) : 1,
-        amount_to_collect: finalCodAmount,
+        amount_to_collect: Math.round(defaultCodAmount), // Fixed
         item_description: `Order #${order.id.slice(-6).toUpperCase()}`,
       });
 
@@ -236,7 +232,6 @@ export default function DeliveryAssignment({
     });
   };
 
-  // Cancel Assignment Logic
   const handleCancelAssignment = () => {
     setIsCancelling(true);
     startTransition(async () => {
@@ -281,37 +276,65 @@ export default function DeliveryAssignment({
             <title>Print Label - Order #${order.id.slice(-6).toUpperCase()}</title>
             <style>
               @page { size: 4in 6in; margin: 0; }
-              body { font-family: Arial, sans-serif; padding: 16px; margin: 0; color: #000; }
+              body { font-family: Arial, sans-serif; padding: 12px; margin: 0; color: #000; box-sizing: border-box; }
+              
               .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
-              .header h1 { font-size: 24px; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
-              .cod-box { border: 4px solid #000; padding: 8px; margin-bottom: 12px; text-align: center; border-radius: 6px; }
-              .cod-box p { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 4px 0; }
-              .cod-box h2 { font-size: 32px; font-weight: 900; margin: 0; }
-              .customer { margin-bottom: 16px; }
-              .customer .label { font-size: 10px; font-weight: bold; text-transform: uppercase; border-bottom: 2px solid #000; display: inline-block; margin-bottom: 4px; }
-              .customer h3 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 4px 0; }
-              .customer p { margin: 4px 0; font-size: 14px; font-weight: bold; line-height: 1.2; }
-              .info-grid { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 8px 0; margin-bottom: 12px; display: flex; font-size: 12px; justify-content: space-between; }
+              .header h1 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+              .header p { font-size: 10px; margin: 4px 0 0 0; }
+              .header .vat { font-size: 10px; margin: 2px 0 0 0; font-weight: bold; }
+              
+              .cod-box { border: 4px solid #000; padding: 6px; margin-bottom: 12px; text-align: center; border-radius: 6px; }
+              .cod-box p { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 2px 0; }
+              .cod-box h2 { font-size: 28px; font-weight: 900; margin: 0; }
+              
+              .addresses { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 8px; gap: 8px; }
+              .address-block { width: 48%; }
+              .address-block .label { font-size: 9px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 4px; }
+              .address-block h3 { font-size: 14px; font-weight: 900; text-transform: uppercase; margin: 0 0 2px 0; line-height: 1.1; word-wrap: break-word; }
+              .address-block p { margin: 0 0 2px 0; font-size: 11px; line-height: 1.2; word-wrap: break-word; }
+              .address-block .phone { font-size: 11px; font-weight: bold; margin-top: 4px; }
+              
+              .info-grid { border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; display: flex; font-size: 11px; justify-content: space-between; }
               .info-col p { margin: 2px 0; }
               .info-label { font-weight: bold; opacity: 0.7; }
-              .items { font-size: 12px; font-weight: bold; }
+              
+              .items { font-size: 11px; font-weight: bold; }
               .items .label { font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; }
               .item-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 4px; margin-bottom: 4px; }
-              .footer { margin-top: 16px; padding-top: 8px; text-align: center; font-size: 10px; font-weight: bold; }
+              
+              .footer { margin-top: 12px; text-align: center; font-size: 9px; font-weight: bold; }
               @media print { .no-print { display: none; } }
             </style>
           </head>
           <body>
-            <div class="header"><h1>Nepal E-com</h1></div>
+            <div class="header">
+              <h1>${settings?.storeName || 'Nepal E-com'}</h1>
+              <p>${settings?.storeAddress || 'Online Store'} | 📞 ${settings?.storePhone || 'Contact Support'}</p>
+              ${settings?.storeTaxId ? `<p class="vat">PAN/VAT: ${settings.storeTaxId}</p>` : ''}
+            </div>
+            
             <div class="cod-box">
               <p>Cash to Collect</p>
               <h2>${defaultCodAmount > 0 ? `Rs. ${defaultCodAmount.toLocaleString()}` : 'PRE-PAID'}</h2>
             </div>
-            <div class="customer">
-              <h3>${shippingAddress.fullName || order.user?.name || "Customer"}</h3>
-              <p>📞 ${shippingAddress.phone || order.phone || "N/A"}</p>
-              <p>${shippingAddress.street || "N/A"}</p>
+            
+            <div class="addresses">
+              <div class="address-block">
+                <span class="label">Sender / Return To:</span>
+                <h3>${settings?.storeName || 'Store'}</h3>
+                <p>${settings?.storeAddress || 'N/A'}</p>
+                <p class="phone">📞 ${settings?.storePhone || 'N/A'}</p>
+              </div>
+              <div class="address-block" style="text-align: right;">
+                <span class="label">Deliver To:</span>
+                <h3>${shippingAddress.fullName || order.user?.name || "Customer"}</h3>
+                <p>${shippingAddress.street || "N/A"}</p>
+                <p>${selectedCityName !== 'N/A' ? selectedCityName : (shippingAddress.city || "N/A")}, ${selectedZoneName !== 'N/A' ? selectedZoneName : (shippingAddress.district || "N/A")}</p>
+                <p>${shippingAddress.province || "N/A"} ${shippingAddress.postalCode ? `- ${shippingAddress.postalCode}` : ""}</p>
+                <p class="phone">📞 ${shippingAddress.phone || order.phone || "N/A"}</p>
+              </div>
             </div>
+            
             <div class="info-grid">
               <div class="info-col">
                 <p class="info-label">Order ID:</p>
@@ -322,11 +345,13 @@ export default function DeliveryAssignment({
                 <p style="font-weight: bold;">${order.courier || (order.rider?.name || "Store Courier")}</p>
               </div>
             </div>
+            
             ${order.trackingCode ? `
-            <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; font-size: 12px;">
+            <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; font-size: 11px;">
               <p class="info-label" style="margin:0 0 2px 0;">Tracking ID:</p>
-              <p style="font-family: monospace; font-size: 16px; font-weight: 900; margin:0;">${order.trackingCode}</p>
+              <p style="font-family: monospace; font-size: 16px; font-weight: 900; margin:0; letter-spacing: 1px;">${order.trackingCode}</p>
             </div>` : ''}
+            
             <div class="items">
               <div class="label">Package Contents (${order.items?.length || 0})</div>
               ${order.items?.map((item: any) => `
@@ -336,9 +361,16 @@ export default function DeliveryAssignment({
                 </div>
               `).join('') || ''}
             </div>
-            <div class="no-print" style="margin-top: 20px; text-align: center;">
-              <button onclick="window.print()" style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Print Label</button>
+            
+            <div class="footer">
+              <p>Date: ${new Date().toLocaleDateString()}</p>
+              <p style="margin-top:2px;">Thank you for shopping with us!</p>
             </div>
+            
+            <div class="no-print" style="margin-top: 20px; text-align: center;">
+              <button onclick="window.print()" style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Print Label</button>
+            </div>
+            
             <script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }</script>
           </body>
         </html>
@@ -357,10 +389,9 @@ export default function DeliveryAssignment({
           Logistics & Assignment
         </h2>
 
-        {/* ✅ RENDER 1: ACTIVE ASSIGNMENT STATE (Clean View) */}
+        {/* ✅ RENDER 1: ACTIVE ASSIGNMENT STATE */}
         {isAssigned ? (
           <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-            {/* PATHAO ACTIVE */}
             {order.trackingCode && (
               <div className="p-5 bg-success/10 border border-success/20 rounded-2xl space-y-4 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-success/10 rounded-bl-full pointer-events-none"></div>
@@ -402,7 +433,6 @@ export default function DeliveryAssignment({
               </div>
             )}
 
-            {/* INTERNAL RIDER ACTIVE */}
             {order.riderId && order.rider && (
               <div className="p-5 bg-base-100 rounded-2xl space-y-4 border-2 border-primary/20 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full pointer-events-none"></div>
@@ -430,9 +460,8 @@ export default function DeliveryAssignment({
           </div>
         ) : (
 
-          /* ✅ RENDER 2: UNASSIGNED STATE (Selection Forms) */
+          /* ✅ RENDER 2: UNASSIGNED STATE */
           <>
-            {/* Dropdown Selection */}
             <div className="mb-6 relative" ref={partnerDropdownRef}>
               <label className="label text-xs font-bold uppercase opacity-60 pb-1 px-0">Logistics Partner</label>
               <div
@@ -491,7 +520,6 @@ export default function DeliveryAssignment({
               )}
             </div>
 
-            {/* Form: INTERNAL STORE DELIVERY */}
             {deliveryMode === "STORE" && (
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-200">
                 <div className="bg-base-200/40 p-5 rounded-2xl border border-base-200">
@@ -552,7 +580,6 @@ export default function DeliveryAssignment({
               </div>
             )}
 
-            {/* Form: PATHAO DELIVERY */}
             {deliveryMode === "PATHAO" && (
               <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
                 <div className="bg-base-200/50 p-4 rounded-xl border border-base-200">
@@ -639,7 +666,7 @@ export default function DeliveryAssignment({
           </>
         )}
 
-        {/* ✅ RESTORED CONFIRMATION MODAL WITH EDITABLE COD */}
+        {/* ✅ CONFIRMATION MODAL (Fixed, Read-only COD) */}
         <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
           <div className="modal-box">
             <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
@@ -652,7 +679,6 @@ export default function DeliveryAssignment({
             </div>
 
             <div className="space-y-3 text-sm bg-base-200/50 p-5 rounded-2xl border border-base-200">
-              {/* Recipient */}
               <div className="flex justify-between items-start border-b border-base-300 pb-3">
                 <span className="opacity-60 font-bold uppercase text-[10px] tracking-wider mt-0.5">Recipient</span>
                 <div className="text-right">
@@ -661,13 +687,11 @@ export default function DeliveryAssignment({
                 </div>
               </div>
 
-              {/* Address */}
               <div className="flex justify-between items-start border-b border-base-300 pb-3 pt-1">
                 <span className="opacity-60 font-bold uppercase text-[10px] tracking-wider mt-0.5">Address</span>
                 <span className="font-bold text-right max-w-[200px] leading-tight">{shippingAddress.street || "N/A"}</span>
               </div>
 
-              {/* Pathao Routing */}
               {deliveryMode === "PATHAO" && (
                 <>
                   <div className="flex justify-between items-start border-b border-base-300 pb-3 pt-1">
@@ -691,35 +715,24 @@ export default function DeliveryAssignment({
                 </>
               )}
 
-              {/* Editable COD */}
+              {/* ✅ Read-only COD Display */}
               <div className="flex justify-between items-center pt-2">
                 <div className="flex flex-col">
                   <span className="opacity-60 font-bold uppercase text-[10px] tracking-wider">Cash to Collect (COD)</span>
-                  <span className="text-[10px] text-base-content/50 mt-0.5">Amount courier should ask for</span>
+                  <span className="text-[10px] text-base-content/50 mt-0.5">Amount courier must collect</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold opacity-50">Rs.</span>
-                  <input
-                    type="number"
-                    className="input input-sm input-bordered w-24 text-right font-black text-error focus:ring-error"
-                    value={customCod}
-                    onChange={(e) => setCustomCod(e.target.value ? Number(e.target.value) : "")}
-                  />
+                <div className="text-right">
+                  <span className="text-lg font-black text-error">
+                    Rs. {defaultCodAmount.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
-              {/* COD Warnings */}
-              {customCod === 0 && (
+              {defaultCodAmount === 0 && (
                 <p className="text-[10px] text-success text-right uppercase font-bold tracking-widest mt-1">Pre-Paid / Nothing to collect</p>
-              )}
-              {customCod !== defaultCodAmount && (
-                <div className="mt-2 text-[10px] text-warning font-bold text-right flex items-center justify-end gap-1 bg-warning/10 p-2 rounded-lg border border-warning/20">
-                  <AlertTriangle size={12} /> Note: COD amount has been manually adjusted
-                </div>
               )}
             </div>
 
-            {/* Modal Actions */}
             <div className="modal-action mt-6">
               <form method="dialog">
                 <button className="btn btn-ghost" disabled={isPending}>Cancel</button>
@@ -738,7 +751,6 @@ export default function DeliveryAssignment({
           </form>
         </dialog>
 
-        {/* ✅ Cancel Assignment Modal */}
         {cancelModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <div className="bg-base-100 rounded-3xl w-full max-w-md flex flex-col shadow-2xl border border-base-200 overflow-hidden animate-in zoom-in-95 duration-200">
