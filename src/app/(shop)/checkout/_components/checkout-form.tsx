@@ -28,6 +28,7 @@ import {
   getPublicAreas,
 } from "@/actions/public-delivery";
 import { calculateShipping } from "@/actions/delivery-actions";
+import { verifyCoupon } from "@/actions/coupon-actions";
 
 const NEPAL_LOCATIONS: Record<string, string[]> = {
   Koshi: [
@@ -193,6 +194,45 @@ export default function CheckoutForm({
       ? "PATHAO"
       : "";
 
+  // ✅ 1. Initialize Form BEFORE extracting watches to prevent 'used before declaration' errors
+  const form = useForm<CheckoutFormValues>({
+    resolver: zodResolver(CheckoutSchema) as any,
+    defaultValues: {
+      fullName: user?.name || "",
+      email: user?.email || "",
+      phone: defaultAddress?.phone || user?.phone || "",
+      province: defaultAddress?.province || "",
+      district: defaultAddress?.district || "",
+      city: defaultAddress?.city || "",
+      ward: defaultAddress?.ward || undefined,
+      street: defaultAddress?.street || "",
+      paymentMethod: defaultPayment as any,
+      deliveryPartner: defaultPartner as any,
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    reset,
+    formState: { errors },
+  } = form;
+
+  // ✅ 2. Extract Watch Variables early
+  const selectedPayment = watch("paymentMethod");
+  const selectedPartner = watch("deliveryPartner");
+  const selectedProvince = useWatch({ control, name: "province" });
+  const watchDistrict = useWatch({ control, name: "district" });
+  const watchCity = useWatch({ control, name: "city" });
+  const watchStreet = useWatch({ control, name: "street" });
+
+  const districtOptions = selectedProvince
+    ? NEPAL_LOCATIONS[selectedProvince] || []
+    : [];
+
   const items = useCartStore((state) => state.items);
   const checkoutIds = useCartStore((state) => state.checkoutIds);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -211,7 +251,6 @@ export default function CheckoutForm({
     0,
   );
 
-  // ✅ BUG FIX: Properly parses "0" and safely evaluates Free Shipping logic
   const standardCost = Number(settings?.shippingCharge ?? 150);
   const freeThreshold = Number(settings?.freeShippingThreshold || 0);
   const isFreeShipping = freeThreshold > 0 && subTotal >= freeThreshold;
@@ -231,7 +270,6 @@ export default function CheckoutForm({
   >(null);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
 
-  // ✅ BUG FIX: Completely eliminated useEffect arrays to prevent "Store" from ghosting
   const deliveryOptions: DeliveryOption[] = useMemo(() => {
     const options: DeliveryOption[] = [];
 
@@ -272,6 +310,132 @@ export default function CheckoutForm({
   const [pZones, setPZones] = useState<any[]>([]);
   const [pAreas, setPAreas] = useState<any[]>([]);
 
+  const handlePCityChange = async (cityId: number) => {
+    setPathaoCityId(cityId);
+    setPathaoZoneId(null);
+    setPathaoAreaId(null);
+    setPZones([]);
+    setPAreas([]);
+    if (cityId) {
+      const zones = await getPublicZones(cityId);
+      setPZones(zones || []);
+    }
+  };
+
+  const handlePZoneChange = async (zoneId: number) => {
+    setPathaoZoneId(zoneId);
+    setPathaoAreaId(null);
+    setPAreas([]);
+    if (zoneId) {
+      const areas = await getPublicAreas(zoneId);
+      setPAreas(areas || []);
+    }
+  };
+
+  // ✅ NEW: Auto-match Area/Tole based on typed Street
+  useEffect(() => {
+    if (!isPathaoEnabled || pAreas.length === 0 || !watchStreet) return;
+
+    const streetLower = watchStreet.toLowerCase();
+
+    const matchedArea = pAreas.find((area: any) => {
+      const areaNameLower = area.area_name.toLowerCase();
+      // Match if street contains the area name or vice-versa
+      return (
+        streetLower.includes(areaNameLower) ||
+        areaNameLower.includes(streetLower)
+      );
+    });
+
+    if (matchedArea) {
+      // Only set and toast if it's a *new* match to avoid spamming
+      if (pathaoAreaId !== matchedArea.area_id) {
+        setPathaoAreaId(matchedArea.area_id);
+        toast.success(`Auto-matched Delivery Area: ${matchedArea.area_name}`, {
+          id: "auto-area", // Prevents duplicate toasts
+          position: "bottom-center",
+        });
+      }
+    } else if (pathaoAreaId) {
+      // If the user changed the street and it NO LONGER matches the selected area,
+      // we should probably clear the area selection so they pick the right one.
+      // But only if we had previously auto-matched it. To be safe, we'll just clear it
+      // if they type something completely different.
+
+      const currentSelectedArea = pAreas.find(
+        (a) => a.area_id === pathaoAreaId,
+      );
+      if (
+        currentSelectedArea &&
+        !streetLower.includes(currentSelectedArea.area_name.toLowerCase())
+      ) {
+        setPathaoAreaId(null);
+      }
+    }
+  }, [pAreas, watchStreet, pathaoAreaId, isPathaoEnabled]);
+
+  useEffect(() => {
+    if (isPathaoEnabled) {
+      getPublicCities().then((res) => setPCities(res || []));
+    }
+  }, [isPathaoEnabled]);
+
+  useEffect(() => {
+    if (!isPathaoEnabled || !watchDistrict || !watchCity) return;
+    const verify = async () => {
+      setVerifyingLoc(true);
+      const res = await verifyPathaoLocation(watchDistrict, watchCity);
+      if (res.matched && res.cityId) {
+        setPathaoStatus("MATCHED");
+        setPathaoCityId(res.cityId);
+
+        // Fetch Zones for matched city
+        const zones = await getPublicZones(res.cityId);
+        setPZones(zones || []);
+
+        // ✅ CRITICAL FIX: Automatically select the first zone and fetch its areas so the UI doesn't hang disabled
+        if (zones && zones.length > 0) {
+          const firstZoneId = zones[0].zone_id;
+          setPathaoZoneId(firstZoneId);
+          const areas = await getPublicAreas(firstZoneId);
+          setPAreas(areas || []);
+        } else {
+          setPathaoZoneId(null);
+          setPAreas([]);
+        }
+      } else {
+        setPathaoStatus("UNMATCHED");
+        setPathaoCityId(null);
+        setPathaoZoneId(null);
+        setPathaoAreaId(null);
+      }
+      setVerifyingLoc(false);
+    };
+    const timer = setTimeout(verify, 1000);
+    return () => clearTimeout(timer);
+  }, [watchDistrict, watchCity, isPathaoEnabled]);
+
+  useEffect(() => {
+    if (selectedPartner === "PATHAO" && pathaoCityId && pathaoZoneId) {
+      setIsCalculatingShipping(true);
+      calculateShipping({
+        recipient_city: pathaoCityId,
+        recipient_zone: pathaoZoneId,
+        items: checkoutItems.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      }).then((res) => {
+        if (res.success) {
+          setPathaoCalculatedCost(res.cost || 0);
+        }
+        setIsCalculatingShipping(false);
+      });
+    } else {
+      setPathaoCalculatedCost(null);
+    }
+  }, [selectedPartner, pathaoCityId, pathaoZoneId, checkoutItems]);
+
   const formatPrice = (p: number) => {
     return new Intl.NumberFormat("en-NP", {
       style: "currency",
@@ -279,39 +443,6 @@ export default function CheckoutForm({
       maximumFractionDigits: 0,
     }).format(p);
   };
-
-  const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(CheckoutSchema) as any,
-    defaultValues: {
-      fullName: user?.name || "",
-      email: user?.email || "",
-      phone: defaultAddress?.phone || user?.phone || "",
-      province: defaultAddress?.province || "",
-      district: defaultAddress?.district || "",
-      city: defaultAddress?.city || "",
-      ward: defaultAddress?.ward || undefined,
-      street: defaultAddress?.street || "",
-      paymentMethod: defaultPayment as any,
-      deliveryPartner: defaultPartner as any,
-    },
-  });
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    control,
-    reset,
-    formState: { errors },
-  } = form;
-
-  const selectedPayment = watch("paymentMethod");
-  const selectedPartner = watch("deliveryPartner");
-  const selectedProvince = useWatch({ control, name: "province" });
-  const districtOptions = selectedProvince
-    ? NEPAL_LOCATIONS[selectedProvince] || []
-    : [];
 
   const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) ||
     deliveryOptions[0] || { price: 0 };
@@ -325,132 +456,25 @@ export default function CheckoutForm({
     taxAmount = subTotal - subTotal / (1 + taxRate / 100);
   }
 
-  const watchDistrict = useWatch({ control, name: "district" });
-  const watchCity = useWatch({ control, name: "city" });
-  const watchStreet = useWatch({ control, name: "street" });
+  // Coupon State
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+  } | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
-  useEffect(() => {
-    if (user || defaultAddress) {
-      reset({
-        fullName: user?.name || "",
-        email: user?.email || "",
-        phone: defaultAddress?.phone || user?.phone || "",
-        province: defaultAddress?.province || "",
-        district: defaultAddress?.district || "",
-        city: defaultAddress?.city || "",
-        ward: defaultAddress?.ward || undefined,
-        street: defaultAddress?.street || "",
-        paymentMethod: defaultPayment as any,
-        deliveryPartner: defaultPartner as any,
-      });
+  const handleApplyCoupon = async () => {
+    setIsApplyingCoupon(true);
+    const res = await verifyCoupon(couponInput, subTotal);
+    if (res.error) {
+      toast.error(res.error);
+      setAppliedCoupon(null);
+    } else if (res.success && res.discountAmount && res.code) {
+      toast.success("Coupon applied successfully! 🎉");
+      setAppliedCoupon({ code: res.code, discountAmount: res.discountAmount });
     }
-  }, [user, defaultAddress, reset, defaultPayment, defaultPartner]);
-
-  // Auto-Verify Location & Zone Logic (Only if Pathao is enabled)
-  useEffect(() => {
-    if (isOrderPlaced || !isPathaoEnabled) return;
-
-    const timer = setTimeout(async () => {
-      if (watchDistrict && watchCity) {
-        setVerifyingLoc(true);
-        const res = await verifyPathaoLocation(watchDistrict, watchCity);
-
-        if (res.matched && res.cityId) {
-          setPathaoStatus("MATCHED");
-          setPathaoCityId(res.cityId);
-          const zones = await getPublicZones(res.cityId);
-          setPZones(zones);
-
-          const addressString =
-            `${watchStreet} ${watchCity} ${watchDistrict}`.toLowerCase();
-          const matchZone = zones.find((z: any) =>
-            addressString.includes(z.zone_name.toLowerCase()),
-          );
-
-          if (matchZone) {
-            setPathaoZoneId(matchZone.zone_id);
-            const areas = await getPublicAreas(matchZone.zone_id);
-            setPAreas(areas);
-            const matchArea = areas.find((a: any) =>
-              addressString.includes(a.area_name.toLowerCase()),
-            );
-            if (matchArea) setPathaoAreaId(matchArea.area_id);
-          } else {
-            setPathaoZoneId(null);
-            setPathaoAreaId(null);
-          }
-        } else {
-          setPathaoStatus("UNMATCHED");
-          if (pCities.length === 0) {
-            const cities = await getPublicCities();
-            setPCities(cities);
-          }
-        }
-        setVerifyingLoc(false);
-      } else {
-        setPathaoStatus("PENDING");
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [watchDistrict, watchCity, watchStreet, isOrderPlaced, isPathaoEnabled]);
-
-  useEffect(() => {
-    if (isOrderPlaced || !isPathaoEnabled) return;
-    if (pathaoZoneId) {
-      if (pAreas.length === 0)
-        getPublicAreas(pathaoZoneId).then(setPAreas).catch(console.error);
-    } else {
-      setPAreas([]);
-      setPathaoAreaId(null);
-    }
-  }, [pathaoZoneId, isOrderPlaced, isPathaoEnabled]);
-
-  // ✅ Clean Pathao Calculation Effect
-  useEffect(() => {
-    if (isOrderPlaced || !isPathaoEnabled) return;
-
-    if (pathaoCityId && pathaoZoneId) {
-      setIsCalculatingShipping(true);
-      calculateShipping({
-        recipient_city: pathaoCityId,
-        recipient_zone: pathaoZoneId,
-        items: checkoutItems.map((i) => ({
-          productId: i.productId,
-          quantity: i.quantity,
-        })),
-      })
-        .then((res) => {
-          if (res.success && res.cost !== undefined) {
-            setPathaoCalculatedCost(Number(res.cost));
-          } else {
-            setPathaoCalculatedCost(null);
-          }
-        })
-        .catch(console.error)
-        .finally(() => setIsCalculatingShipping(false));
-    } else {
-      setPathaoCalculatedCost(null);
-    }
-  }, [
-    pathaoCityId,
-    pathaoZoneId,
-    checkoutItems,
-    isOrderPlaced,
-    isPathaoEnabled,
-  ]);
-
-  const handlePCityChange = async (cid: number) => {
-    setPathaoCityId(cid);
-    setPathaoZoneId(null);
-    const zones = await getPublicZones(cid);
-    setPZones(zones);
-  };
-
-  const handlePZoneChange = (zid: number) => {
-    setPathaoZoneId(zid);
-    setPathaoAreaId(null);
-    setPAreas([]);
+    setIsApplyingCoupon(false);
   };
 
   useEffect(() => {
@@ -466,6 +490,12 @@ export default function CheckoutForm({
   const hasNoDeliveryMethods = deliveryOptions.length === 0;
   const hasNoPaymentMethods =
     !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
+
+  const discountTotal = appliedCoupon?.discountAmount || 0;
+  const finalCalculatedTotal = Math.max(
+    0,
+    subTotal + currentOption.price - discountTotal,
+  );
 
   const onSubmit = async (data: CheckoutFormValues) => {
     if (hasNoDeliveryMethods || hasNoPaymentMethods) return;
@@ -487,6 +517,7 @@ export default function CheckoutForm({
       pathaoZoneId: pathaoZoneId || null,
       pathaoAreaId: pathaoAreaId || null,
       shippingCost: currentOption?.price || 0,
+      couponCode: appliedCoupon?.code || null,
     };
 
     const result = await placeOrder(orderData);
@@ -497,24 +528,36 @@ export default function CheckoutForm({
       return;
     }
 
-    if (result.success && result.orderId) {
+    // ✅ FIX: Relaxed strict orderId check and used router.push to navigate
+    if (result.success) {
       setIsOrderPlaced(true);
-      if (data.paymentMethod === "COD")
-        toast.success("Order placed successfully! 🎉");
-      else toast.success("Order initiated! Redirecting to payment...");
 
-      if ((result as any).isNewAccount)
+      if (data.paymentMethod === "COD") {
+        toast.success("Order placed successfully! 🎉");
+      } else {
+        toast.success("Order initiated! Redirecting to payment...");
+      }
+
+      if ((result as any).isNewAccount) {
         toast.success("Account created! Check email for login.", {
           duration: 6000,
         });
+      }
 
       checkoutItems.forEach((item) =>
         removeItem(item.productId, item.variantId),
       );
       setCheckoutIds([]);
 
-      if (data.paymentMethod === "COD") router.push("/orders");
-      else router.push(`/payment/${result.orderId}?auto=true`);
+      if (data.paymentMethod === "COD") {
+        router.push("/orders");
+      } else if (result.orderId) {
+        router.push(`/payment/${result.orderId}?auto=true`);
+      } else {
+        router.push("/orders");
+      }
+    } else {
+      setIsProcessing(false);
     }
   };
 
@@ -1038,9 +1081,59 @@ export default function CheckoutForm({
               </div>
             )}
 
-            <div className="flex justify-between text-lg font-black mt-4">
+            {/* ✅ Coupon Code UI */}
+            <div className="pt-4 border-t border-base-200 mt-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Promo Code"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  disabled={!!appliedCoupon || isApplyingCoupon}
+                  className="input input-sm h-10 input-bordered w-full rounded-xl font-bold uppercase tracking-widest focus:border-primary"
+                />
+                {appliedCoupon ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCoupon(null);
+                      setCouponInput("");
+                    }}
+                    className="btn btn-sm h-10 btn-error text-white rounded-xl"
+                  >
+                    Remove
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={!couponInput || isApplyingCoupon}
+                    className="btn btn-sm h-10 btn-neutral rounded-xl px-5"
+                  >
+                    {isApplyingCoupon ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Apply"
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {appliedCoupon && (
+              <div className="flex justify-between items-center text-success mt-3 text-sm font-bold bg-success/10 p-2 rounded-lg border border-success/20">
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 size={14} /> Code {appliedCoupon.code}
+                </span>
+                <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-lg font-black mt-4 pt-4 border-t border-base-200">
               <span>Total</span>
-              <span className="text-primary">{formatPrice(total)}</span>
+              <span className="text-primary">
+                {formatPrice(finalCalculatedTotal)}
+              </span>
             </div>
           </div>
 

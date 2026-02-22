@@ -9,7 +9,7 @@ import crypto from "crypto";
 // Expanded Schema to include optional Pathao IDs and Dynamic Shipping Cost
 const PlaceOrderSchema = z.object({
   fullName: z.string(),
-  email: z.email(),
+  email: z.string().email(),
   phone: z.string(),
   province: z.string(),
   district: z.string(),
@@ -29,6 +29,7 @@ const PlaceOrderSchema = z.object({
   pathaoZoneId: z.number().optional().nullable(),
   pathaoAreaId: z.number().optional().nullable(),
   shippingCost: z.coerce.number().optional().default(150),
+  couponCode: z.string().optional().nullable(), // ✅ Accept Coupon Code
 });
 
 export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
@@ -50,6 +51,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     pathaoZoneId,
     pathaoAreaId,
     shippingCost,
+    couponCode,
     ...address
   } = validated.data;
 
@@ -130,8 +132,46 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     });
   }
 
-  // ✅ FIX: Use the shippingCost directly from the validated frontend data instead of hardcoding 150
-  const totalAmount = subTotal + shippingCost;
+  // --- ✅ DISCOUNT CALCULATION ---
+  let finalDiscount = 0;
+  if (couponCode) {
+    const coupon = await prisma.coupon.findUnique({
+      where: { code: couponCode },
+    });
+
+    // Server-side strict validation ensures they can't hack the frontend request
+    if (coupon && coupon.isActive) {
+      const isNotExpired =
+        !coupon.expiresAt || new Date(coupon.expiresAt) > new Date();
+      const meetsMinOrder =
+        !coupon.minOrder || subTotal >= Number(coupon.minOrder);
+
+      if (isNotExpired && meetsMinOrder) {
+        if (coupon.type === "PERCENTAGE") {
+          finalDiscount = (subTotal * Number(coupon.value)) / 100;
+          if (
+            coupon.maxDiscount &&
+            finalDiscount > Number(coupon.maxDiscount)
+          ) {
+            finalDiscount = Number(coupon.maxDiscount);
+          }
+        } else {
+          finalDiscount = Number(coupon.value);
+        }
+
+        // Prevent discount from being larger than the subtotal
+        if (finalDiscount > subTotal) finalDiscount = subTotal;
+
+        // Register Coupon Usage
+        await prisma.coupon.update({
+          where: { id: coupon.id },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+    }
+  }
+
+  const totalAmount = Math.max(0, subTotal + shippingCost - finalDiscount);
 
   try {
     const order = await prisma.order.create({
@@ -142,7 +182,6 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         paymentMethod,
         deliveryType: "EXTERNAL",
 
-        // Store Pathao IDs in the snapshot for Admin use
         shippingAddress: JSON.stringify({
           fullName,
           email,
@@ -156,7 +195,8 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         phone: address.phone,
 
         subTotal,
-        shippingCost, // ✅ Saves the dynamic cost accurately
+        shippingCost,
+        discount: finalDiscount, // ✅ Save discount value to the order record
         totalAmount,
 
         items: {

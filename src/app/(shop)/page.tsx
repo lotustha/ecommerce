@@ -8,10 +8,12 @@ export default async function HomePage() {
 
   const [featuredProducts, newArrivals] = await Promise.all([
     getFeaturedProducts(),
-    getNewArrivals()
+    getNewArrivals(),
   ]);
 
-  console.log(`⚡ Data fetched: ${featuredProducts.length} featured, ${newArrivals.length} new`);
+  console.log(
+    `⚡ Data fetched: ${featuredProducts.length} featured, ${newArrivals.length} new`,
+  );
 
   return (
     <LandingView
