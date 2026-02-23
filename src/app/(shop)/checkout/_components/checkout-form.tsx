@@ -18,6 +18,7 @@ import {
   Clock,
   Zap,
   FileText,
+  RefreshCcw,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { placeOrder } from "@/actions/place-order";
@@ -26,18 +27,103 @@ import {
   getPublicCities,
   getPublicZones,
   getPublicAreas,
+  getPublicNcmBranches,
 } from "@/actions/public-delivery";
 import { calculateShipping } from "@/actions/delivery-actions";
 import { verifyCoupon } from "@/actions/coupon-actions";
 
 const NEPAL_LOCATIONS: Record<string, string[]> = {
-  Koshi: ["Bhojpur", "Dhankuta", "Ilam", "Jhapa", "Khotang", "Morang", "Okhaldhunga", "Panchthar", "Sankhuwasabha", "Solukhumbu", "Sunsari", "Taplejung", "Terhathum", "Udayapur"],
-  Madhesh: ["Bara", "Dhanusha", "Mahottari", "Parsa", "Rautahat", "Saptari", "Sarlahi", "Siraha"],
-  Bagmati: ["Bhaktapur", "Chitwan", "Dhading", "Dolakha", "Kathmandu", "Kavrepalanchok", "Lalitpur", "Makwanpur", "Nuwakot", "Ramechhap", "Rasuwa", "Sindhuli", "Sindhupalchok"],
-  Gandaki: ["Baglung", "Gorkha", "Kaski", "Lamjung", "Manang", "Mustang", "Myagdi", "Nawalpur", "Parbat", "Syangja", "Tanahun"],
-  Lumbini: ["Arghakhanchi", "Banke", "Bardiya", "Dang", "Gulmi", "Kapilvastu", "Parasi", "Palpa", "Pyuthan", "Rolpa", "Rukum East", "Rupandehi"],
-  Karnali: ["Dailekh", "Dolpa", "Humla", "Jajarkot", "Jumla", "Kalikot", "Mugu", "Salyan", "Surkhet", "Rukum West"],
-  Sudurpashchim: ["Achham", "Baitadi", "Bajhang", "Bajura", "Dadeldhura", "Darchula", "Doti", "Kailali", "Kanchanpur"],
+  Koshi: [
+    "Bhojpur",
+    "Dhankuta",
+    "Ilam",
+    "Jhapa",
+    "Khotang",
+    "Morang",
+    "Okhaldhunga",
+    "Panchthar",
+    "Sankhuwasabha",
+    "Solukhumbu",
+    "Sunsari",
+    "Taplejung",
+    "Terhathum",
+    "Udayapur",
+  ],
+  Madhesh: [
+    "Bara",
+    "Dhanusha",
+    "Mahottari",
+    "Parsa",
+    "Rautahat",
+    "Saptari",
+    "Sarlahi",
+    "Siraha",
+  ],
+  Bagmati: [
+    "Bhaktapur",
+    "Chitwan",
+    "Dhading",
+    "Dolakha",
+    "Kathmandu",
+    "Kavrepalanchok",
+    "Lalitpur",
+    "Makwanpur",
+    "Nuwakot",
+    "Ramechhap",
+    "Rasuwa",
+    "Sindhuli",
+    "Sindhupalchok",
+  ],
+  Gandaki: [
+    "Baglung",
+    "Gorkha",
+    "Kaski",
+    "Lamjung",
+    "Manang",
+    "Mustang",
+    "Myagdi",
+    "Nawalpur",
+    "Parbat",
+    "Syangja",
+    "Tanahun",
+  ],
+  Lumbini: [
+    "Arghakhanchi",
+    "Banke",
+    "Bardiya",
+    "Dang",
+    "Gulmi",
+    "Kapilvastu",
+    "Parasi",
+    "Palpa",
+    "Pyuthan",
+    "Rolpa",
+    "Rukum East",
+    "Rupandehi",
+  ],
+  Karnali: [
+    "Dailekh",
+    "Dolpa",
+    "Humla",
+    "Jajarkot",
+    "Jumla",
+    "Kalikot",
+    "Mugu",
+    "Salyan",
+    "Surkhet",
+    "Rukum West",
+  ],
+  Sudurpashchim: [
+    "Achham",
+    "Baitadi",
+    "Bajhang",
+    "Bajura",
+    "Dadeldhura",
+    "Darchula",
+    "Doti",
+    "Kailali",
+    "Kanchanpur",
+  ],
 };
 
 const CheckoutSchema = z.object({
@@ -50,7 +136,7 @@ const CheckoutSchema = z.object({
   ward: z.coerce.number().min(1, "Ward No. is required"),
   street: z.string().min(1, "Street/Tole is required"),
   paymentMethod: z.enum(["COD", "ESEWA", "KHALTI"]),
-  deliveryPartner: z.enum(["STORE", "PATHAO"]).default("STORE"),
+  deliveryPartner: z.enum(["STORE", "PATHAO", "NCM"]).default("STORE"),
 });
 
 type CheckoutFormValues = z.infer<typeof CheckoutSchema>;
@@ -66,7 +152,7 @@ interface CheckoutFormProps {
 }
 
 interface DeliveryOption {
-  id: "STORE" | "PATHAO";
+  id: "STORE" | "PATHAO" | "NCM";
   name: string;
   description: string;
   price: number;
@@ -92,15 +178,29 @@ export default function CheckoutForm({
 
   const isStoreDeliveryEnabled = settings?.enableStoreDelivery ?? true;
   const isPathaoEnabled = settings?.enablePathao ?? false;
+  const isNcmEnabled = settings?.enableNcm ?? false;
 
   const isPathaoSandbox = settings?.pathaoSandbox ?? true;
+  const isNcmSandbox = settings?.ncmSandbox ?? true;
   const isEsewaSandbox = settings?.esewaSandbox ?? true;
   const isKhaltiSandbox = settings?.khaltiSandbox ?? true;
 
-  const defaultPayment = isCodEnabled ? "COD" : isEsewaEnabled ? "ESEWA" : isKhaltiEnabled ? "KHALTI" : "";
-  const defaultPartner = isStoreDeliveryEnabled ? "STORE" : isPathaoEnabled ? "PATHAO" : "";
+  const defaultPayment = isCodEnabled
+    ? "COD"
+    : isEsewaEnabled
+      ? "ESEWA"
+      : isKhaltiEnabled
+        ? "KHALTI"
+        : "";
+  const defaultPartner = isStoreDeliveryEnabled
+    ? "STORE"
+    : isPathaoEnabled
+      ? "PATHAO"
+      : isNcmEnabled
+        ? "NCM"
+        : "";
 
-  // ✅ 1. Initialize Form BEFORE extracting watches to prevent 'used before declaration' errors
+  // 1. Initialize Form BEFORE extracting watches to prevent 'used before declaration' errors
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(CheckoutSchema) as any,
     defaultValues: {
@@ -123,11 +223,10 @@ export default function CheckoutForm({
     setValue,
     watch,
     control,
-    reset,
     formState: { errors },
   } = form;
 
-  // ✅ 2. Extract Watch Variables early
+  // 2. Extract Watch Variables early
   const selectedPayment = watch("paymentMethod");
   const selectedPartner = watch("deliveryPartner");
   const selectedProvince = useWatch({ control, name: "province" });
@@ -135,7 +234,9 @@ export default function CheckoutForm({
   const watchCity = useWatch({ control, name: "city" });
   const watchStreet = useWatch({ control, name: "street" });
 
-  const districtOptions = selectedProvince ? NEPAL_LOCATIONS[selectedProvince] || [] : [];
+  const districtOptions = selectedProvince
+    ? NEPAL_LOCATIONS[selectedProvince] || []
+    : [];
 
   const items = useCartStore((state) => state.items);
   const checkoutIds = useCartStore((state) => state.checkoutIds);
@@ -162,14 +263,26 @@ export default function CheckoutForm({
 
   // Pathao Logistics State
   const [verifyingLoc, setVerifyingLoc] = useState(false);
-  const [pathaoStatus, setPathaoStatus] = useState<"MATCHED" | "UNMATCHED" | "PENDING">("PENDING");
+  const [pathaoStatus, setPathaoStatus] = useState<
+    "MATCHED" | "UNMATCHED" | "PENDING"
+  >("PENDING");
   const [pathaoCityId, setPathaoCityId] = useState<number | null>(null);
   const [pathaoZoneId, setPathaoZoneId] = useState<number | null>(null);
   const [pathaoAreaId, setPathaoAreaId] = useState<number | null>(null);
   const [isZoneAligned, setIsZoneAligned] = useState(false);
   const [isAreaAligned, setIsAreaAligned] = useState(false);
 
-  const [pathaoCalculatedCost, setPathaoCalculatedCost] = useState<number | null>(null);
+  // NCM Logistics State
+  const [ncmBranches, setNcmBranches] = useState<any[]>([]);
+  const [ncmBranch, setNcmBranch] = useState<string>("");
+  const [isLoadingNcm, setIsLoadingNcm] = useState(false);
+
+  const [pathaoCalculatedCost, setPathaoCalculatedCost] = useState<
+    number | null
+  >(null);
+  const [ncmCalculatedCost, setNcmCalculatedCost] = useState<number | null>(
+    null,
+  );
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
 
   const deliveryOptions: DeliveryOption[] = useMemo(() => {
@@ -197,8 +310,29 @@ export default function CheckoutForm({
       });
     }
 
+    if (isNcmEnabled) {
+      options.push({
+        id: "NCM",
+        name: "Nepal Can Move",
+        description: isNcmSandbox ? "Test Mode Active" : "Nationwide Delivery",
+        price: ncmCalculatedCost ?? 0,
+        time: "2-4 Days",
+        isTest: isNcmSandbox,
+      });
+    }
+
     return options;
-  }, [isStoreDeliveryEnabled, isPathaoEnabled, finalStandardCost, isFreeShipping, isPathaoSandbox, pathaoCalculatedCost]);
+  }, [
+    isStoreDeliveryEnabled,
+    isPathaoEnabled,
+    isNcmEnabled,
+    finalStandardCost,
+    isFreeShipping,
+    isPathaoSandbox,
+    isNcmSandbox,
+    pathaoCalculatedCost,
+    ncmCalculatedCost,
+  ]);
 
   // Manual Selection Lists
   const [pCities, setPCities] = useState<any[]>([]);
@@ -230,13 +364,14 @@ export default function CheckoutForm({
     }
   };
 
-  // ✅ NEW: Smart Auto-Match for BOTH Zone and Area based on Street and City
+  // ✅ Smart Auto-Match for BOTH Zone and Area based on Street and City (Pathao)
   useEffect(() => {
     if (!isPathaoEnabled || !watchStreet) return;
 
     const streetLower = watchStreet.toLowerCase();
     const cityLower = (watchCity || "").toLowerCase();
-    const combined = `${cityLower} ${streetLower}`;
+    const districtLower = (watchDistrict || "").toLowerCase();
+    const combined = `${districtLower} ${cityLower} ${streetLower}`;
 
     let zoneChanged = false;
     let zoneMatchedLocal = false;
@@ -246,18 +381,27 @@ export default function CheckoutForm({
       const matchedZone = pZones.find((z: any) => {
         const zName = z.zone_name.toLowerCase();
         // Match if zone name is inside typed address, or typed address contains zone name
-        return combined.includes(zName) || zName.includes(streetLower) || streetLower.includes(zName);
+        return (
+          combined.includes(zName) ||
+          zName.includes(streetLower) ||
+          streetLower.includes(zName)
+        );
       });
 
       if (matchedZone) {
         zoneMatchedLocal = true;
         if (pathaoZoneId !== matchedZone.zone_id) {
           setPathaoZoneId(matchedZone.zone_id);
-          getPublicAreas(matchedZone.zone_id).then(res => setPAreas(res || []));
-          toast.success(`Auto-matched Delivery Zone: ${matchedZone.zone_name}`, {
-            id: 'auto-zone',
-            position: "bottom-center"
-          });
+          getPublicAreas(matchedZone.zone_id).then((res) =>
+            setPAreas(res || []),
+          );
+          toast.success(
+            `Auto-matched Delivery Zone: ${matchedZone.zone_name}`,
+            {
+              id: "auto-zone",
+              position: "bottom-center",
+            },
+          );
           setPathaoAreaId(null);
           zoneChanged = true;
         }
@@ -268,22 +412,29 @@ export default function CheckoutForm({
       setIsZoneAligned(zoneMatchedLocal);
     }
 
-    // 2. Try to auto-match the Area (if zone didn't just change, preventing stale data)
+    // 2. Try to auto-match the Area
     let areaMatchedLocal = false;
     if (!zoneChanged && pAreas.length > 0) {
       const matchedArea = pAreas.find((a: any) => {
         const aName = a.area_name.toLowerCase();
-        return combined.includes(aName) || aName.includes(streetLower) || streetLower.includes(aName);
+        return (
+          combined.includes(aName) ||
+          aName.includes(streetLower) ||
+          streetLower.includes(aName)
+        );
       });
 
       if (matchedArea) {
         areaMatchedLocal = true;
         if (pathaoAreaId !== matchedArea.area_id) {
           setPathaoAreaId(matchedArea.area_id);
-          toast.success(`Auto-matched Delivery Area: ${matchedArea.area_name}`, {
-            id: 'auto-area',
-            position: "bottom-center"
-          });
+          toast.success(
+            `Auto-matched Delivery Area: ${matchedArea.area_name}`,
+            {
+              id: "auto-area",
+              position: "bottom-center",
+            },
+          );
         }
       }
     }
@@ -292,13 +443,60 @@ export default function CheckoutForm({
       setIsAreaAligned(areaMatchedLocal);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchStreet, watchCity, pZones, pAreas, isPathaoEnabled]);
+  }, [
+    watchStreet,
+    watchCity,
+    watchDistrict,
+    pZones.length,
+    pAreas.length,
+    isPathaoEnabled,
+  ]);
+
+  // --- ✅ ROBUST NCM LOADER ---
+  const loadNcmBranches = async () => {
+    setIsLoadingNcm(true);
+    try {
+      const data = await getPublicNcmBranches();
+      let branches: any[] = [];
+
+      // Extremely defensive parsing for NCM API structures
+      if (Array.isArray(data)) {
+        branches = data;
+      } else if (data && data.data && Array.isArray(data.data)) {
+        branches = data.data;
+      } else if (data && typeof data === "object") {
+        branches = Object.values(data);
+      }
+
+      setNcmBranches(Array.isArray(branches) ? branches : []);
+
+      if (!branches || branches.length === 0) {
+        toast.error(
+          "NCM branches could not be loaded. Please try again or contact support.",
+          { id: "ncm-empty" },
+        );
+      }
+    } catch (e) {
+      console.error("NCM Fetch Error:", e);
+      toast.error("Failed to connect to NCM.", { id: "ncm-err" });
+    } finally {
+      setIsLoadingNcm(false);
+    }
+  };
 
   useEffect(() => {
     if (isPathaoEnabled) {
-      getPublicCities().then(res => setPCities(res || []));
+      getPublicCities().then((res) => setPCities(res || []));
     }
   }, [isPathaoEnabled]);
+
+  // ✅ Auto-load NCM branches when switching to NCM tab
+  useEffect(() => {
+    if (isNcmEnabled && selectedPartner === "NCM" && ncmBranches.length === 0) {
+      loadNcmBranches();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNcmEnabled, selectedPartner, ncmBranches.length]);
 
   useEffect(() => {
     if (!isPathaoEnabled || !watchDistrict || !watchCity) return;
@@ -309,30 +507,38 @@ export default function CheckoutForm({
         setPathaoStatus("MATCHED");
         setPathaoCityId(res.cityId);
 
-        // Fetch Zones for matched city
         const zones = await getPublicZones(res.cityId);
         setPZones(zones || []);
 
-        // Initial Smart Zone selection on City match
         if (zones && zones.length > 0) {
           const streetLower = (watchStreet || "").toLowerCase();
           const cityLower = (watchCity || "").toLowerCase();
-          const combined = `${cityLower} ${streetLower}`;
+          const districtLower = (watchDistrict || "").toLowerCase();
+          const combined = `${districtLower} ${cityLower} ${streetLower}`;
 
           const matchedZone = zones.find((z: any) => {
             const zName = z.zone_name.toLowerCase();
-            return combined.includes(zName) || zName.includes(streetLower) || streetLower.includes(zName);
+            return (
+              combined.includes(zName) ||
+              zName.includes(streetLower) ||
+              streetLower.includes(zName)
+            );
           });
 
           setIsZoneAligned(!!matchedZone);
-          const targetZoneId = matchedZone ? matchedZone.zone_id : zones[0].zone_id;
+          const targetZoneId = matchedZone
+            ? matchedZone.zone_id
+            : zones[0].zone_id;
           setPathaoZoneId(targetZoneId);
 
           const areas = await getPublicAreas(targetZoneId);
           setPAreas(areas || []);
 
           if (matchedZone) {
-            toast.success(`Auto-matched Delivery Zone: ${matchedZone.zone_name}`, { id: 'auto-zone', position: 'bottom-center' });
+            toast.success(
+              `Auto-matched Delivery Zone: ${matchedZone.zone_name}`,
+              { id: "auto-zone", position: "bottom-center" },
+            );
           }
         } else {
           setPathaoZoneId(null);
@@ -353,25 +559,46 @@ export default function CheckoutForm({
     const timer = setTimeout(verify, 1000);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchDistrict, watchCity, isPathaoEnabled]); // Purposely excluded watchStreet to avoid excessive API calls
+  }, [watchDistrict, watchCity, isPathaoEnabled]);
 
   useEffect(() => {
     if (selectedPartner === "PATHAO" && pathaoCityId && pathaoZoneId) {
       setIsCalculatingShipping(true);
       calculateShipping({
+        provider: "PATHAO",
         recipient_city: pathaoCityId,
         recipient_zone: pathaoZoneId,
-        items: checkoutItems.map(i => ({ productId: i.productId, quantity: i.quantity }))
-      }).then(res => {
+        items: checkoutItems.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      }).then((res) => {
         if (res.success) {
           setPathaoCalculatedCost(res.cost || 0);
         }
         setIsCalculatingShipping(false);
       });
+    } else if (selectedPartner === "NCM" && ncmBranch) {
+      setIsCalculatingShipping(true);
+      calculateShipping({
+        provider: "NCM",
+        ncm_destination: ncmBranch,
+        items: checkoutItems.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      }).then((res) => {
+        if (res.success) {
+          setNcmCalculatedCost(res.cost || 0);
+        }
+        setIsCalculatingShipping(false);
+      });
     } else {
       setPathaoCalculatedCost(null);
+      setNcmCalculatedCost(null);
     }
-  }, [selectedPartner, pathaoCityId, pathaoZoneId, checkoutItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPartner, pathaoCityId, pathaoZoneId, ncmBranch, checkoutItems]);
 
   const formatPrice = (p: number) => {
     return new Intl.NumberFormat("en-NP", {
@@ -381,20 +608,22 @@ export default function CheckoutForm({
     }).format(p);
   };
 
-  const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) || deliveryOptions[0] || { price: 0 };
+  const currentOption = deliveryOptions.find((o) => o.id === selectedPartner) ||
+    deliveryOptions[0] || { price: 0 };
 
   const total = subTotal + currentOption.price;
 
-  // Tax Calculation (INCLUSIVE Pricing)
   const taxRate = settings?.taxRate ? Number(settings.taxRate) : 0;
   let taxAmount = 0;
   if (taxRate > 0) {
     taxAmount = subTotal - subTotal / (1 + taxRate / 100);
   }
 
-  // Coupon State
   const [couponInput, setCouponInput] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, discountAmount: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+  } | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   const handleApplyCoupon = async () => {
@@ -417,16 +646,28 @@ export default function CheckoutForm({
     }
   }, [items.length, checkoutIds.length, router, isOrderPlaced]);
 
-  const isPathaoInvalid = selectedPartner === "PATHAO" && (!pathaoCityId || !pathaoZoneId || (pAreas.length > 0 && !pathaoAreaId));
+  const isPathaoInvalid =
+    selectedPartner === "PATHAO" &&
+    (!pathaoCityId || !pathaoZoneId || (pAreas.length > 0 && !pathaoAreaId));
+  const isNcmInvalid = selectedPartner === "NCM" && !ncmBranch;
   const hasNoDeliveryMethods = deliveryOptions.length === 0;
-  const hasNoPaymentMethods = !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
+  const hasNoPaymentMethods =
+    !isCodEnabled && !isEsewaEnabled && !isKhaltiEnabled;
 
   const discountTotal = appliedCoupon?.discountAmount || 0;
-  const finalCalculatedTotal = Math.max(0, subTotal + currentOption.price - discountTotal);
+  const finalCalculatedTotal = Math.max(
+    0,
+    subTotal + currentOption.price - discountTotal,
+  );
 
   const onSubmit = async (data: CheckoutFormValues) => {
     if (hasNoDeliveryMethods || hasNoPaymentMethods) return;
-    if (isPathaoInvalid && isPathaoEnabled) return toast.error("Please verify or select your specific delivery location for Pathao.");
+    if (isPathaoInvalid && isPathaoEnabled)
+      return toast.error(
+        "Please verify or select your specific delivery location for Pathao.",
+      );
+    if (isNcmInvalid && isNcmEnabled)
+      return toast.error("Please select a destination branch for NCM.");
 
     setIsProcessing(true);
 
@@ -440,6 +681,7 @@ export default function CheckoutForm({
       pathaoCityId: pathaoCityId || null,
       pathaoZoneId: pathaoZoneId || null,
       pathaoAreaId: pathaoAreaId || null,
+      ncmBranch: ncmBranch || null,
       shippingCost: currentOption?.price || 0,
       couponCode: appliedCoupon?.code || null,
     };
@@ -462,11 +704,10 @@ export default function CheckoutForm({
       }
 
       if ((result as any).isNewAccount) {
-        toast.success("Account created! Check email for login.", { duration: 6000 });
+        toast.success("Account created! Check email for login.", {
+          duration: 6000,
+        });
       }
-
-      checkoutItems.forEach((item) => removeItem(item.productId, item.variantId));
-      setCheckoutIds([]);
 
       // Redirect using router.push
       if (data.paymentMethod === "COD") {
@@ -476,6 +717,10 @@ export default function CheckoutForm({
       } else {
         router.push("/orders");
       }
+      checkoutItems.forEach((item) =>
+        removeItem(item.productId, item.variantId),
+      );
+      setCheckoutIds([]);
     } else {
       setIsProcessing(false);
     }
@@ -663,54 +908,62 @@ export default function CheckoutForm({
           </div>
 
           {/* --- LOCATION CHECK UI (Pathao) --- */}
-          {isPathaoEnabled && watchCity && watchDistrict && (
-            <div className="mt-4 flex items-center justify-between bg-base-200/50 p-3 rounded-lg border border-base-200">
-              <div className="flex items-center gap-2 text-sm">
-                {verifyingLoc ? (
-                  <Loader2 size={16} className="animate-spin text-primary" />
-                ) : (
-                  <MapPin
-                    size={16}
-                    className={
-                      pathaoStatus === "MATCHED"
-                        ? "text-success"
-                        : "text-warning"
-                    }
-                  />
-                )}
-                {verifyingLoc ? (
-                  <span className="opacity-60">Checking coverage...</span>
-                ) : pathaoStatus === "MATCHED" ? (
-                  <span className="text-success font-medium">
-                    Standard Delivery Available
-                  </span>
-                ) : (
-                  <span className="text-warning font-medium">
-                    Exact location not matched automatically
-                  </span>
-                )}
+          {isPathaoEnabled &&
+            selectedPartner === "PATHAO" &&
+            watchCity &&
+            watchDistrict && (
+              <div className="mt-4 flex items-center justify-between bg-base-200/50 p-3 rounded-lg border border-base-200">
+                <div className="flex items-center gap-2 text-sm">
+                  {verifyingLoc ? (
+                    <Loader2 size={16} className="animate-spin text-primary" />
+                  ) : (
+                    <MapPin
+                      size={16}
+                      className={
+                        pathaoStatus === "MATCHED"
+                          ? "text-success"
+                          : "text-warning"
+                      }
+                    />
+                  )}
+                  {verifyingLoc ? (
+                    <span className="opacity-60">Checking coverage...</span>
+                  ) : pathaoStatus === "MATCHED" ? (
+                    <span className="text-success font-medium">
+                      Standard Delivery Available
+                    </span>
+                  ) : (
+                    <span className="text-warning font-medium">
+                      Exact location not matched automatically
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* --- MANUAL FALLBACK SELECTORS --- */}
-          {isPathaoEnabled && selectedPartner === "PATHAO" && (
-            pathaoStatus === "UNMATCHED" ||
-            !pathaoCityId ||
-            !pathaoZoneId ||
-            !pathaoAreaId ||
-            !isZoneAligned ||
-            !isAreaAligned
-          ) && (
+          {/* --- MANUAL FALLBACK SELECTORS (Pathao) --- */}
+          {isPathaoEnabled &&
+            selectedPartner === "PATHAO" &&
+            (pathaoStatus === "UNMATCHED" ||
+              !pathaoCityId ||
+              !pathaoZoneId ||
+              !pathaoAreaId ||
+              !isZoneAligned ||
+              !isAreaAligned) && (
               <div className="mt-4 p-4 bg-warning/5 rounded-xl border border-warning/20 space-y-3">
                 {pathaoStatus === "UNMATCHED" ? (
                   <p className="text-xs text-warning font-bold flex gap-2">
                     <AlertTriangle size={14} /> Please select closest location
                     for accurate delivery:
                   </p>
+                ) : isZoneAligned && !isAreaAligned ? (
+                  <p className="text-xs text-info font-bold flex gap-2">
+                    <MapPin size={14} /> Please select your specific Area/Tole:
+                  </p>
                 ) : (
                   <p className="text-xs text-info font-bold flex gap-2">
-                    <MapPin size={14} /> Please confirm or select your delivery location:
+                    <MapPin size={14} /> Please confirm or select your delivery
+                    location:
                   </p>
                 )}
 
@@ -755,7 +1008,9 @@ export default function CheckoutForm({
                       <select
                         className="select select-bordered select-sm w-full"
                         value={pathaoAreaId || ""}
-                        onChange={(e) => setPathaoAreaId(Number(e.target.value))}
+                        onChange={(e) =>
+                          setPathaoAreaId(Number(e.target.value))
+                        }
                         disabled={!pathaoZoneId}
                       >
                         <option value="">Select Area *</option>
@@ -770,6 +1025,48 @@ export default function CheckoutForm({
                 </div>
               </div>
             )}
+
+          {/* --- NCM BRANCH SELECTOR --- */}
+          {isNcmEnabled && selectedPartner === "NCM" && (
+            <div className="mt-4 p-4 bg-info/5 rounded-xl border border-info/20 space-y-3 animate-in fade-in">
+              <div className="flex justify-between items-center">
+                <p className="text-xs text-info font-bold flex gap-2">
+                  <MapPin size={14} /> Select NCM Destination Branch:
+                </p>
+                <button
+                  type="button"
+                  onClick={loadNcmBranches}
+                  disabled={isLoadingNcm}
+                  className="text-[10px] text-info flex items-center gap-1 hover:underline disabled:opacity-50"
+                >
+                  <RefreshCcw
+                    size={10}
+                    className={isLoadingNcm ? "animate-spin" : ""}
+                  />{" "}
+                  Refresh
+                </button>
+              </div>
+              <select
+                className="select select-bordered select-sm w-full"
+                value={ncmBranch}
+                onChange={(e) => setNcmBranch(e.target.value)}
+                disabled={isLoadingNcm}
+              >
+                <option value="">
+                  {isLoadingNcm ? "Loading branches..." : "Select Branch..."}
+                </option>
+                {ncmBranches.map((b: any, idx: number) => {
+                  const val =
+                    b.branch_name || b.name || b.id || `Branch ${idx}`;
+                  return (
+                    <option key={idx} value={val}>
+                      {val}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
         </section>
 
         {/* 2. Delivery Method */}
@@ -817,7 +1114,7 @@ export default function CheckoutForm({
                           <Clock size={12} /> {option.time}
                         </span>
                         <span>•</span>
-                        {/* ✅ Bright Test Mode Indicator for Delivery */}
+                        {/* Bright Test Mode Indicator for Delivery */}
                         <span
                           className={
                             option.isTest
@@ -836,17 +1133,26 @@ export default function CheckoutForm({
                       <span className="text-xs text-warning font-bold flex items-center gap-1">
                         <AlertTriangle size={10} /> Check Location
                       </span>
+                    ) : option.id === "NCM" && option.price === 0 ? (
+                      <span className="text-xs text-warning font-bold flex items-center gap-1">
+                        <AlertTriangle size={10} /> Select Branch
+                      </span>
                     ) : (
-                      <p className={`font-bold text-lg ${option.price === 0 ? 'text-success' : ''}`}>
-                        {option.price === 0 ? "Free" : formatPrice(option.price)}
+                      <p
+                        className={`font-bold text-lg ${option.price === 0 ? "text-success" : ""}`}
+                      >
+                        {option.price === 0
+                          ? "Free"
+                          : formatPrice(option.price)}
                       </p>
                     )}
-                    {isCalculatingShipping && option.id === "PATHAO" && (
-                      <p className="text-[10px] opacity-60 flex items-center justify-end gap-1">
-                        <Loader2 size={10} className="animate-spin" />{" "}
-                        Calculating...
-                      </p>
-                    )}
+                    {isCalculatingShipping &&
+                      (option.id === "PATHAO" || option.id === "NCM") && (
+                        <p className="text-[10px] opacity-60 flex items-center justify-end gap-1">
+                          <Loader2 size={10} className="animate-spin" />{" "}
+                          Calculating...
+                        </p>
+                      )}
                   </div>
                 </div>
               ))}
@@ -984,8 +1290,12 @@ export default function CheckoutForm({
                   <Loader2 size={10} className="animate-spin" />
                 )}
               </span>
-              <span className={`font-bold ${(currentOption?.price || 0) === 0 ? 'text-success' : ''}`}>
-                {(currentOption?.price || 0) === 0 ? "Free" : formatPrice(currentOption?.price || 0)}
+              <span
+                className={`font-bold ${(currentOption?.price || 0) === 0 ? "text-success" : ""}`}
+              >
+                {(currentOption?.price || 0) === 0
+                  ? "Free"
+                  : formatPrice(currentOption?.price || 0)}
               </span>
             </div>
 
@@ -1013,10 +1323,28 @@ export default function CheckoutForm({
                   className="input input-sm h-10 input-bordered w-full rounded-xl font-bold uppercase tracking-widest focus:border-primary"
                 />
                 {appliedCoupon ? (
-                  <button type="button" onClick={() => { setAppliedCoupon(null); setCouponInput(""); }} className="btn btn-sm h-10 btn-error text-white rounded-xl">Remove</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCoupon(null);
+                      setCouponInput("");
+                    }}
+                    className="btn btn-sm h-10 btn-error text-white rounded-xl"
+                  >
+                    Remove
+                  </button>
                 ) : (
-                  <button type="button" onClick={handleApplyCoupon} disabled={!couponInput || isApplyingCoupon} className="btn btn-sm h-10 btn-neutral rounded-xl px-5">
-                    {isApplyingCoupon ? <Loader2 size={16} className="animate-spin" /> : "Apply"}
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={!couponInput || isApplyingCoupon}
+                    className="btn btn-sm h-10 btn-neutral rounded-xl px-5"
+                  >
+                    {isApplyingCoupon ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Apply"
+                    )}
                   </button>
                 )}
               </div>
@@ -1024,14 +1352,18 @@ export default function CheckoutForm({
 
             {appliedCoupon && (
               <div className="flex justify-between items-center text-success mt-3 text-sm font-bold bg-success/10 p-2 rounded-lg border border-success/20">
-                <span className="flex items-center gap-1"><CheckCircle2 size={14} /> Code {appliedCoupon.code}</span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 size={14} /> Code {appliedCoupon.code}
+                </span>
                 <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
               </div>
             )}
 
             <div className="flex justify-between text-lg font-black mt-4 pt-4 border-t border-base-200">
               <span>Total</span>
-              <span className="text-primary">{formatPrice(finalCalculatedTotal)}</span>
+              <span className="text-primary">
+                {formatPrice(finalCalculatedTotal)}
+              </span>
             </div>
           </div>
 
@@ -1040,6 +1372,7 @@ export default function CheckoutForm({
             disabled={
               isProcessing ||
               (selectedPartner === "PATHAO" && isPathaoInvalid) ||
+              (selectedPartner === "NCM" && isNcmInvalid) ||
               hasNoDeliveryMethods ||
               hasNoPaymentMethods
             }

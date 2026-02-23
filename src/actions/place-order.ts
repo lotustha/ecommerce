@@ -28,6 +28,7 @@ const PlaceOrderSchema = z.object({
   pathaoCityId: z.number().optional().nullable(),
   pathaoZoneId: z.number().optional().nullable(),
   pathaoAreaId: z.number().optional().nullable(),
+  ncmBranch: z.string().optional().nullable(),
   shippingCost: z.coerce.number().optional().default(150),
   couponCode: z.string().optional().nullable(), // ✅ Accept Coupon Code
 });
@@ -50,6 +51,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
     pathaoCityId,
     pathaoZoneId,
     pathaoAreaId,
+    ncmBranch,
     shippingCost,
     couponCode,
     ...address
@@ -190,6 +192,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
             pathaoCityId,
             pathaoZoneId,
             pathaoAreaId,
+            ncmBranch,
           },
         }),
         phone: address.phone,

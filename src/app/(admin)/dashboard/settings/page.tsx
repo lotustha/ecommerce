@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const rawSettings = await getSettings();
-  const settings = JSON.parse(JSON.stringify(rawSettings));
-
+  const settingsRaw = JSON.parse(JSON.stringify(rawSettings));
+  const settings = JSON.parse(JSON.stringify(settingsRaw)) || {};
   // Pass settings to form, or empty object if null
-  return <SettingsForm initialData={settings || {}} />;
+  return <SettingsForm initialData={settings} />;
 }

@@ -1,41 +1,51 @@
 "use server";
 
 import { prisma } from "@/lib/db/prisma";
-import { unstable_noStore as noStore } from "next/cache";
 
-// Only returns non-sensitive fields safe for the public frontend
 export async function getPublicSettings() {
   try {
-    const rawSettings = await prisma.systemSetting.findUnique({
+    const settings = await prisma.systemSetting.findUnique({
       where: { id: "default" },
       select: {
+        appName: true,
         storeName: true,
-        storeLogo: true,
         storeSubtitle: true,
+        storeLogo: true,
         storeAddress: true,
-        storePhone: true,
         storeEmail: true,
-        storeTaxId: true,
-        socialFacebook: true,
-        socialInstagram: true,
-        socialTiktok: true,
-        socialTwitter: true,
+        storePhone: true,
         currency: true,
         taxRate: true,
+
+        // Logistics
         shippingCharge: true,
+        shippingMarkup: true,
         freeShippingThreshold: true,
         enableStoreDelivery: true,
+
         enablePathao: true,
         pathaoSandbox: true,
+
+        // ✅ NCM newly added to the public fetch!
+        enableNcm: true,
+        ncmSandbox: true,
+
+        // Payments
         enableCod: true,
         enableEsewa: true,
         esewaSandbox: true,
         enableKhalti: true,
         khaltiSandbox: true,
+
+        // Socials
+        socialFacebook: true,
+        socialInstagram: true,
+        socialTiktok: true,
+        socialTwitter: true,
       },
     });
 
-    return JSON.parse(JSON.stringify(rawSettings));
+    return JSON.parse(JSON.stringify(settings));
   } catch (error) {
     console.error("Failed to fetch public settings:", error);
     return null;

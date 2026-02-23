@@ -63,6 +63,10 @@ export type SystemSettingMinAggregateOutputType = {
   pathaoClientSecret: string | null
   pathaoUsername: string | null
   pathaoPassword: string | null
+  enableNcm: boolean | null
+  ncmSandbox: boolean | null
+  ncmToken: string | null
+  ncmOriginBranch: string | null
   enableCod: boolean | null
   enableEsewa: boolean | null
   esewaSandbox: boolean | null
@@ -108,6 +112,10 @@ export type SystemSettingMaxAggregateOutputType = {
   pathaoClientSecret: string | null
   pathaoUsername: string | null
   pathaoPassword: string | null
+  enableNcm: boolean | null
+  ncmSandbox: boolean | null
+  ncmToken: string | null
+  ncmOriginBranch: string | null
   enableCod: boolean | null
   enableEsewa: boolean | null
   esewaSandbox: boolean | null
@@ -153,6 +161,10 @@ export type SystemSettingCountAggregateOutputType = {
   pathaoClientSecret: number
   pathaoUsername: number
   pathaoPassword: number
+  enableNcm: number
+  ncmSandbox: number
+  ncmToken: number
+  ncmOriginBranch: number
   enableCod: number
   enableEsewa: number
   esewaSandbox: number
@@ -214,6 +226,10 @@ export type SystemSettingMinAggregateInputType = {
   pathaoClientSecret?: true
   pathaoUsername?: true
   pathaoPassword?: true
+  enableNcm?: true
+  ncmSandbox?: true
+  ncmToken?: true
+  ncmOriginBranch?: true
   enableCod?: true
   enableEsewa?: true
   esewaSandbox?: true
@@ -259,6 +275,10 @@ export type SystemSettingMaxAggregateInputType = {
   pathaoClientSecret?: true
   pathaoUsername?: true
   pathaoPassword?: true
+  enableNcm?: true
+  ncmSandbox?: true
+  ncmToken?: true
+  ncmOriginBranch?: true
   enableCod?: true
   enableEsewa?: true
   esewaSandbox?: true
@@ -304,6 +324,10 @@ export type SystemSettingCountAggregateInputType = {
   pathaoClientSecret?: true
   pathaoUsername?: true
   pathaoPassword?: true
+  enableNcm?: true
+  ncmSandbox?: true
+  ncmToken?: true
+  ncmOriginBranch?: true
   enableCod?: true
   enableEsewa?: true
   esewaSandbox?: true
@@ -436,6 +460,10 @@ export type SystemSettingGroupByOutputType = {
   pathaoClientSecret: string | null
   pathaoUsername: string | null
   pathaoPassword: string | null
+  enableNcm: boolean
+  ncmSandbox: boolean
+  ncmToken: string | null
+  ncmOriginBranch: string | null
   enableCod: boolean
   enableEsewa: boolean
   esewaSandbox: boolean
@@ -504,6 +532,10 @@ export type SystemSettingWhereInput = {
   pathaoClientSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   pathaoUsername?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   pathaoPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  enableNcm?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  ncmSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  ncmToken?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  ncmOriginBranch?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolFilter<"SystemSetting"> | boolean
   esewaSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
@@ -549,6 +581,10 @@ export type SystemSettingOrderByWithRelationInput = {
   pathaoClientSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   pathaoUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   pathaoPassword?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableNcm?: Prisma.SortOrder
+  ncmSandbox?: Prisma.SortOrder
+  ncmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  ncmOriginBranch?: Prisma.SortOrderInput | Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
   esewaSandbox?: Prisma.SortOrder
@@ -598,6 +634,10 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   pathaoClientSecret?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   pathaoUsername?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   pathaoPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  enableNcm?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  ncmSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
+  ncmToken?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  ncmOriginBranch?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolFilter<"SystemSetting"> | boolean
   esewaSandbox?: Prisma.BoolFilter<"SystemSetting"> | boolean
@@ -643,6 +683,10 @@ export type SystemSettingOrderByWithAggregationInput = {
   pathaoClientSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   pathaoUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   pathaoPassword?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableNcm?: Prisma.SortOrder
+  ncmSandbox?: Prisma.SortOrder
+  ncmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  ncmOriginBranch?: Prisma.SortOrderInput | Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
   esewaSandbox?: Prisma.SortOrder
@@ -696,6 +740,10 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   pathaoClientSecret?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   pathaoUsername?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   pathaoPassword?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  enableNcm?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  ncmSandbox?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
+  ncmToken?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  ncmOriginBranch?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   enableCod?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   enableEsewa?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
   esewaSandbox?: Prisma.BoolWithAggregatesFilter<"SystemSetting"> | boolean
@@ -741,6 +789,10 @@ export type SystemSettingCreateInput = {
   pathaoClientSecret?: string | null
   pathaoUsername?: string | null
   pathaoPassword?: string | null
+  enableNcm?: boolean
+  ncmSandbox?: boolean
+  ncmToken?: string | null
+  ncmOriginBranch?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
   esewaSandbox?: boolean
@@ -786,6 +838,10 @@ export type SystemSettingUncheckedCreateInput = {
   pathaoClientSecret?: string | null
   pathaoUsername?: string | null
   pathaoPassword?: string | null
+  enableNcm?: boolean
+  ncmSandbox?: boolean
+  ncmToken?: string | null
+  ncmOriginBranch?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
   esewaSandbox?: boolean
@@ -831,6 +887,10 @@ export type SystemSettingUpdateInput = {
   pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableNcm?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ncmOriginBranch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -876,6 +936,10 @@ export type SystemSettingUncheckedUpdateInput = {
   pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableNcm?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ncmOriginBranch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -921,6 +985,10 @@ export type SystemSettingCreateManyInput = {
   pathaoClientSecret?: string | null
   pathaoUsername?: string | null
   pathaoPassword?: string | null
+  enableNcm?: boolean
+  ncmSandbox?: boolean
+  ncmToken?: string | null
+  ncmOriginBranch?: string | null
   enableCod?: boolean
   enableEsewa?: boolean
   esewaSandbox?: boolean
@@ -966,6 +1034,10 @@ export type SystemSettingUpdateManyMutationInput = {
   pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableNcm?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ncmOriginBranch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1011,6 +1083,10 @@ export type SystemSettingUncheckedUpdateManyInput = {
   pathaoClientSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pathaoPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableNcm?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ncmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ncmOriginBranch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enableCod?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableEsewa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   esewaSandbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1062,6 +1138,10 @@ export type SystemSettingCountOrderByAggregateInput = {
   pathaoClientSecret?: Prisma.SortOrder
   pathaoUsername?: Prisma.SortOrder
   pathaoPassword?: Prisma.SortOrder
+  enableNcm?: Prisma.SortOrder
+  ncmSandbox?: Prisma.SortOrder
+  ncmToken?: Prisma.SortOrder
+  ncmOriginBranch?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
   esewaSandbox?: Prisma.SortOrder
@@ -1114,6 +1194,10 @@ export type SystemSettingMaxOrderByAggregateInput = {
   pathaoClientSecret?: Prisma.SortOrder
   pathaoUsername?: Prisma.SortOrder
   pathaoPassword?: Prisma.SortOrder
+  enableNcm?: Prisma.SortOrder
+  ncmSandbox?: Prisma.SortOrder
+  ncmToken?: Prisma.SortOrder
+  ncmOriginBranch?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
   esewaSandbox?: Prisma.SortOrder
@@ -1159,6 +1243,10 @@ export type SystemSettingMinOrderByAggregateInput = {
   pathaoClientSecret?: Prisma.SortOrder
   pathaoUsername?: Prisma.SortOrder
   pathaoPassword?: Prisma.SortOrder
+  enableNcm?: Prisma.SortOrder
+  ncmSandbox?: Prisma.SortOrder
+  ncmToken?: Prisma.SortOrder
+  ncmOriginBranch?: Prisma.SortOrder
   enableCod?: Prisma.SortOrder
   enableEsewa?: Prisma.SortOrder
   esewaSandbox?: Prisma.SortOrder
@@ -1213,6 +1301,10 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   pathaoClientSecret?: boolean
   pathaoUsername?: boolean
   pathaoPassword?: boolean
+  enableNcm?: boolean
+  ncmSandbox?: boolean
+  ncmToken?: boolean
+  ncmOriginBranch?: boolean
   enableCod?: boolean
   enableEsewa?: boolean
   esewaSandbox?: boolean
@@ -1260,6 +1352,10 @@ export type SystemSettingSelectScalar = {
   pathaoClientSecret?: boolean
   pathaoUsername?: boolean
   pathaoPassword?: boolean
+  enableNcm?: boolean
+  ncmSandbox?: boolean
+  ncmToken?: boolean
+  ncmOriginBranch?: boolean
   enableCod?: boolean
   enableEsewa?: boolean
   esewaSandbox?: boolean
@@ -1282,7 +1378,7 @@ export type SystemSettingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
+export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableNcm" | "ncmSandbox" | "ncmToken" | "ncmOriginBranch" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
 
 export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemSetting"
@@ -1310,6 +1406,10 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     pathaoClientSecret: string | null
     pathaoUsername: string | null
     pathaoPassword: string | null
+    enableNcm: boolean
+    ncmSandbox: boolean
+    ncmToken: string | null
+    ncmOriginBranch: string | null
     enableCod: boolean
     enableEsewa: boolean
     esewaSandbox: boolean
@@ -1721,6 +1821,10 @@ export interface SystemSettingFieldRefs {
   readonly pathaoClientSecret: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly pathaoUsername: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly pathaoPassword: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly enableNcm: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly ncmSandbox: Prisma.FieldRef<"SystemSetting", 'Boolean'>
+  readonly ncmToken: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly ncmOriginBranch: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly enableCod: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly enableEsewa: Prisma.FieldRef<"SystemSetting", 'Boolean'>
   readonly esewaSandbox: Prisma.FieldRef<"SystemSetting", 'Boolean'>

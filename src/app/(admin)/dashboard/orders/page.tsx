@@ -21,10 +21,7 @@ export default async function AdminOrdersPage({
   const skip = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const where: any = {
-    OR: [
-      { id: { contains: query } },
-      { shippingAddress: { contains: query } },
-    ]
+    OR: [{ id: { contains: query } }, { shippingAddress: { contains: query } }],
   };
 
   if (statusFilter) {
@@ -39,30 +36,32 @@ export default async function AdminOrdersPage({
         user: { select: { name: true, email: true, image: true } },
         items: {
           include: {
-            product: { select: { images: true } }
-          }
-        }
+            product: { select: { images: true } },
+          },
+        },
       },
       take: ITEMS_PER_PAGE,
-      skip
+      skip,
     }),
     prisma.order.count({ where }),
-    prisma.systemSetting.findUnique({ where: { id: "default" } })
+    prisma.systemSetting.findUnique({ where: { id: "default" } }),
   ]);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   const formatPrice = (p: number) => {
-    return new Intl.NumberFormat('en-NP', {
-      style: 'currency',
-      currency: 'NPR',
+    return new Intl.NumberFormat("en-NP", {
+      style: "currency",
+      currency: "NPR",
       maximumFractionDigits: 0,
     }).format(Number(p));
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', year: 'numeric'
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -71,10 +70,11 @@ export default async function AdminOrdersPage({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight">Orders</h1>
-          <p className="text-sm opacity-60">Manage and track customer orders ({totalCount})</p>
+          <p className="text-sm opacity-60">
+            Manage and track customer orders ({totalCount})
+          </p>
         </div>
 
-        {/* ✅ EXPORT TO CSV BUTTON */}
         <a
           href="/api/admin/export-orders"
           download
@@ -106,14 +106,20 @@ export default async function AdminOrdersPage({
                 let shipping = { fullName: "Unknown", city: "N/A" };
                 try {
                   shipping = JSON.parse(order.shippingAddress as string);
-                } catch (e) { }
+                } catch (e) {}
 
                 return (
                   <tr key={order.id} className="hover group transition-colors">
                     <td className="pl-6">
-                      <Link href={`/dashboard/orders/${order.id}`} className="font-mono text-xs font-bold opacity-60 hover:text-primary hover:underline flex items-center gap-1">
+                      <Link
+                        href={`/dashboard/orders/${order.id}`}
+                        className="font-mono text-xs font-bold opacity-60 hover:text-primary hover:underline flex items-center gap-1"
+                      >
                         #{order.id.slice(-6).toUpperCase()}
-                        <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowUpRight
+                          size={10}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
                       </Link>
                       <div className="text-[10px] opacity-50 mt-1 flex items-center gap-1">
                         <Calendar size={10} /> {formatDate(order.createdAt)}
@@ -128,8 +134,12 @@ export default async function AdminOrdersPage({
                           </div>
                         </div>
                         <div>
-                          <div className="font-bold text-sm">{shipping.fullName}</div>
-                          <div className="text-xs opacity-50">{order.user?.email || "Guest User"}</div>
+                          <div className="font-bold text-sm">
+                            {shipping.fullName}
+                          </div>
+                          <div className="text-xs opacity-50">
+                            {order.user?.email || "Guest User"}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -139,13 +149,23 @@ export default async function AdminOrdersPage({
                         {order.items.slice(0, 3).map((item) => {
                           let imageUrl = "/placeholder.jpg";
                           try {
-                            const imgs = item.product?.images ? JSON.parse(item.product.images as string) : [];
+                            const imgs = item.product?.images
+                              ? JSON.parse(item.product.images as string)
+                              : [];
                             if (imgs.length > 0) imageUrl = imgs[0];
-                          } catch (e) { }
+                          } catch (e) {}
                           return (
-                            <div key={item.id} className="inline-block h-8 w-8 rounded-full ring-2 ring-base-100 bg-base-200 overflow-hidden shrink-0 tooltip" data-tip={item.name}>
+                            <div
+                              key={item.id}
+                              className="inline-block h-8 w-8 rounded-full ring-2 ring-base-100 bg-base-200 overflow-hidden shrink-0 tooltip"
+                              data-tip={item.name}
+                            >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                              <img
+                                src={imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           );
                         })}
@@ -156,27 +176,42 @@ export default async function AdminOrdersPage({
                         )}
                       </div>
                       <div className="text-xs opacity-60 truncate font-medium">
-                        {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+                        {order.items.length} item
+                        {order.items.length !== 1 ? "s" : ""}
                       </div>
                     </td>
 
                     <td>
-                      <div className="font-bold">{formatPrice(Number(order.totalAmount))}</div>
-                      <div className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit mt-1 border ${order.paymentStatus === 'PAID' ? 'bg-success/10 text-success border-success/20' :
-                          order.paymentStatus === 'FAILED' ? 'bg-error/10 text-error border-error/20' :
-                            'bg-warning/10 text-warning-content border-warning/20'
-                        }`}>
+                      <div className="font-bold">
+                        {formatPrice(Number(order.totalAmount))}
+                      </div>
+                      <div
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit mt-1 border ${
+                          order.paymentStatus === "PAID"
+                            ? "bg-success/10 text-success border-success/20"
+                            : order.paymentStatus === "FAILED"
+                              ? "bg-error/10 text-error border-error/20"
+                              : "bg-warning/10 text-warning-content border-warning/20"
+                        }`}
+                      >
                         {order.paymentMethod}
                       </div>
                     </td>
 
                     <td>
-                      <OrderStatusSelect id={order.id} currentStatus={order.status} />
+                      <OrderStatusSelect
+                        id={order.id}
+                        currentStatus={order.status}
+                      />
                     </td>
 
                     <td className="pr-6 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <OrderPrintActions order={order} settings={settings} />
+                        {/* ✅ FIX: Serialize the order to remove Prisma Decimals before passing to Client Components */}
+                        <OrderPrintActions
+                          order={JSON.parse(JSON.stringify(order))}
+                          settings={JSON.parse(JSON.stringify(settings))}
+                        />
 
                         <Link
                           href={`/dashboard/orders/${order.id}`}
@@ -195,7 +230,9 @@ export default async function AdminOrdersPage({
                   <td colSpan={6} className="text-center py-16 opacity-50">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-lg font-bold">No orders found</p>
-                      <p className="text-sm">Wait for customers to place their first order.</p>
+                      <p className="text-sm">
+                        Wait for customers to place their first order.
+                      </p>
                     </div>
                   </td>
                 </tr>

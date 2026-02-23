@@ -49,9 +49,9 @@ export default async function CheckoutPage() {
       </div>
 
       <CheckoutForm
-        user={user}
-        defaultAddress={defaultAddress}
-        settings={settings}
+        user={JSON.parse(JSON.stringify(user))}
+        defaultAddress={JSON.parse(JSON.stringify(defaultAddress))}
+        settings={JSON.parse(JSON.stringify(settings))}
       />
     </div>
   );

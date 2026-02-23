@@ -398,13 +398,18 @@ model SystemSetting {
   pathaoUsername      String?
   pathaoPassword      String?
 
+  // ✅ NEPAL CAN MOVE (NCM) CONFIG
+  enableNcm       Boolean @default(false)
+  ncmSandbox      Boolean @default(true)
+  ncmToken        String?
+  ncmOriginBranch String? @default("TINKUNE")
   // Payment Gateway Toggles
-  enableCod     Boolean @default(true)
-  enableEsewa   Boolean @default(false)
-  esewaSandbox  Boolean @default(true) // ✅ Added
-  enableKhalti  Boolean @default(false)
-  khaltiSandbox Boolean @default(true) // ✅ Added
-  enableSctPay  Boolean @default(false)
+  enableCod       Boolean @default(true)
+  enableEsewa     Boolean @default(false)
+  esewaSandbox    Boolean @default(true) // ✅ Added
+  enableKhalti    Boolean @default(false)
+  khaltiSandbox   Boolean @default(true) // ✅ Added
+  enableSctPay    Boolean @default(false)
 
   // Payment API Credentials
   esewaId      String?

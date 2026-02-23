@@ -1,12 +1,25 @@
-"use server"
+"use server";
 
-import { getPathaoCities, getPathaoZones, getPathaoAreas } from "@/lib/delivery/external-apis";
+import {
+  getPathaoCities,
+  getPathaoZones,
+  getPathaoAreas,
+  getNcmBranches,
+} from "@/lib/delivery/external-apis";
 
 // Wrapper for public access (no admin check)
-export async function getPublicCities() { return await getPathaoCities(); }
-export async function getPublicZones(cityId: number) { return await getPathaoZones(cityId); }
-export async function getPublicAreas(zoneId: number) { return await getPathaoAreas(zoneId); }
-
+export async function getPublicCities() {
+  return await getPathaoCities();
+}
+export async function getPublicZones(cityId: number) {
+  return await getPathaoZones(cityId);
+}
+export async function getPublicAreas(zoneId: number) {
+  return await getPathaoAreas(zoneId);
+}
+export async function getPublicNcmBranches() {
+  return await getNcmBranches();
+}
 export async function verifyPathaoLocation(district: string, city: string) {
   try {
     const cities = await getPathaoCities();
@@ -14,36 +27,40 @@ export async function verifyPathaoLocation(district: string, city: string) {
 
     const cleanDistrict = district.trim().toLowerCase();
     const cleanCity = city.trim().toLowerCase();
-    
+
     let match: any = null;
 
     // 1. Kathmandu Valley Check
-    if (['kathmandu', 'lalitpur', 'bhaktapur'].includes(cleanDistrict) || 
-        ['kathmandu', 'lalitpur', 'bhaktapur'].includes(cleanCity)) {
-        match = cities.find((c: any) => c.city_name === "Kathmandu Valley");
+    if (
+      ["kathmandu", "lalitpur", "bhaktapur"].includes(cleanDistrict) ||
+      ["kathmandu", "lalitpur", "bhaktapur"].includes(cleanCity)
+    ) {
+      match = cities.find((c: any) => c.city_name === "Kathmandu Valley");
     }
 
     // 2. Direct Match
     if (!match) {
-        match = cities.find((c: any) => 
-            c.city_name.toLowerCase() === cleanCity || 
-            c.city_name.toLowerCase() === cleanDistrict
-        );
+      match = cities.find(
+        (c: any) =>
+          c.city_name.toLowerCase() === cleanCity ||
+          c.city_name.toLowerCase() === cleanDistrict,
+      );
     }
 
     // 3. Partial Match
     if (!match) {
-        match = cities.find((c: any) => 
-            c.city_name.toLowerCase().includes(cleanCity) || 
-            c.city_name.toLowerCase().includes(cleanDistrict)
-        );
+      match = cities.find(
+        (c: any) =>
+          c.city_name.toLowerCase().includes(cleanCity) ||
+          c.city_name.toLowerCase().includes(cleanDistrict),
+      );
     }
 
     if (match) {
-      return { 
-        matched: true, 
-        cityId: match.city_id, 
-        cityName: match.city_name 
+      return {
+        matched: true,
+        cityId: match.city_id,
+        cityName: match.city_name,
       };
     }
 

@@ -24,6 +24,12 @@ export const SettingsFormSchema = z.object({
   pathaoUsername: z.string().optional().nullable(),
   pathaoPassword: z.string().optional().nullable(),
 
+  // NCM LOGISTICS
+  enableNcm: z.boolean().default(false),
+  ncmSandbox: z.boolean().default(true),
+  ncmToken: z.string().optional().nullable(),
+  ncmOriginBranch: z.string().optional().nullable(),
+
   // Store Info
   storeName: z.string().min(1, "Store Name is required"),
   storeTaxId: z.string().optional().nullable(),

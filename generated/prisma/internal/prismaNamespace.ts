@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.4.0
- * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
+ * Prisma Client JS version: 7.4.1
+ * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.4.0",
-  engine: "ab56fe763f921d033a6c195e7ddeb3e255bdbb57"
+  client: "7.4.1",
+  engine: "55ae170b1ced7fc6ed07a15f110549408c501bb3"
 }
 
 /**
@@ -2065,6 +2065,10 @@ export const SystemSettingScalarFieldEnum = {
   pathaoClientSecret: 'pathaoClientSecret',
   pathaoUsername: 'pathaoUsername',
   pathaoPassword: 'pathaoPassword',
+  enableNcm: 'enableNcm',
+  ncmSandbox: 'ncmSandbox',
+  ncmToken: 'ncmToken',
+  ncmOriginBranch: 'ncmOriginBranch',
   enableCod: 'enableCod',
   enableEsewa: 'enableEsewa',
   esewaSandbox: 'esewaSandbox',
@@ -2332,6 +2336,8 @@ export const SystemSettingOrderByRelevanceFieldEnum = {
   pathaoClientSecret: 'pathaoClientSecret',
   pathaoUsername: 'pathaoUsername',
   pathaoPassword: 'pathaoPassword',
+  ncmToken: 'ncmToken',
+  ncmOriginBranch: 'ncmOriginBranch',
   esewaId: 'esewaId',
   esewaSecret: 'esewaSecret',
   khaltiSecret: 'khaltiSecret',

@@ -17,8 +17,8 @@ export default async function HomePage() {
 
   return (
     <LandingView
-      featuredProducts={featuredProducts}
-      newArrivals={newArrivals}
+      featuredProducts={JSON.parse(JSON.stringify(featuredProducts))}
+      newArrivals={JSON.parse(JSON.stringify(newArrivals))}
     />
   );
 }

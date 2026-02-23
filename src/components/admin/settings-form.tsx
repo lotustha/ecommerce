@@ -7,73 +7,71 @@ import {
   SettingsFormValues,
 } from "@/lib/validators/settings-schema";
 import { updateSettings } from "@/actions/settings-actions";
-import { useState, useTransition, useEffect, useCallback } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import {
   Save,
   Store,
-  CreditCard,
-  ShieldCheck,
-  Settings as SettingsIcon,
   Truck,
-  Cpu,
+  CreditCard,
+  Sparkles,
   UploadCloud,
-  Image as ImageIcon,
-  Trash2,
-  FileText,
-  Wallet,
-  MapPin,
-  Phone,
-  Mail,
-  Hash,
-  Percent,
-  Facebook,
-  Instagram,
-  Globe,
   Info,
+  Globe,
+  Percent,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
-export default function SettingsForm({ initialData }: { initialData?: any }) {
+export default function SettingsForm({ initialData }: { initialData: any }) {
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState("general");
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(SettingsFormSchema) as any,
     defaultValues: {
+      // General
       appName: initialData?.appName || "Nepal E-com",
+      storeName: initialData?.storeName || "",
+      storeSubtitle: initialData?.storeSubtitle || "",
+      storeEmail: initialData?.storeEmail || "",
+      storePhone: initialData?.storePhone || "",
+      storeAddress: initialData?.storeAddress || "",
+      storeTaxId: initialData?.storeTaxId || "",
       storeLogo: initialData?.storeLogo || "",
       currency: initialData?.currency || "NPR",
-      taxRate: Number(initialData?.taxRate) || 0,
+      taxRate: initialData?.taxRate ? Number(initialData.taxRate) : 0,
+
+      // Socials
+      socialFacebook: initialData?.socialFacebook || "",
+      socialInstagram: initialData?.socialInstagram || "",
+      socialTwitter: initialData?.socialTwitter || "",
+      socialTiktok: initialData?.socialTiktok || "",
 
       // Logistics
-      enableStoreDelivery: initialData?.enableStoreDelivery ?? true,
-      shippingCharge: Number(initialData?.shippingCharge) || 150,
+      shippingCharge: initialData?.shippingCharge
+        ? Number(initialData.shippingCharge)
+        : 150,
+      shippingMarkup: initialData?.shippingMarkup
+        ? Number(initialData.shippingMarkup)
+        : 0,
       freeShippingThreshold: initialData?.freeShippingThreshold
         ? Number(initialData.freeShippingThreshold)
         : undefined,
+      enableStoreDelivery: initialData?.enableStoreDelivery ?? true,
+
+      // Pathao
       enablePathao: initialData?.enablePathao ?? false,
       pathaoSandbox: initialData?.pathaoSandbox ?? true,
       pathaoClientId: initialData?.pathaoClientId || "",
       pathaoClientSecret: initialData?.pathaoClientSecret || "",
       pathaoUsername: initialData?.pathaoUsername || "",
       pathaoPassword: initialData?.pathaoPassword || "",
-      shippingMarkup: Number(initialData?.shippingMarkup) || 0,
-      deliveryPartners: initialData?.deliveryPartners || "Pathao, Upaya",
 
-      // Store Info
-      storeName: initialData?.storeName || "Nepal E-com",
-      storeTaxId: initialData?.storeTaxId || "",
-      storeSubtitle: initialData?.storeSubtitle || "",
-      storeAddress: initialData?.storeAddress || "",
-      storePhone: initialData?.storePhone || "",
-      storeEmail: initialData?.storeEmail || "",
-
-      // Socials
-      socialFacebook: initialData?.socialFacebook || "",
-      socialInstagram: initialData?.socialInstagram || "",
-      socialTiktok: initialData?.socialTiktok || "",
-      socialTwitter: initialData?.socialTwitter || "",
+      // NCM
+      enableNcm: initialData?.enableNcm ?? false,
+      ncmSandbox: initialData?.ncmSandbox ?? true,
+      ncmToken: initialData?.ncmToken || "",
+      ncmOriginBranch: initialData?.ncmOriginBranch || "TINKUNE",
 
       // Payments
       enableCod: initialData?.enableCod ?? true,
@@ -84,31 +82,24 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
       enableKhalti: initialData?.enableKhalti ?? false,
       khaltiSandbox: initialData?.khaltiSandbox ?? true,
       khaltiSecret: initialData?.khaltiSecret || "",
-      sctPayKey: initialData?.sctPayKey || "",
-      enableSctPay: initialData?.enableSctPay ?? false,
 
-      // AI & Legal
-      aiOpenAiKey: initialData?.aiOpenAiKey || "",
+      // AI Integrations
       aiGeminiKey: initialData?.aiGeminiKey || "",
+      aiOpenAiKey: initialData?.aiOpenAiKey || "",
       crawlerApiKey: initialData?.crawlerApiKey || "",
-      privacyPolicy: initialData?.privacyPolicy || "",
-      termsAndConditions: initialData?.termsAndConditions || "",
     },
   });
 
-  useEffect(() => {
-    if (initialData) form.reset(initialData);
-  }, [initialData, form]);
-
+  // Logo Upload Handler
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          form.setValue("storeLogo", result, { shouldDirty: true });
-        };
+        reader.onload = () =>
+          form.setValue("storeLogo", reader.result as string, {
+            shouldDirty: true,
+          });
         reader.readAsDataURL(file);
       }
     },
@@ -129,769 +120,630 @@ export default function SettingsForm({ initialData }: { initialData?: any }) {
     });
   };
 
-  // ✅ More resilient error handler
-  const onError = (errors: any) => {
-    console.error("Settings Validation Failed:", errors);
-    const errorKeys = Object.keys(errors);
-    if (errorKeys.length > 0) {
-      const firstKey = errorKeys[0];
-      const firstErrorMsg = errors[firstKey]?.message || "Invalid field";
-      toast.error(`Form Error (${firstKey}): ${firstErrorMsg}`);
-    } else {
-      toast.error("Please check the form for validation errors.");
-    }
-  };
-
   const tabs = [
-    { id: "general", label: "General", icon: SettingsIcon },
-    { id: "store", label: "Store Info", icon: Store },
-    { id: "shipping", label: "Logistics", icon: Truck },
-    { id: "payment", label: "Payments", icon: CreditCard },
-    { id: "ai", label: "AI & Automation", icon: Cpu },
-    { id: "legal", label: "Legal", icon: ShieldCheck },
+    { id: "general", label: "Store Details", icon: Store },
+    { id: "logistics", label: "Logistics & Delivery", icon: Truck },
+    { id: "payments", label: "Payments", icon: CreditCard },
+    { id: "integrations", label: "AI & Integrations", icon: Sparkles },
   ];
 
-  const currentLogo = form.watch("storeLogo");
-
   return (
-    <div className="max-w-6xl mx-auto pb-20">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-6 pb-20 max-w-6xl mx-auto"
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-base-100 p-6 rounded-3xl border border-base-200 shadow-sm sticky top-0 z-20">
         <div>
-          <h1 className="text-3xl font-black tracking-tight">
-            System Settings
-          </h1>
-          <p className="text-sm opacity-60">Configure your store globally</p>
+          <h1 className="text-3xl font-black tracking-tight">Settings</h1>
+          <p className="text-sm opacity-60">
+            Manage your store configurations globally.
+          </p>
         </div>
-
-        {/* ✅ Use type="submit" and form="settings-form" instead of external onClick */}
         <button
           type="submit"
-          form="settings-form"
           disabled={isPending}
-          className="btn btn-primary rounded-xl shadow-lg"
+          className="btn btn-primary rounded-xl shadow-lg w-full sm:w-auto"
         >
           {isPending ? (
             <span className="loading loading-spinner"></span>
           ) : (
             <Save size={18} />
           )}
-          Save Changes
+          Save Settings
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1">
-          <ul className="menu bg-base-100 rounded-box border border-base-200 p-2 gap-1 sticky top-24">
-            {tabs.map((tab) => (
-              <li key={tab.id}>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={activeTab === tab.id ? "active font-bold" : ""}
-                >
-                  <tab.icon size={18} /> {tab.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="lg:col-span-3">
-          {/* ✅ Attached id and handleSubmit exactly to the form itself */}
-          <form
-            id="settings-form"
-            onSubmit={form.handleSubmit(onSubmit, onError)}
-            className="space-y-6"
+      {/* Tabs */}
+      <div className="tabs tabs-boxed bg-base-200/50 p-2 overflow-x-auto whitespace-nowrap scrollbar-hide rounded-2xl">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setActiveTab(t.id)}
+            className={`tab tab-lg transition-all rounded-xl ${activeTab === t.id ? "bg-base-100 shadow-sm font-bold text-primary" : "font-medium opacity-70 hover:opacity-100"}`}
           >
-            {/* GENERAL TAB */}
-            {activeTab === "general" && (
-              <div className="card bg-base-100 shadow-sm border border-base-200">
-                <div className="card-body p-6 space-y-6">
-                  <h2 className="card-title text-sm opacity-60 uppercase border-b pb-2">
-                    Application Config
-                  </h2>
+            <t.icon size={16} className="mr-2" /> {t.label}
+          </button>
+        ))}
+      </div>
 
+      {/* --- TAB CONTENT: GENERAL --- */}
+      {activeTab === "general" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-4">Basic Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="form-control">
                     <label className="label font-bold text-sm">
-                      Store Logo
+                      Store Name
                     </label>
-                    <div className="flex items-start gap-6">
-                      <div
-                        {...getRootProps()}
-                        className={`w-32 h-32 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all overflow-hidden bg-base-200/50 ${
-                          isDragActive
-                            ? "border-primary bg-primary/5"
-                            : "border-base-300 hover:border-primary/50"
-                        }`}
-                      >
-                        <input {...getInputProps()} />
-                        {currentLogo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={currentLogo}
-                            alt="Logo"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center opacity-40">
-                            <ImageIcon size={24} />
-                            <span className="text-[10px] mt-1 font-bold">
-                              Upload
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm opacity-60 mb-2">
-                          Upload your store logo. Used in navbar and invoices.
-                        </p>
-                        {currentLogo && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              form.setValue("storeLogo", "", {
-                                shouldDirty: true,
-                              })
-                            }
-                            className="btn btn-xs btn-ghost text-error"
-                          >
-                            <Trash2 size={14} /> Remove Logo
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                    <input
+                      {...form.register("storeName")}
+                      className="input input-bordered"
+                      placeholder="e.g. Nepal E-com"
+                    />
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="form-control">
-                      <label className="label font-bold text-sm">
-                        App Name
-                      </label>
-                      <input
-                        {...form.register("appName")}
-                        className="input input-bordered"
-                        placeholder="Nepal E-com"
-                      />
-                      {form.formState.errors.appName && (
-                        <span className="text-error text-xs">
-                          {form.formState.errors.appName.message}
-                        </span>
-                      )}
-                    </div>
-                    <div className="form-control">
-                      <label className="label font-bold text-sm">
-                        Currency Symbol
-                      </label>
-                      <input
-                        {...form.register("currency")}
-                        className="input input-bordered"
-                        placeholder="NPR, $, etc."
-                      />
-                      {form.formState.errors.currency && (
-                        <span className="text-error text-xs">
-                          {form.formState.errors.currency.message}
-                        </span>
-                      )}
-                    </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      App Internal Name
+                    </label>
+                    <input
+                      {...form.register("appName")}
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control md:col-span-2">
+                    <label className="label font-bold text-sm">
+                      Store Subtitle / Tagline
+                    </label>
+                    <input
+                      {...form.register("storeSubtitle")}
+                      className="input input-bordered"
+                      placeholder="Your trusted destination..."
+                    />
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* STORE INFO TAB */}
-            {activeTab === "store" && (
-              <div className="space-y-6">
-                {/* 1. Identity & Tax */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-base-content/5">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Store size={20} />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold">Identity & Tax</h2>
-                        <p className="text-xs opacity-60">
-                          Legal name and registration details.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Store Name
-                        </label>
-                        <input
-                          {...form.register("storeName")}
-                          className="input input-bordered"
-                        />
-                        {form.formState.errors.storeName && (
-                          <span className="text-error text-xs">
-                            {form.formState.errors.storeName.message}
-                          </span>
-                        )}
-                      </div>
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Tagline
-                        </label>
-                        <input
-                          {...form.register("storeSubtitle")}
-                          className="input input-bordered"
-                          placeholder="Best electronics in Nepal"
-                        />
-                      </div>
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          VAT / PAN Number
-                        </label>
-                        <label className="input input-bordered flex items-center gap-2">
-                          <Hash size={16} className="opacity-50" />
-                          <input
-                            {...form.register("storeTaxId")}
-                            className="grow"
-                            placeholder="e.g. 601234567"
-                          />
-                        </label>
-                      </div>
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Tax Rate (%)
-                        </label>
-                        <label className="input input-bordered flex items-center gap-2">
-                          <Percent size={16} className="opacity-50" />
-                          <input
-                            type="number"
-                            {...form.register("taxRate")}
-                            className="grow"
-                            step="0.01"
-                          />
-                        </label>
-                      </div>
-                    </div>
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-4">Contact Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Support Email
+                    </label>
+                    <input
+                      {...form.register("storeEmail")}
+                      className="input input-bordered"
+                      placeholder="support@domain.com"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Support Phone
+                    </label>
+                    <input
+                      {...form.register("storePhone")}
+                      className="input input-bordered"
+                      placeholder="+977..."
+                    />
+                  </div>
+                  <div className="form-control md:col-span-2">
+                    <label className="label font-bold text-sm">
+                      Physical Address
+                    </label>
+                    <input
+                      {...form.register("storeAddress")}
+                      className="input input-bordered"
+                      placeholder="Kathmandu, Nepal"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      PAN / VAT Number
+                    </label>
+                    <input
+                      {...form.register("storeTaxId")}
+                      className="input input-bordered"
+                      placeholder="Optional"
+                    />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                {/* 2. Contact & Location */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-base-content/5">
-                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                        <MapPin size={20} />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold">
-                          Contact Information
-                        </h2>
-                        <p className="text-xs opacity-60">
-                          Where customers can reach you.
-                        </p>
-                      </div>
+          <div className="space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 flex flex-col items-center text-center">
+                <h2 className="text-lg font-bold mb-4 w-full text-left">
+                  Store Logo
+                </h2>
+                <div
+                  {...getRootProps()}
+                  className={`relative w-40 h-40 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
+                    isDragActive
+                      ? "border-primary bg-primary/5"
+                      : "border-base-300 hover:border-primary/50 hover:bg-base-200/50"
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  {form.watch("storeLogo") ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={form.watch("storeLogo") || ""}
+                      alt="Logo"
+                      className="w-full h-full object-contain p-2"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center opacity-40">
+                      <UploadCloud size={32} />
+                      <span className="text-xs mt-2 font-bold">
+                        Upload Logo
+                      </span>
                     </div>
+                  )}
+                </div>
+                {form.watch("storeLogo") && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      form.setValue("storeLogo", "", { shouldDirty: true })
+                    }
+                    className="btn btn-xs btn-ghost text-error mt-4"
+                  >
+                    Remove Logo
+                  </button>
+                )}
+              </div>
+            </div>
 
-                    <div className="space-y-4">
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Physical Address
-                        </label>
-                        <input
-                          {...form.register("storeAddress")}
-                          className="input input-bordered"
-                          placeholder="New Road, Kathmandu"
-                        />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="form-control">
-                          <label className="label font-bold text-sm">
-                            Support Phone
-                          </label>
-                          <label className="input input-bordered flex items-center gap-2">
-                            <Phone size={16} className="opacity-50" />
-                            <input
-                              {...form.register("storePhone")}
-                              className="grow"
-                            />
-                          </label>
-                        </div>
-                        <div className="form-control">
-                          <label className="label font-bold text-sm">
-                            Support Email
-                          </label>
-                          <label className="input input-bordered flex items-center gap-2">
-                            <Mail size={16} className="opacity-50" />
-                            <input
-                              {...form.register("storeEmail")}
-                              className="grow"
-                            />
-                          </label>
-                          {form.formState.errors.storeEmail && (
-                            <span className="text-error text-xs mt-1">
-                              {form.formState.errors.storeEmail.message}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-4">Financials</h2>
+                <div className="form-control">
+                  <label className="label font-bold text-sm">
+                    Tax Rate (VAT %)
+                  </label>
+                  <div className="relative">
+                    <Percent
+                      className="absolute left-3 top-3 text-base-content/40"
+                      size={18}
+                    />
+                    <input
+                      type="number"
+                      {...form.register("taxRate")}
+                      className="input input-bordered w-full pl-10"
+                      placeholder="13"
+                    />
+                  </div>
+                  <label className="label">
+                    <span className="label-text-alt opacity-60">
+                      Inclusive tax percentage to show on receipts
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB CONTENT: LOGISTICS --- */}
+      {activeTab === "logistics" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 space-y-4">
+                <h2 className="text-lg font-bold border-b border-base-200 pb-3">
+                  Standard Shipping
+                </h2>
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      {...form.register("enableStoreDelivery")}
+                      className="toggle toggle-success toggle-sm"
+                    />
+                    <span className="label-text font-bold">
+                      Enable Internal Delivery
+                    </span>
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Flat Rate Charge
+                    </label>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <span className="opacity-50 text-xs font-bold">NRP</span>
+                      <input
+                        type="number"
+                        {...form.register("shippingCharge")}
+                        className="grow"
+                      />
+                    </label>
+                  </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Free Shipping Threshold
+                    </label>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <span className="opacity-50 text-xs font-bold">NRP</span>
+                      <input
+                        type="number"
+                        {...form.register("freeShippingThreshold")}
+                        className="grow"
+                        placeholder="e.g. 5000"
+                      />
+                    </label>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* 3. Social Media */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-base-content/5">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                        <Globe size={20} />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold">Social Media</h2>
-                        <p className="text-xs opacity-60">
-                          Connect with your audience.
-                        </p>
-                      </div>
+            {/* NEPAL CAN MOVE */}
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 space-y-4">
+                <div className="flex justify-between items-center border-b border-base-200 pb-3">
+                  <h2 className="card-title text-sm opacity-60 uppercase tracking-widest flex items-center gap-2">
+                    <Globe size={16} className="text-error" /> Nepal Can Move
+                    (NCM)
+                  </h2>
+                  <input
+                    type="checkbox"
+                    {...form.register("enableNcm")}
+                    className="toggle toggle-error toggle-sm"
+                  />
+                </div>
+
+                {form.watch("enableNcm") && (
+                  <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
+                    <div className="form-control">
+                      <label className="label cursor-pointer justify-start gap-4">
+                        <input
+                          type="checkbox"
+                          {...form.register("ncmSandbox")}
+                          className="checkbox checkbox-warning checkbox-sm"
+                        />
+                        <span className="label-text font-bold text-sm">
+                          Enable Sandbox Mode (Test Environment)
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="alert alert-info bg-info/10 text-info-content text-xs p-3 rounded-xl border border-info/20 flex gap-2">
+                      <Info size={16} className="shrink-0 text-info" />
+                      <span className="leading-relaxed">
+                        <strong>Webhook Setup Required:</strong> Go to the NCM
+                        Vendor Portal and set your Webhook URL to:
+                        <br />
+                        <span className="font-mono bg-base-100 px-2 py-1 rounded mt-1 inline-block select-all text-primary border border-base-200">
+                          https://yourdomain.com/api/webhooks/ncm
+                        </span>
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
                       <div className="form-control">
                         <label className="label font-bold text-sm">
-                          Facebook
+                          NCM API Token
                         </label>
-                        <label className="input input-bordered flex items-center gap-2">
-                          <Facebook size={16} className="text-blue-600" />
-                          <input
-                            {...form.register("socialFacebook")}
-                            className="grow"
-                            placeholder="https://facebook.com/..."
-                          />
-                        </label>
+                        <input
+                          type="password"
+                          {...form.register("ncmToken")}
+                          className="input input-bordered font-mono text-sm"
+                          placeholder="Paste your API token key here"
+                        />
                       </div>
                       <div className="form-control">
                         <label className="label font-bold text-sm">
-                          Instagram
+                          Default Origin Branch
                         </label>
-                        <label className="input input-bordered flex items-center gap-2">
-                          <Instagram size={16} className="text-pink-600" />
-                          <input
-                            {...form.register("socialInstagram")}
-                            className="grow"
-                            placeholder="https://instagram.com/..."
-                          />
-                        </label>
-                      </div>
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          TikTok
-                        </label>
-                        <label className="input input-bordered flex items-center gap-2">
-                          <span className="font-bold text-xs w-4 text-center">
-                            TT
+                        <input
+                          {...form.register("ncmOriginBranch")}
+                          placeholder="e.g. TINKUNE"
+                          className="input input-bordered font-mono text-sm uppercase"
+                        />
+                        <label className="label">
+                          <span className="label-text-alt opacity-60">
+                            The branch where you drop off packages
                           </span>
-                          <input
-                            {...form.register("socialTiktok")}
-                            className="grow"
-                            placeholder="https://tiktok.com/@..."
-                          />
                         </label>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* LOGISTICS TAB */}
-            {activeTab === "shipping" && (
-              <div className="space-y-6">
-                {/* 1. Internal / Store Delivery */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
-                      <h2 className="card-title text-sm opacity-60 uppercase flex items-center gap-2">
-                        <Truck size={16} /> Store Delivery
-                      </h2>
-                      <input
-                        type="checkbox"
-                        {...form.register("enableStoreDelivery")}
-                        className="toggle toggle-primary toggle-sm"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Standard Shipping Charge
-                        </label>
-                        <input
-                          type="number"
-                          {...form.register("shippingCharge")}
-                          className="input input-bordered"
-                          disabled={!form.watch("enableStoreDelivery")}
-                        />
-                        <label className="label">
-                          <span className="label-text-alt opacity-60">
-                            Flat rate for manual delivery
-                          </span>
-                        </label>
-                      </div>
-                      <div className="form-control">
-                        <label className="label font-bold text-sm">
-                          Free Shipping Threshold
-                        </label>
-                        <input
-                          type="number"
-                          {...form.register("freeShippingThreshold")}
-                          className="input input-bordered"
-                          placeholder="e.g. 5000"
-                          disabled={!form.watch("enableStoreDelivery")}
-                        />
-                        <label className="label">
-                          <span className="label-text-alt opacity-60">
-                            Free shipping if order &gt; this
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+          <div className="space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 space-y-4">
+                <div className="flex justify-between items-center border-b border-base-200 pb-3">
+                  <h2 className="card-title text-sm opacity-60 uppercase tracking-widest flex items-center gap-2">
+                    <Truck size={16} className="text-info" /> Pathao Logistics
+                  </h2>
+                  <input
+                    type="checkbox"
+                    {...form.register("enablePathao")}
+                    className="toggle toggle-info toggle-sm"
+                  />
                 </div>
 
-                {/* 2. Pathao Integration */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
-                      <h2 className="card-title text-sm opacity-60 uppercase flex items-center gap-2">
-                        <Globe size={16} /> Pathao Logistics
-                      </h2>
-                      <input
-                        type="checkbox"
-                        {...form.register("enablePathao")}
-                        className="toggle toggle-error toggle-sm"
-                      />
+                {form.watch("enablePathao") && (
+                  <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
+                    <div className="form-control">
+                      <label className="label cursor-pointer justify-start gap-4">
+                        <input
+                          type="checkbox"
+                          {...form.register("pathaoSandbox")}
+                          className="checkbox checkbox-warning checkbox-sm"
+                        />
+                        <span className="label-text font-bold text-sm">
+                          Enable Sandbox Mode (Test)
+                        </span>
+                      </label>
                     </div>
 
-                    {form.watch("enablePathao") && (
-                      <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="form-control">
-                          <label className="label cursor-pointer justify-start gap-4">
-                            <input
-                              type="checkbox"
-                              {...form.register("pathaoSandbox")}
-                              className="checkbox checkbox-warning checkbox-sm"
-                            />
-                            <span className="label-text font-bold text-sm">
-                              Enable Sandbox Mode (Test)
-                            </span>
-                          </label>
-                        </div>
-
-                        {!form.watch("pathaoSandbox") ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Client ID
-                              </label>
-                              <input
-                                type="password"
-                                {...form.register("pathaoClientId")}
-                                className="input input-bordered font-mono text-sm"
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Client Secret
-                              </label>
-                              <input
-                                type="password"
-                                {...form.register("pathaoClientSecret")}
-                                className="input input-bordered font-mono text-sm"
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Username / Email
-                              </label>
-                              <input
-                                {...form.register("pathaoUsername")}
-                                className="input input-bordered font-mono text-sm"
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Password
-                              </label>
-                              <input
-                                type="password"
-                                {...form.register("pathaoPassword")}
-                                className="input input-bordered font-mono text-sm"
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
-                            <Info size={16} className="shrink-0" />
-                            <span>
-                              Sandbox mode is ON. Predefined test credentials
-                              will be used automatically.
-                            </span>
-                          </div>
-                        )}
-
+                    {!form.watch("pathaoSandbox") && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="form-control">
                           <label className="label font-bold text-sm">
-                            Shipping Markup
+                            Client ID
                           </label>
                           <input
-                            type="number"
-                            {...form.register("shippingMarkup")}
-                            className="input input-bordered"
+                            type="password"
+                            {...form.register("pathaoClientId")}
+                            className="input input-bordered font-mono text-sm"
                           />
-                          <label className="label">
-                            <span className="label-text-alt opacity-60">
-                              Add extra amount to Pathao API rates
-                            </span>
-                          </label>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* PAYMENTS TAB */}
-            {activeTab === "payment" && (
-              <div className="space-y-6">
-                {/* 1. COD */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                          <Truck size={20} />
-                        </div>
-                        <div>
-                          <h3 className="font-bold">Cash On Delivery</h3>
-                          <p className="text-xs opacity-60">
-                            Collect cash upon delivery
-                          </p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        {...form.register("enableCod")}
-                        className="toggle toggle-primary"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. eSewa */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
-                          <Wallet size={20} />
-                        </div>
-                        <div>
-                          <h3 className="font-bold">eSewa</h3>
-                          <p className="text-xs opacity-60">
-                            Digital Wallet Payment
-                          </p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        {...form.register("enableEsewa")}
-                        className="toggle toggle-success"
-                      />
-                    </div>
-
-                    {form.watch("enableEsewa") && (
-                      <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-top-2">
                         <div className="form-control">
-                          <label className="label cursor-pointer justify-start gap-4">
-                            <input
-                              type="checkbox"
-                              {...form.register("esewaSandbox")}
-                              className="checkbox checkbox-warning checkbox-sm"
-                            />
-                            <span className="label-text font-bold text-sm">
-                              Enable Sandbox Mode
-                            </span>
+                          <label className="label font-bold text-sm">
+                            Client Secret
                           </label>
+                          <input
+                            type="password"
+                            {...form.register("pathaoClientSecret")}
+                            className="input input-bordered font-mono text-sm"
+                          />
                         </div>
-
-                        {!form.watch("esewaSandbox") ? (
-                          <>
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Merchant ID (SCD)
-                              </label>
-                              <input
-                                {...form.register("esewaId")}
-                                className="input input-bordered font-mono"
-                                placeholder="EPAYTEST"
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label font-bold text-sm">
-                                Secret Key
-                              </label>
-                              <input
-                                type="password"
-                                {...form.register("esewaSecret")}
-                                className="input input-bordered font-mono"
-                              />
-                            </div>
-                          </>
-                        ) : (
-                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
-                            <Info size={16} className="shrink-0" />
-                            <span>
-                              Sandbox mode is ON. Default EPAYTEST credentials
-                              will be used automatically.
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 3. Khalti */}
-                <div className="card bg-base-100 shadow-sm border border-base-200">
-                  <div className="card-body p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-600">
-                          <CreditCard size={20} />
-                        </div>
-                        <div>
-                          <h3 className="font-bold">Khalti</h3>
-                          <p className="text-xs opacity-60">
-                            Digital Wallet & Banking
-                          </p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        {...form.register("enableKhalti")}
-                        className="toggle toggle-secondary"
-                      />
-                    </div>
-
-                    {form.watch("enableKhalti") && (
-                      <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-top-2">
                         <div className="form-control">
-                          <label className="label cursor-pointer justify-start gap-4">
-                            <input
-                              type="checkbox"
-                              {...form.register("khaltiSandbox")}
-                              className="checkbox checkbox-warning checkbox-sm"
-                            />
-                            <span className="label-text font-bold text-sm">
-                              Enable Sandbox Mode
-                            </span>
+                          <label className="label font-bold text-sm">
+                            Username / Email
                           </label>
+                          <input
+                            {...form.register("pathaoUsername")}
+                            className="input input-bordered font-mono text-sm"
+                          />
                         </div>
-
-                        {!form.watch("khaltiSandbox") ? (
-                          <div className="form-control">
-                            <label className="label font-bold text-sm">
-                              Live Secret Key
-                            </label>
-                            <input
-                              type="password"
-                              {...form.register("khaltiSecret")}
-                              className="input input-bordered font-mono"
-                            />
-                          </div>
-                        ) : (
-                          <div className="alert alert-info text-xs p-3 rounded-xl border border-info/20">
-                            <Info size={16} className="shrink-0" />
-                            <span>
-                              Sandbox mode is ON. Default testing keys will be
-                              used automatically.
-                            </span>
-                          </div>
-                        )}
+                        <div className="form-control">
+                          <label className="label font-bold text-sm">
+                            Password
+                          </label>
+                          <input
+                            type="password"
+                            {...form.register("pathaoPassword")}
+                            className="input input-bordered font-mono text-sm"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
+                )}
               </div>
-            )}
-
-            {/* AI & AUTOMATION TAB */}
-            {activeTab === "ai" && (
-              <div className="card bg-base-100 shadow-sm border border-base-200">
-                <div className="card-body p-6 space-y-4">
-                  <h2 className="card-title text-sm opacity-60 uppercase border-b pb-2 flex items-center gap-2">
-                    <Cpu size={16} /> AI Configuration
-                  </h2>
-                  <p className="text-xs opacity-60">
-                    Configure API keys to enable smart features.
-                  </p>
-
-                  <div className="form-control">
-                    <label className="label font-bold text-sm">
-                      OpenAI API Key
-                    </label>
-                    <input
-                      type="password"
-                      {...form.register("aiOpenAiKey")}
-                      className="input input-bordered font-mono"
-                      placeholder="sk-..."
-                    />
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label font-bold text-sm">
-                      Google Gemini API Key
-                    </label>
-                    <input
-                      type="password"
-                      {...form.register("aiGeminiKey")}
-                      className="input input-bordered font-mono"
-                      placeholder="AIza..."
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* LEGAL TAB */}
-            {activeTab === "legal" && (
-              <div className="card bg-base-100 shadow-sm border border-base-200">
-                <div className="card-body p-6 space-y-4">
-                  <h2 className="card-title text-sm opacity-60 uppercase border-b pb-2">
-                    Legal Documents
-                  </h2>
-                  <div className="form-control">
-                    <label className="label font-bold text-sm">
-                      Privacy Policy
-                    </label>
-                    <textarea
-                      {...form.register("privacyPolicy")}
-                      className="textarea textarea-bordered h-48 font-mono text-xs"
-                      placeholder="HTML or Markdown content..."
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label font-bold text-sm">
-                      Terms & Conditions
-                    </label>
-                    <textarea
-                      {...form.register("termsAndConditions")}
-                      className="textarea textarea-bordered h-48 font-mono text-xs"
-                      placeholder="HTML or Markdown content..."
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </form>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* --- TAB CONTENT: PAYMENTS --- */}
+      {activeTab === "payments" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 space-y-4">
+                <div className="flex justify-between items-center border-b border-base-200 pb-3">
+                  <h2 className="card-title text-sm opacity-60 uppercase tracking-widest flex items-center gap-2">
+                    <CreditCard size={16} className="text-[#60bb46]" /> eSewa
+                    Integration
+                  </h2>
+                  <input
+                    type="checkbox"
+                    {...form.register("enableEsewa")}
+                    className="toggle toggle-success toggle-sm"
+                  />
+                </div>
+
+                {form.watch("enableEsewa") && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="form-control">
+                      <label className="label cursor-pointer justify-start gap-4">
+                        <input
+                          type="checkbox"
+                          {...form.register("esewaSandbox")}
+                          className="checkbox checkbox-warning checkbox-sm"
+                        />
+                        <span className="label-text font-bold text-sm">
+                          Enable eSewa Sandbox Mode (EPAYTEST)
+                        </span>
+                      </label>
+                    </div>
+
+                    {!form.watch("esewaSandbox") && (
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="form-control">
+                          <label className="label font-bold text-sm">
+                            Merchant ID / Product Code
+                          </label>
+                          <input
+                            {...form.register("esewaId")}
+                            className="input input-bordered font-mono text-sm"
+                          />
+                        </div>
+                        <div className="form-control">
+                          <label className="label font-bold text-sm">
+                            Secret Key
+                          </label>
+                          <input
+                            type="password"
+                            {...form.register("esewaSecret")}
+                            className="input input-bordered font-mono text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6 space-y-4">
+                <div className="flex justify-between items-center border-b border-base-200 pb-3">
+                  <h2 className="card-title text-sm opacity-60 uppercase tracking-widest flex items-center gap-2">
+                    <CreditCard size={16} className="text-[#5c2d91]" /> Khalti
+                    Integration
+                  </h2>
+                  <input
+                    type="checkbox"
+                    {...form.register("enableKhalti")}
+                    className="toggle toggle-primary toggle-sm"
+                  />
+                </div>
+
+                {form.watch("enableKhalti") && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="form-control">
+                      <label className="label cursor-pointer justify-start gap-4">
+                        <input
+                          type="checkbox"
+                          {...form.register("khaltiSandbox")}
+                          className="checkbox checkbox-warning checkbox-sm"
+                        />
+                        <span className="label-text font-bold text-sm">
+                          Enable Khalti Sandbox Mode
+                        </span>
+                      </label>
+                    </div>
+
+                    {!form.watch("khaltiSandbox") && (
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">
+                          Secret Key
+                        </label>
+                        <input
+                          type="password"
+                          {...form.register("khaltiSecret")}
+                          className="input input-bordered font-mono text-sm"
+                          placeholder="Live Secret Key"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-4">Cash on Delivery</h2>
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-between p-4 bg-base-200/50 rounded-xl border border-base-200 hover:border-primary transition-colors">
+                    <span className="label-text font-bold">
+                      Enable COD Checkout
+                    </span>
+                    <input
+                      type="checkbox"
+                      {...form.register("enableCod")}
+                      className="toggle toggle-primary"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB CONTENT: INTEGRATIONS --- */}
+      {activeTab === "integrations" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="card bg-base-100 shadow-sm border border-base-200">
+            <div className="card-body p-6">
+              <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <Sparkles size={20} className="text-accent" /> AI Generation
+                Keys
+              </h2>
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label font-bold text-sm">
+                    Google Gemini API Key
+                  </label>
+                  <input
+                    type="password"
+                    {...form.register("aiGeminiKey")}
+                    className="input input-bordered font-mono text-sm"
+                    placeholder="AIzaSy..."
+                  />
+                  <label className="label">
+                    <span className="label-text-alt opacity-60">
+                      Used for Product Magic Fill
+                    </span>
+                  </label>
+                </div>
+                <div className="divider my-0">OR</div>
+                <div className="form-control">
+                  <label className="label font-bold text-sm">
+                    OpenAI API Key (Fallback)
+                  </label>
+                  <input
+                    type="password"
+                    {...form.register("aiOpenAiKey")}
+                    className="input input-bordered font-mono text-sm"
+                    placeholder="sk-..."
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-sm border border-base-200">
+            <div className="card-body p-6">
+              <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <Globe size={20} className="text-primary" /> Scraper & Search
+              </h2>
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label font-bold text-sm">
+                    Google Custom Search Key
+                  </label>
+                  <input
+                    type="password"
+                    {...form.register("crawlerApiKey")}
+                    className="input input-bordered font-mono text-sm"
+                    placeholder="API_KEY:CX_ID"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt opacity-60">
+                      Required to fetch automatic product images online. Format:
+                      KEY:CX
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </form>
   );
 }

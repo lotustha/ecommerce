@@ -10,6 +10,9 @@ import {
   getPathaoAreas,
   getPathaoPricePlan,
   getPathaoOrderStatus,
+  getNcmBranches,
+  getNcmPricePlan,
+  createNcmOrder,
 } from "@/lib/delivery/external-apis";
 
 export async function fetchCities() {
@@ -24,10 +27,16 @@ export async function fetchAreas(zoneId: number) {
   return await getPathaoAreas(zoneId);
 }
 
+export async function fetchNcmBranches() {
+  return await getNcmBranches();
+}
+
 // ✅ Smart Shipping Calculation (Parses weight from product specs)
 export async function calculateShipping(data: {
-  recipient_city: number;
-  recipient_zone: number;
+  provider?: "PATHAO" | "NCM";
+  recipient_city?: number;
+  recipient_zone?: number;
+  ncm_destination?: string;
   items: { productId: string; quantity: number }[];
   override_weight?: number; // Accept manual weight override
 }) {
@@ -86,33 +95,53 @@ export async function calculateShipping(data: {
       totalWeight = Math.max(0.5, totalWeight);
     }
 
-    // Call Pathao API
-    const pricePlan = await getPathaoPricePlan({
-      recipient_city: data.recipient_city,
-      recipient_zone: data.recipient_zone,
-      item_weight: totalWeight,
-      delivery_type: 48, // 48 hours standard
-      item_type: 2, // Parcel
-    });
+    // --- NCM Provider Logic ---
+    if (data.provider === "NCM" && data.ncm_destination) {
+      const pricePlan = await getNcmPricePlan(
+        data.ncm_destination,
+        totalWeight,
+      );
+      const apiCost = pricePlan
+        ? Number(pricePlan.charge || pricePlan.delivery_charge || 150)
+        : 150;
+      const finalCost = apiCost + markup;
+      return {
+        success: true,
+        cost: finalCost,
+        final_price: finalCost,
+        breakdown: { apiCost, markup, weight: totalWeight },
+      };
+    }
+    // --- PATHAO Provider Logic ---
+    else if (data.recipient_city && data.recipient_zone) {
+      // Call Pathao API
+      const pricePlan = await getPathaoPricePlan({
+        recipient_city: data.recipient_city,
+        recipient_zone: data.recipient_zone,
+        item_weight: totalWeight,
+        delivery_type: 48, // 48 hours standard
+        item_type: 2, // Parcel
+      });
 
-    const apiCost = Number(pricePlan.final_price) || 0;
-    const finalCost = apiCost + markup;
+      const apiCost = Number(pricePlan.final_price) || 0;
+      const finalCost = apiCost + markup;
 
-    return {
-      success: true,
-      cost: finalCost,
-      final_price: finalCost, // Included for the UI state mapping
-      breakdown: {
-        apiCost,
-        markup,
-        weight: totalWeight,
-      },
-    };
+      return {
+        success: true,
+        cost: finalCost,
+        final_price: finalCost,
+        breakdown: { apiCost, markup, weight: totalWeight },
+      };
+    }
+
+    throw new Error("Provider details missing for calculation");
   } catch (error) {
     console.error("Shipping Calc Error:", error);
 
     // Safe Fallback to DB Flat Rate if API fails
-    const settingsFallback = await prisma.systemSetting.findUnique({ where: { id: "default" } });
+    const settingsFallback = await prisma.systemSetting.findUnique({
+      where: { id: "default" },
+    });
     const fallbackCost = Number(settingsFallback?.shippingCharge) || 150;
 
     return {
@@ -178,9 +207,10 @@ export async function assignDelivery(orderId: string, data: any) {
     // --- PATHAO ASSIGNMENT ---
     if (data.method === "PATHAO") {
       // ✅ FIX: Strictly enforce COD amount based on database truth, never frontend input
-      let finalAmountToCollect = (order.paymentMethod === "COD" && order.paymentStatus !== "PAID")
-        ? Number(order.totalAmount)
-        : 0;
+      let finalAmountToCollect =
+        order.paymentMethod === "COD" && order.paymentStatus !== "PAID"
+          ? Number(order.totalAmount)
+          : 0;
 
       // Pathao requires a strict integer without decimals
       finalAmountToCollect = Math.round(finalAmountToCollect);
@@ -198,7 +228,8 @@ export async function assignDelivery(orderId: string, data: any) {
         amount_to_collect: finalAmountToCollect,
         item_type: 2,
         delivery_type: 48,
-        item_description: data.item_description || `Order #${order.id.slice(-6)}`,
+        item_description:
+          data.item_description || `Order #${order.id.slice(-6)}`,
       };
 
       const res = await createPathaoOrder(payload);
@@ -211,7 +242,37 @@ export async function assignDelivery(orderId: string, data: any) {
       updateData.courier = "Pathao";
       updateData.trackingCode = res.consignment_id;
     }
+    // --- NCM ASSIGNMENT ---
+    else if (data.method === "NCM") {
+      let finalAmountToCollect =
+        order.paymentMethod === "COD" && order.paymentStatus !== "PAID"
+          ? Number(order.totalAmount)
+          : 0;
 
+      const payload = {
+        name: data.recipient_name,
+        phone: data.recipient_phone,
+        phone2: "",
+        cod_charge: String(finalAmountToCollect),
+        address: data.recipient_address,
+        branch: data.recipient_branch,
+        package: data.item_description || `Order #${order.id.slice(-6)}`,
+        vref_id: order.id,
+        instruction: "Handle with care",
+        delivery_type: "Door2Door",
+        weight: String(data.item_weight || 1),
+      };
+
+      const res = await createNcmOrder(payload);
+
+      if (!res.success) {
+        return { error: res.error || "Failed to create order with NCM" };
+      }
+
+      updateData.deliveryType = "EXTERNAL";
+      updateData.courier = "NCM";
+      updateData.trackingCode = res.consignment_id;
+    }
     // --- INTERNAL RIDER ASSIGNMENT ---
     else if (data.method === "RIDER") {
       if (!data.riderId) return { error: "Please select a rider" };
@@ -221,7 +282,8 @@ export async function assignDelivery(orderId: string, data: any) {
 
     // --- OTHER / MANUAL ASSIGNMENT ---
     else if (data.method === "OTHER") {
-      if (!data.courierName || !data.trackingId) return { error: "Courier name and tracking ID are required." }
+      if (!data.courierName || !data.trackingId)
+        return { error: "Courier name and tracking ID are required." };
       updateData.deliveryType = "EXTERNAL";
       updateData.courier = data.courierName;
       updateData.trackingCode = data.trackingId;
@@ -233,7 +295,6 @@ export async function assignDelivery(orderId: string, data: any) {
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath(`/dashboard/orders`);
     return { success: "Delivery assigned successfully" };
-
   } catch (error: any) {
     console.error("Delivery Assign Error:", error);
     return { error: error.message || "Internal Server Error" };
