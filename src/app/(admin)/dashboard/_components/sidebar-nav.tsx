@@ -12,6 +12,7 @@ import {
   Shield,
   Banknote,
   Ticket,
+  Bike,
 } from "lucide-react";
 
 export default function SidebarNav() {
@@ -20,6 +21,7 @@ export default function SidebarNav() {
   const menuItems = [
     { name: "Overview", icon: LayoutDashboard, href: "/dashboard" },
     { name: "Orders", icon: ShoppingCart, href: "/dashboard/orders" },
+    { name: "Dispatch", icon: Bike, href: "/dashboard/dispatch" },
     { name: "Products", icon: Package, href: "/dashboard/products" },
     { name: "Categories", icon: Layers, href: "/dashboard/categories" },
     { name: "Customers", icon: Users, href: "/dashboard/customers" },
@@ -41,11 +43,10 @@ export default function SidebarNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
-              isActive
-                ? "bg-primary text-primary-content shadow-md shadow-primary/20"
-                : "text-base-content/70 hover:bg-base-200 hover:text-primary"
-            }`}
+            className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${isActive
+              ? "bg-primary text-primary-content shadow-md shadow-primary/20"
+              : "text-base-content/70 hover:bg-base-200 hover:text-primary"
+              }`}
           >
             <item.icon size={20} />
             {item.name}

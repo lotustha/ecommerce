@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "leaflet/dist/leaflet.css";
 /* Include the official typography plugin for rich text formatting */
 @plugin "@tailwindcss/typography";
 

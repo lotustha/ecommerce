@@ -12,24 +12,29 @@ export default async function AdminLayout({
 }) {
   const session = await auth();
 
-  // 1. Secure the Admin Route
-  if (!session || session.user.role !== "ADMIN") {
+  // 1. Intelligent Route Protection & Redirection
+  if (!session) {
     redirect("/login");
   }
+
+  // ✅ Auto-redirect users to their correct designated portal
+  if (session.user.role === "RIDER") {
+    redirect("/rider");
+  }
+  if (session.user.role === "USER") {
+    redirect("/profile");
+  }
+
+  // At this point, only ADMIN and STAFF roles will render the dashboard below
 
   return (
     <div className="min-h-screen bg-base-200 flex">
       {/* --- SIDEBAR --- */}
-      <aside className="w-64 bg-base-100 border-r border-base-200 shrink-0 hidden lg:flex flex-col fixed h-full">
+      <aside className="w-64 bg-base-100 border-r border-base-200 flex-shrink-0 hidden lg:flex flex-col fixed h-full">
         <div className="p-6 border-b border-base-200">
-          <Link
-            href="/"
-            className="text-2xl font-black text-primary tracking-tight"
-          >
+          <Link href="/" className="text-2xl font-black text-primary tracking-tight">
             Nepal E-com
-            <span className="text-xs font-normal text-base-content/50 block">
-              Admin Panel
-            </span>
+            <span className="text-xs font-normal text-base-content/50 block">Admin Panel</span>
           </Link>
         </div>
 
@@ -45,9 +50,7 @@ export default async function AdminLayout({
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-bold truncate">{session.user.name}</p>
-              <p className="text-xs text-base-content/50 truncate">
-                Administrator
-              </p>
+              <p className="text-xs text-base-content/50 truncate">Administrator</p>
             </div>
           </div>
           <form action={logout}>
@@ -66,35 +69,22 @@ export default async function AdminLayout({
           <span className="font-bold text-lg">Admin Panel</span>
           {/* Mobile Menu Trigger */}
           <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle"
-            >
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
               <Settings size={20} />
             </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <Link href="/">Back to Store</Link>
-              </li>
-              <li>
-                <Link href="/dashboard">Dashboard</Link>
-              </li>
-              <li>
-                <Link href="/dashboard/orders">Orders</Link>
-              </li>
-              <li>
-                <Link href="/dashboard/products">Products</Link>
-              </li>
+            <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+              <li><Link href="/">Back to Store</Link></li>
+              <li><Link href="/dashboard">Dashboard</Link></li>
+              <li><Link href="/dashboard/orders">Orders</Link></li>
+              <li><Link href="/dashboard/products">Products</Link></li>
             </ul>
           </div>
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-auto p-4 md:p-8">{children}</div>
+        <div className="flex-1 overflow-auto p-4 md:p-8">
+          {children}
+        </div>
       </main>
     </div>
   );
