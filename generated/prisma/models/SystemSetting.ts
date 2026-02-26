@@ -31,6 +31,7 @@ export type SystemSettingAvgAggregateOutputType = {
   shippingCharge: runtime.Decimal | null
   shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
+  smtpPort: number | null
 }
 
 export type SystemSettingSumAggregateOutputType = {
@@ -38,6 +39,7 @@ export type SystemSettingSumAggregateOutputType = {
   shippingCharge: runtime.Decimal | null
   shippingMarkup: runtime.Decimal | null
   freeShippingThreshold: runtime.Decimal | null
+  smtpPort: number | null
 }
 
 export type SystemSettingMinAggregateOutputType = {
@@ -86,6 +88,16 @@ export type SystemSettingMinAggregateOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  mailProvider: string | null
+  storeEmailFrom: string | null
+  smtpHost: string | null
+  smtpPort: number | null
+  smtpUser: string | null
+  smtpPassword: string | null
+  resendApiKey: string | null
   updatedAt: Date | null
 }
 
@@ -135,6 +147,16 @@ export type SystemSettingMaxAggregateOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  mailProvider: string | null
+  storeEmailFrom: string | null
+  smtpHost: string | null
+  smtpPort: number | null
+  smtpUser: string | null
+  smtpPassword: string | null
+  resendApiKey: string | null
   updatedAt: Date | null
 }
 
@@ -184,6 +206,16 @@ export type SystemSettingCountAggregateOutputType = {
   crawlerApiKey: number
   privacyPolicy: number
   termsAndConditions: number
+  heroTitle: number
+  heroSubtitle: number
+  heroImage: number
+  mailProvider: number
+  storeEmailFrom: number
+  smtpHost: number
+  smtpPort: number
+  smtpUser: number
+  smtpPassword: number
+  resendApiKey: number
   updatedAt: number
   _all: number
 }
@@ -194,6 +226,7 @@ export type SystemSettingAvgAggregateInputType = {
   shippingCharge?: true
   shippingMarkup?: true
   freeShippingThreshold?: true
+  smtpPort?: true
 }
 
 export type SystemSettingSumAggregateInputType = {
@@ -201,6 +234,7 @@ export type SystemSettingSumAggregateInputType = {
   shippingCharge?: true
   shippingMarkup?: true
   freeShippingThreshold?: true
+  smtpPort?: true
 }
 
 export type SystemSettingMinAggregateInputType = {
@@ -249,6 +283,16 @@ export type SystemSettingMinAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  mailProvider?: true
+  storeEmailFrom?: true
+  smtpHost?: true
+  smtpPort?: true
+  smtpUser?: true
+  smtpPassword?: true
+  resendApiKey?: true
   updatedAt?: true
 }
 
@@ -298,6 +342,16 @@ export type SystemSettingMaxAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  mailProvider?: true
+  storeEmailFrom?: true
+  smtpHost?: true
+  smtpPort?: true
+  smtpUser?: true
+  smtpPassword?: true
+  resendApiKey?: true
   updatedAt?: true
 }
 
@@ -347,6 +401,16 @@ export type SystemSettingCountAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  mailProvider?: true
+  storeEmailFrom?: true
+  smtpHost?: true
+  smtpPort?: true
+  smtpUser?: true
+  smtpPassword?: true
+  resendApiKey?: true
   updatedAt?: true
   _all?: true
 }
@@ -483,6 +547,16 @@ export type SystemSettingGroupByOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  mailProvider: string | null
+  storeEmailFrom: string | null
+  smtpHost: string | null
+  smtpPort: number | null
+  smtpUser: string | null
+  smtpPassword: string | null
+  resendApiKey: string | null
   updatedAt: Date
   _count: SystemSettingCountAggregateOutputType | null
   _avg: SystemSettingAvgAggregateOutputType | null
@@ -555,6 +629,16 @@ export type SystemSettingWhereInput = {
   crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  mailProvider?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  storeEmailFrom?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpHost?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpPort?: Prisma.IntNullableFilter<"SystemSetting"> | number | null
+  smtpUser?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  resendApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
 }
 
@@ -604,6 +688,16 @@ export type SystemSettingOrderByWithRelationInput = {
   crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  mailProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  storeEmailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpHost?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpPort?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpUser?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpPassword?: Prisma.SortOrderInput | Prisma.SortOrder
+  resendApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.SystemSettingOrderByRelevanceInput
 }
@@ -657,6 +751,16 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  mailProvider?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  storeEmailFrom?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpHost?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpPort?: Prisma.IntNullableFilter<"SystemSetting"> | number | null
+  smtpUser?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  smtpPassword?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  resendApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
 }, "id">
 
@@ -706,6 +810,16 @@ export type SystemSettingOrderByWithAggregationInput = {
   crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  mailProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  storeEmailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpHost?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpPort?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpUser?: Prisma.SortOrderInput | Prisma.SortOrder
+  smtpPassword?: Prisma.SortOrderInput | Prisma.SortOrder
+  resendApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SystemSettingCountOrderByAggregateInput
   _avg?: Prisma.SystemSettingAvgOrderByAggregateInput
@@ -763,6 +877,16 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   crawlerApiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  mailProvider?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  storeEmailFrom?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  smtpHost?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  smtpPort?: Prisma.IntNullableWithAggregatesFilter<"SystemSetting"> | number | null
+  smtpUser?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  smtpPassword?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  resendApiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SystemSetting"> | Date | string
 }
 
@@ -812,6 +936,16 @@ export type SystemSettingCreateInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  mailProvider?: string | null
+  storeEmailFrom?: string | null
+  smtpHost?: string | null
+  smtpPort?: number | null
+  smtpUser?: string | null
+  smtpPassword?: string | null
+  resendApiKey?: string | null
   updatedAt?: Date | string
 }
 
@@ -861,6 +995,16 @@ export type SystemSettingUncheckedCreateInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  mailProvider?: string | null
+  storeEmailFrom?: string | null
+  smtpHost?: string | null
+  smtpPort?: number | null
+  smtpUser?: string | null
+  smtpPassword?: string | null
+  resendApiKey?: string | null
   updatedAt?: Date | string
 }
 
@@ -910,6 +1054,16 @@ export type SystemSettingUpdateInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mailProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeEmailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpHost?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resendApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -959,6 +1113,16 @@ export type SystemSettingUncheckedUpdateInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mailProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeEmailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpHost?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resendApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1008,6 +1172,16 @@ export type SystemSettingCreateManyInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  mailProvider?: string | null
+  storeEmailFrom?: string | null
+  smtpHost?: string | null
+  smtpPort?: number | null
+  smtpUser?: string | null
+  smtpPassword?: string | null
+  resendApiKey?: string | null
   updatedAt?: Date | string
 }
 
@@ -1057,6 +1231,16 @@ export type SystemSettingUpdateManyMutationInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mailProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeEmailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpHost?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resendApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1106,6 +1290,16 @@ export type SystemSettingUncheckedUpdateManyInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mailProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storeEmailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpHost?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPassword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resendApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1161,6 +1355,16 @@ export type SystemSettingCountOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  mailProvider?: Prisma.SortOrder
+  storeEmailFrom?: Prisma.SortOrder
+  smtpHost?: Prisma.SortOrder
+  smtpPort?: Prisma.SortOrder
+  smtpUser?: Prisma.SortOrder
+  smtpPassword?: Prisma.SortOrder
+  resendApiKey?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1169,6 +1373,7 @@ export type SystemSettingAvgOrderByAggregateInput = {
   shippingCharge?: Prisma.SortOrder
   shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
+  smtpPort?: Prisma.SortOrder
 }
 
 export type SystemSettingMaxOrderByAggregateInput = {
@@ -1217,6 +1422,16 @@ export type SystemSettingMaxOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  mailProvider?: Prisma.SortOrder
+  storeEmailFrom?: Prisma.SortOrder
+  smtpHost?: Prisma.SortOrder
+  smtpPort?: Prisma.SortOrder
+  smtpUser?: Prisma.SortOrder
+  smtpPassword?: Prisma.SortOrder
+  resendApiKey?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1266,6 +1481,16 @@ export type SystemSettingMinOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  mailProvider?: Prisma.SortOrder
+  storeEmailFrom?: Prisma.SortOrder
+  smtpHost?: Prisma.SortOrder
+  smtpPort?: Prisma.SortOrder
+  smtpUser?: Prisma.SortOrder
+  smtpPassword?: Prisma.SortOrder
+  resendApiKey?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1274,6 +1499,7 @@ export type SystemSettingSumOrderByAggregateInput = {
   shippingCharge?: Prisma.SortOrder
   shippingMarkup?: Prisma.SortOrder
   freeShippingThreshold?: Prisma.SortOrder
+  smtpPort?: Prisma.SortOrder
 }
 
 
@@ -1324,6 +1550,16 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
+  heroTitle?: boolean
+  heroSubtitle?: boolean
+  heroImage?: boolean
+  mailProvider?: boolean
+  storeEmailFrom?: boolean
+  smtpHost?: boolean
+  smtpPort?: boolean
+  smtpUser?: boolean
+  smtpPassword?: boolean
+  resendApiKey?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["systemSetting"]>
 
@@ -1375,10 +1611,20 @@ export type SystemSettingSelectScalar = {
   crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
+  heroTitle?: boolean
+  heroSubtitle?: boolean
+  heroImage?: boolean
+  mailProvider?: boolean
+  storeEmailFrom?: boolean
+  smtpHost?: boolean
+  smtpPort?: boolean
+  smtpUser?: boolean
+  smtpPassword?: boolean
+  resendApiKey?: boolean
   updatedAt?: boolean
 }
 
-export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableNcm" | "ncmSandbox" | "ncmToken" | "ncmOriginBranch" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
+export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableNcm" | "ncmSandbox" | "ncmToken" | "ncmOriginBranch" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "heroTitle" | "heroSubtitle" | "heroImage" | "mailProvider" | "storeEmailFrom" | "smtpHost" | "smtpPort" | "smtpUser" | "smtpPassword" | "resendApiKey" | "updatedAt", ExtArgs["result"]["systemSetting"]>
 
 export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemSetting"
@@ -1429,6 +1675,16 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     crawlerApiKey: string | null
     privacyPolicy: string | null
     termsAndConditions: string | null
+    heroTitle: string | null
+    heroSubtitle: string | null
+    heroImage: string | null
+    mailProvider: string | null
+    storeEmailFrom: string | null
+    smtpHost: string | null
+    smtpPort: number | null
+    smtpUser: string | null
+    smtpPassword: string | null
+    resendApiKey: string | null
     updatedAt: Date
   }, ExtArgs["result"]["systemSetting"]>
   composites: {}
@@ -1844,6 +2100,16 @@ export interface SystemSettingFieldRefs {
   readonly crawlerApiKey: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly privacyPolicy: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly termsAndConditions: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroTitle: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroSubtitle: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroImage: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly mailProvider: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly storeEmailFrom: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly smtpHost: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly smtpPort: Prisma.FieldRef<"SystemSetting", 'Int'>
+  readonly smtpUser: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly smtpPassword: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly resendApiKey: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly updatedAt: Prisma.FieldRef<"SystemSetting", 'DateTime'>
 }
     

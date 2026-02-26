@@ -3,6 +3,7 @@
 import * as z from "zod";
 import { prisma } from "@/lib/db/prisma";
 import { randomUUID } from "crypto";
+import { sendPasswordResetEmail } from "@/lib/mail";
 
 const ResetSchema = z.object({
   email: z.email("Invalid email address"),
@@ -48,9 +49,14 @@ export async function resetPassword(values: z.infer<typeof ResetSchema>) {
   // 4. Send Email (Mock Implementation)
   // In a real app, you would use Resend or SendGrid here.
   const resetLink = `http://localhost:3000/new-password?token=${token}`;
-  console.log("📧 MOCK EMAIL SENT:");
-  console.log(`To: ${email}`);
-  console.log(`Link: ${resetLink}`);
 
+  // 4. ✅ Send Real Email
+  try {
+    await sendPasswordResetEmail(email, resetLink);
+    console.log(`[SYS] Password reset email fired to ${email}`);
+  } catch (e) {
+    console.error("Failed to send reset email:", e);
+    // Still return success so attackers can't verify server errors
+  }
   return { success: "If an account exists, a reset email has been sent." };
 }

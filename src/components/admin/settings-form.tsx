@@ -9,18 +9,9 @@ import {
 import { updateSettings } from "@/actions/settings-actions";
 import { useState, useTransition, useCallback } from "react";
 import { toast } from "react-hot-toast";
-import {
-  Save,
-  Store,
-  Truck,
-  CreditCard,
-  Sparkles,
-  UploadCloud,
-  Info,
-  Globe,
-  Percent,
-} from "lucide-react";
-import { useDropzone } from "react-dropzone";
+import { Save, Store, Truck, CreditCard, Sparkles, UploadCloud, Info, Globe, Percent, LayoutTemplate, Mail, Server, Zap, AtSign, Key, Check, User } from "lucide-react"
+import { useDropzone } from "react-dropzone"
+
 
 export default function SettingsForm({ initialData }: { initialData: any }) {
   const [isPending, startTransition] = useTransition();
@@ -87,6 +78,20 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
       aiGeminiKey: initialData?.aiGeminiKey || "",
       aiOpenAiKey: initialData?.aiOpenAiKey || "",
       crawlerApiKey: initialData?.crawlerApiKey || "",
+
+      // CMS
+      heroTitle: initialData?.heroTitle || "Spring Collection 2025",
+      heroSubtitle: initialData?.heroSubtitle || "Elevate Your Everyday Style",
+      heroImage: initialData?.heroImage || "",
+
+      // EMAIL
+      mailProvider: initialData?.mailProvider || "SMTP",
+      storeEmailFrom: initialData?.storeEmailFrom || "orders@store.com",
+      smtpHost: initialData?.smtpHost || "",
+      smtpPort: initialData?.smtpPort ? Number(initialData.smtpPort) : 465,
+      smtpUser: initialData?.smtpUser || "",
+      smtpPassword: initialData?.smtpPassword || "",
+      resendApiKey: initialData?.resendApiKey || "",
     },
   });
 
@@ -122,9 +127,11 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
 
   const tabs = [
     { id: "general", label: "Store Details", icon: Store },
-    { id: "logistics", label: "Logistics & Delivery", icon: Truck },
+    { id: "storefront", label: "Storefront CMS", icon: LayoutTemplate },
+    { id: "logistics", label: "Logistics", icon: Truck },
     { id: "payments", label: "Payments", icon: CreditCard },
-    { id: "integrations", label: "AI & Integrations", icon: Sparkles },
+    { id: "email", label: "Email config", icon: Mail },
+    { id: "integrations", label: "Integrations", icon: Sparkles }
   ];
 
   return (
@@ -266,11 +273,10 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
                 </h2>
                 <div
                   {...getRootProps()}
-                  className={`relative w-40 h-40 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
-                    isDragActive
-                      ? "border-primary bg-primary/5"
-                      : "border-base-300 hover:border-primary/50 hover:bg-base-200/50"
-                  }`}
+                  className={`relative w-40 h-40 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${isDragActive
+                    ? "border-primary bg-primary/5"
+                    : "border-base-300 hover:border-primary/50 hover:bg-base-200/50"
+                    }`}
                 >
                   <input {...getInputProps()} />
                   {form.watch("storeLogo") ? (
@@ -674,43 +680,179 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
         </div>
       )}
 
+      {/* --- TAB CONTENT: EMAIL CONFIG --- */}
+      {activeTab === "email" && (
+        <div className="animate-in fade-in zoom-in-95 duration-200">
+          <div className="card bg-base-100 shadow-sm border border-base-200">
+            <div className="card-body p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-base-content/5">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Email Configuration</h2>
+                  <p className="text-sm opacity-60 mt-1">Manage how your store sends receipts and notifications.</p>
+                </div>
+              </div>
+
+              {/* Global Setting */}
+              <div className="form-control mb-10 max-w-md">
+                <label className="label font-bold text-sm">Sender Email Address (From)</label>
+                <div className="relative">
+                  <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                  <input type="email" {...form.register("storeEmailFrom")} className="input input-bordered w-full pl-12 rounded-xl h-12" placeholder="orders@yourdomain.com" />
+                </div>
+                <label className="label"><span className="label-text-alt opacity-60">Customers will see emails coming from this address.</span></label>
+              </div>
+
+              {/* Provider Selection */}
+              <h3 className="font-bold mb-4 text-sm uppercase tracking-wider opacity-60">Select Email Provider</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+                {/* SMTP Card */}
+                <div
+                  onClick={() => form.setValue("mailProvider", "SMTP", { shouldDirty: true })}
+                  className={`relative cursor-pointer p-6 rounded-2xl border-2 transition-all flex gap-5 items-start group ${form.watch("mailProvider") === "SMTP" ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20" : "border-base-200 hover:border-base-300 bg-base-50"}`}
+                >
+                  <div className={`p-4 rounded-xl transition-colors ${form.watch("mailProvider") === "SMTP" ? "bg-primary text-white" : "bg-base-200 text-base-content/60 group-hover:bg-base-300"}`}>
+                    <Server size={28} />
+                  </div>
+                  <div className="flex-1 pr-6">
+                    <h4 className="font-bold text-lg mb-1 text-base-content">Standard SMTP</h4>
+                    <p className="text-sm opacity-70 leading-relaxed">Use your existing cPanel, Gmail, Outlook, or AWS SES email server credentials.</p>
+                  </div>
+                  {form.watch("mailProvider") === "SMTP" && (
+                    <div className="absolute top-5 right-5 bg-primary text-white rounded-full p-1 shadow-sm">
+                      <Check size={16} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+
+                {/* RESEND Card */}
+                <div
+                  onClick={() => form.setValue("mailProvider", "RESEND", { shouldDirty: true })}
+                  className={`relative cursor-pointer p-6 rounded-2xl border-2 transition-all flex gap-5 items-start group ${form.watch("mailProvider") === "RESEND" ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20" : "border-base-200 hover:border-base-300 bg-base-50"}`}
+                >
+                  <div className={`p-4 rounded-xl transition-colors ${form.watch("mailProvider") === "RESEND" ? "bg-primary text-white" : "bg-base-200 text-base-content/60 group-hover:bg-base-300"}`}>
+                    <Zap size={28} />
+                  </div>
+                  <div className="flex-1 pr-6">
+                    <h4 className="font-bold text-lg mb-1 text-base-content">Resend API</h4>
+                    <p className="text-sm opacity-70 leading-relaxed">Modern, developer-friendly email API designed for high deliverability at scale.</p>
+                  </div>
+                  {form.watch("mailProvider") === "RESEND" && (
+                    <div className="absolute top-5 right-5 bg-primary text-white rounded-full p-1 shadow-sm">
+                      <Check size={16} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              <div className="divider opacity-30"></div>
+
+              {/* Provider Specific Settings */}
+              <div className="bg-base-200/40 p-6 md:p-8 rounded-[2rem] border border-base-200 shadow-inner">
+                {form.watch("mailProvider") === "SMTP" && (
+                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex items-center gap-3 border-b border-base-300 pb-3">
+                      <Server size={22} className="text-primary" />
+                      <h3 className="font-bold text-xl">SMTP Credentials</h3>
+                    </div>
+
+                    <div className="alert alert-info bg-info/10 border-info/20 text-info-content rounded-2xl p-5 flex gap-4 shadow-sm">
+                      <Info size={24} className="shrink-0 text-info mt-1" />
+                      <div>
+                        <p className="font-bold text-base mb-1">Using a free Gmail account?</p>
+                        <p className="opacity-90 text-sm leading-relaxed">
+                          You cannot use your standard password here. Go to your Google Account Settings &rarr; Security &rarr; 2-Step Verification &rarr; <strong>App Passwords</strong> to generate a secure 16-character code, then paste it in the password field below.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">SMTP Host</label>
+                        <div className="relative">
+                          <Globe className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                          <input {...form.register("smtpHost")} className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary" placeholder="smtp.gmail.com" />
+                        </div>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">SMTP Port</label>
+                        <div className="relative">
+                          <input type="number" {...form.register("smtpPort")} className="input input-bordered w-full rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary" placeholder="465" />
+                        </div>
+                        <label className="label"><span className="label-text-alt opacity-60 font-medium">Commonly 465 (SSL) or 587 (TLS)</span></label>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">SMTP Username</label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                          <input {...form.register("smtpUser")} className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary" placeholder="your.email@gmail.com" />
+                        </div>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">SMTP Password / App Password</label>
+                        <div className="relative">
+                          <Key className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                          <input type="password" {...form.register("smtpPassword")} className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary" placeholder="••••••••••••••••" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {form.watch("mailProvider") === "RESEND" && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex items-center gap-3 border-b border-base-300 pb-3">
+                      <Zap size={22} className="text-primary" />
+                      <h3 className="font-bold text-xl">Resend Integration</h3>
+                    </div>
+
+                    <p className="text-base opacity-80 leading-relaxed">
+                      To start sending highly deliverable emails, get your API key from the <a href="https://resend.com" target="_blank" className="text-primary font-bold hover:underline">Resend Dashboard</a> and paste it below.
+                    </p>
+
+                    <div className="form-control max-w-xl">
+                      <label className="label font-bold text-sm">Resend API Key</label>
+                      <div className="relative">
+                        <Key className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                        <input type="password" {...form.register("resendApiKey")} className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary" placeholder="re_123456789..." />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* --- TAB CONTENT: INTEGRATIONS --- */}
       {activeTab === "integrations" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in-95 duration-200">
+
+          {/* AI Keys */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
             <div className="card-body p-6">
               <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                <Sparkles size={20} className="text-accent" /> AI Generation
-                Keys
+                <Sparkles size={20} className="text-accent" /> AI Generation Keys
               </h2>
               <div className="space-y-4">
                 <div className="form-control">
-                  <label className="label font-bold text-sm">
-                    Google Gemini API Key
-                  </label>
-                  <input
-                    type="password"
-                    {...form.register("aiGeminiKey")}
-                    className="input input-bordered font-mono text-sm"
-                    placeholder="AIzaSy..."
-                  />
-                  <label className="label">
-                    <span className="label-text-alt opacity-60">
-                      Used for Product Magic Fill
-                    </span>
-                  </label>
+                  <label className="label font-bold text-sm">Google Gemini API Key</label>
+                  <input type="password" {...form.register("aiGeminiKey")} className="input input-bordered font-mono text-sm" placeholder="AIzaSy..." />
+                  <label className="label"><span className="label-text-alt opacity-60">Used for Product Magic Fill</span></label>
                 </div>
                 <div className="divider my-0">OR</div>
                 <div className="form-control">
-                  <label className="label font-bold text-sm">
-                    OpenAI API Key (Fallback)
-                  </label>
-                  <input
-                    type="password"
-                    {...form.register("aiOpenAiKey")}
-                    className="input input-bordered font-mono text-sm"
-                    placeholder="sk-..."
-                  />
+                  <label className="label font-bold text-sm">OpenAI API Key (Fallback)</label>
+                  <input type="password" {...form.register("aiOpenAiKey")} className="input input-bordered font-mono text-sm" placeholder="sk-..." />
                 </div>
               </div>
             </div>
@@ -723,21 +865,9 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
               </h2>
               <div className="space-y-4">
                 <div className="form-control">
-                  <label className="label font-bold text-sm">
-                    Google Custom Search Key
-                  </label>
-                  <input
-                    type="password"
-                    {...form.register("crawlerApiKey")}
-                    className="input input-bordered font-mono text-sm"
-                    placeholder="API_KEY:CX_ID"
-                  />
-                  <label className="label">
-                    <span className="label-text-alt opacity-60">
-                      Required to fetch automatic product images online. Format:
-                      KEY:CX
-                    </span>
-                  </label>
+                  <label className="label font-bold text-sm">Google Custom Search Key</label>
+                  <input type="password" {...form.register("crawlerApiKey")} className="input input-bordered font-mono text-sm" placeholder="API_KEY:CX_ID" />
+                  <label className="label"><span className="label-text-alt opacity-60">Required to fetch automatic product images online. Format: KEY:CX</span></label>
                 </div>
               </div>
             </div>

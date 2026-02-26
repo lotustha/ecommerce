@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 import { revalidatePath } from "next/cache";
 import { OrderStatus, PaymentStatus } from "../../generated/prisma/client";
+import { sendOrderStatusEmail } from "@/lib/mail";
 
 // Secure helper to ensure only admins can perform actions
 async function requireAdmin() {
@@ -20,11 +21,26 @@ export async function updateOrderStatus(
   try {
     await requireAdmin();
 
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status: newStatus },
+      include: { user: true }
     });
-
+    // ✅ ADD THIS BLOCK AFTER THE UPDATE:
+    try {
+      // Only send emails to actual users with emails (guests might not have one depending on your setup)
+      if (updatedOrder.user && updatedOrder.user.email) {
+        await sendOrderStatusEmail(updatedOrder.user.email, {
+          id: updatedOrder.id,
+          status: updatedOrder.status,
+          trackingCode: updatedOrder.trackingCode,
+          courier: updatedOrder.courier,
+          customerName: updatedOrder.user.name || "Customer"
+        });
+      }
+    } catch (error) {
+      console.error("Non-fatal: Failed to send status update email", error);
+    }
     revalidatePath("/dashboard/orders");
     revalidatePath(`/dashboard/orders/${orderId}`);
     return { success: `Order marked as ${newStatus}` };

@@ -3,7 +3,7 @@
 import * as z from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db/prisma";
-
+import { sendWelcomeEmail } from "@/lib/mail" // 
 // Updated Schema: Includes Phone Number
 const RegisterSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -41,7 +41,12 @@ export async function register(values: z.infer<typeof RegisterSchema>) {
         role: "USER",
       },
     });
-
+    // ✅ Send Welcome Email
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (e) {
+      console.error("Non-fatal: Failed to send welcome email", e);
+    }
     return { success: "Account created! Please login." };
   } catch (error) {
     console.error("Registration Error:", error);

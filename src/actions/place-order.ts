@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-
+import { sendOrderConfirmationEmail, sendWelcomeEmail } from "@/lib/mail"
 // Expanded Schema to include optional Pathao IDs and Dynamic Shipping Cost
 const PlaceOrderSchema = z.object({
   fullName: z.string(),
@@ -32,7 +32,7 @@ const PlaceOrderSchema = z.object({
   shippingCost: z.coerce.number().optional().default(150),
   couponCode: z.string().optional().nullable(), // ✅ Accept Coupon Code
 });
-
+``
 export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
   const session = await auth();
   let userId = session?.user?.id;
@@ -103,7 +103,7 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
 
   // --- PRICE CALCULATION ---
   let subTotal = 0;
-  const orderItemsData = [];
+  const orderItemsData: any = [];
 
   for (const item of items) {
     const product = await prisma.product.findUnique({
@@ -207,12 +207,38 @@ export async function placeOrder(values: z.infer<typeof PlaceOrderSchema>) {
         },
       },
     });
+    // ✅ FIRE EMAILS ASYNCHRONOUSLY (Non-blocking)
+    try {
+      // 1. Send Receipt
+      await sendOrderConfirmationEmail(email, {
+        id: order.id,
+        subTotal,
+        shippingCost,
+        discount: finalDiscount,
+        totalAmount,
+        items: validated.data.items.map(item => ({
+          name: orderItemsData.find((i: { productId: string; }) => i.productId === item.productId)?.name || "Item",
+          quantity: item.quantity,
+          price: orderItemsData.find((i: { productId: string; }) => i.productId === item.productId)?.price || 0
+        })),
+        shippingAddress: { fullName, street: address.street, city: address.city, district: address.district }
+      });
+
+      // 2. Send Welcome (If new user)
+      if (isNewAccount) {
+        await sendWelcomeEmail(email, fullName);
+      }
+    } catch (e) {
+      console.error("Non-fatal email error:", e);
+    }
+
 
     return {
       success: "Order placed successfully!",
       orderId: order.id,
       isNewAccount,
     };
+
   } catch (error) {
     console.error("Order Placement Error:", error);
     return { error: "Failed to place order. Please try again." };

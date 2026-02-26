@@ -430,5 +430,23 @@ model SystemSetting {
   privacyPolicy      String? @db.MediumText
   termsAndConditions String? @db.MediumText
 
+  // Storefront CMS
+  heroTitle    String? @default("Electronics 2025")
+  heroSubtitle String? @default("Best Electronics Products in Nepal")
+  heroImage    String? @db.Text
+
+  // FUTURE-PROOF EMAIL NOTIFICATIONS
+  mailProvider   String? @default("SMTP") // "SMTP" or "RESEND"
+  storeEmailFrom String? @default("orders@nepalecom.com")
+
+  // SMTP Config
+  smtpHost     String?
+  smtpPort     Int?    @default(465)
+  smtpUser     String?
+  smtpPassword String?
+
+  // Resend Config (For future scaling)
+  resendApiKey String?
+
   updatedAt DateTime @updatedAt
 }
