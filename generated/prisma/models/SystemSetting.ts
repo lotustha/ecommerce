@@ -86,6 +86,15 @@ export type SystemSettingMinAggregateOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  feature1Title: string | null
+  feature1Sub: string | null
+  feature2Title: string | null
+  feature2Sub: string | null
+  feature3Title: string | null
+  feature3Sub: string | null
   updatedAt: Date | null
 }
 
@@ -135,6 +144,15 @@ export type SystemSettingMaxAggregateOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  feature1Title: string | null
+  feature1Sub: string | null
+  feature2Title: string | null
+  feature2Sub: string | null
+  feature3Title: string | null
+  feature3Sub: string | null
   updatedAt: Date | null
 }
 
@@ -184,6 +202,15 @@ export type SystemSettingCountAggregateOutputType = {
   crawlerApiKey: number
   privacyPolicy: number
   termsAndConditions: number
+  heroTitle: number
+  heroSubtitle: number
+  heroImage: number
+  feature1Title: number
+  feature1Sub: number
+  feature2Title: number
+  feature2Sub: number
+  feature3Title: number
+  feature3Sub: number
   updatedAt: number
   _all: number
 }
@@ -249,6 +276,15 @@ export type SystemSettingMinAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  feature1Title?: true
+  feature1Sub?: true
+  feature2Title?: true
+  feature2Sub?: true
+  feature3Title?: true
+  feature3Sub?: true
   updatedAt?: true
 }
 
@@ -298,6 +334,15 @@ export type SystemSettingMaxAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  feature1Title?: true
+  feature1Sub?: true
+  feature2Title?: true
+  feature2Sub?: true
+  feature3Title?: true
+  feature3Sub?: true
   updatedAt?: true
 }
 
@@ -347,6 +392,15 @@ export type SystemSettingCountAggregateInputType = {
   crawlerApiKey?: true
   privacyPolicy?: true
   termsAndConditions?: true
+  heroTitle?: true
+  heroSubtitle?: true
+  heroImage?: true
+  feature1Title?: true
+  feature1Sub?: true
+  feature2Title?: true
+  feature2Sub?: true
+  feature3Title?: true
+  feature3Sub?: true
   updatedAt?: true
   _all?: true
 }
@@ -483,6 +537,15 @@ export type SystemSettingGroupByOutputType = {
   crawlerApiKey: string | null
   privacyPolicy: string | null
   termsAndConditions: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  heroImage: string | null
+  feature1Title: string | null
+  feature1Sub: string | null
+  feature2Title: string | null
+  feature2Sub: string | null
+  feature3Title: string | null
+  feature3Sub: string | null
   updatedAt: Date
   _count: SystemSettingCountAggregateOutputType | null
   _avg: SystemSettingAvgAggregateOutputType | null
@@ -555,6 +618,15 @@ export type SystemSettingWhereInput = {
   crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature1Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature1Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature2Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature2Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature3Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature3Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
 }
 
@@ -604,6 +676,15 @@ export type SystemSettingOrderByWithRelationInput = {
   crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature1Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature1Sub?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature2Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature2Sub?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature3Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature3Sub?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.SystemSettingOrderByRelevanceInput
 }
@@ -657,6 +738,15 @@ export type SystemSettingWhereUniqueInput = Prisma.AtLeast<{
   crawlerApiKey?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature1Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature1Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature2Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature2Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature3Title?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
+  feature3Sub?: Prisma.StringNullableFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SystemSetting"> | Date | string
 }, "id">
 
@@ -706,6 +796,15 @@ export type SystemSettingOrderByWithAggregationInput = {
   crawlerApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  heroImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature1Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature1Sub?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature2Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature2Sub?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature3Title?: Prisma.SortOrderInput | Prisma.SortOrder
+  feature3Sub?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SystemSettingCountOrderByAggregateInput
   _avg?: Prisma.SystemSettingAvgOrderByAggregateInput
@@ -763,6 +862,15 @@ export type SystemSettingScalarWhereWithAggregatesInput = {
   crawlerApiKey?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   privacyPolicy?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   termsAndConditions?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroTitle?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroSubtitle?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  heroImage?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature1Title?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature1Sub?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature2Title?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature2Sub?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature3Title?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
+  feature3Sub?: Prisma.StringNullableWithAggregatesFilter<"SystemSetting"> | string | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SystemSetting"> | Date | string
 }
 
@@ -812,6 +920,15 @@ export type SystemSettingCreateInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  feature1Title?: string | null
+  feature1Sub?: string | null
+  feature2Title?: string | null
+  feature2Sub?: string | null
+  feature3Title?: string | null
+  feature3Sub?: string | null
   updatedAt?: Date | string
 }
 
@@ -861,6 +978,15 @@ export type SystemSettingUncheckedCreateInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  feature1Title?: string | null
+  feature1Sub?: string | null
+  feature2Title?: string | null
+  feature2Sub?: string | null
+  feature3Title?: string | null
+  feature3Sub?: string | null
   updatedAt?: Date | string
 }
 
@@ -910,6 +1036,15 @@ export type SystemSettingUpdateInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -959,6 +1094,15 @@ export type SystemSettingUncheckedUpdateInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1008,6 +1152,15 @@ export type SystemSettingCreateManyInput = {
   crawlerApiKey?: string | null
   privacyPolicy?: string | null
   termsAndConditions?: string | null
+  heroTitle?: string | null
+  heroSubtitle?: string | null
+  heroImage?: string | null
+  feature1Title?: string | null
+  feature1Sub?: string | null
+  feature2Title?: string | null
+  feature2Sub?: string | null
+  feature3Title?: string | null
+  feature3Sub?: string | null
   updatedAt?: Date | string
 }
 
@@ -1057,6 +1210,15 @@ export type SystemSettingUpdateManyMutationInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1106,6 +1268,15 @@ export type SystemSettingUncheckedUpdateManyInput = {
   crawlerApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyPolicy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsAndConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroSubtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heroImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature1Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature2Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature3Sub?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1161,6 +1332,15 @@ export type SystemSettingCountOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  feature1Title?: Prisma.SortOrder
+  feature1Sub?: Prisma.SortOrder
+  feature2Title?: Prisma.SortOrder
+  feature2Sub?: Prisma.SortOrder
+  feature3Title?: Prisma.SortOrder
+  feature3Sub?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1217,6 +1397,15 @@ export type SystemSettingMaxOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  feature1Title?: Prisma.SortOrder
+  feature1Sub?: Prisma.SortOrder
+  feature2Title?: Prisma.SortOrder
+  feature2Sub?: Prisma.SortOrder
+  feature3Title?: Prisma.SortOrder
+  feature3Sub?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1266,6 +1455,15 @@ export type SystemSettingMinOrderByAggregateInput = {
   crawlerApiKey?: Prisma.SortOrder
   privacyPolicy?: Prisma.SortOrder
   termsAndConditions?: Prisma.SortOrder
+  heroTitle?: Prisma.SortOrder
+  heroSubtitle?: Prisma.SortOrder
+  heroImage?: Prisma.SortOrder
+  feature1Title?: Prisma.SortOrder
+  feature1Sub?: Prisma.SortOrder
+  feature2Title?: Prisma.SortOrder
+  feature2Sub?: Prisma.SortOrder
+  feature3Title?: Prisma.SortOrder
+  feature3Sub?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -1324,6 +1522,15 @@ export type SystemSettingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
+  heroTitle?: boolean
+  heroSubtitle?: boolean
+  heroImage?: boolean
+  feature1Title?: boolean
+  feature1Sub?: boolean
+  feature2Title?: boolean
+  feature2Sub?: boolean
+  feature3Title?: boolean
+  feature3Sub?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["systemSetting"]>
 
@@ -1375,10 +1582,19 @@ export type SystemSettingSelectScalar = {
   crawlerApiKey?: boolean
   privacyPolicy?: boolean
   termsAndConditions?: boolean
+  heroTitle?: boolean
+  heroSubtitle?: boolean
+  heroImage?: boolean
+  feature1Title?: boolean
+  feature1Sub?: boolean
+  feature2Title?: boolean
+  feature2Sub?: boolean
+  feature3Title?: boolean
+  feature3Sub?: boolean
   updatedAt?: boolean
 }
 
-export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableNcm" | "ncmSandbox" | "ncmToken" | "ncmOriginBranch" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "updatedAt", ExtArgs["result"]["systemSetting"]>
+export type SystemSettingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appName" | "storeLogo" | "storeName" | "storeTaxId" | "storeSubtitle" | "storeAddress" | "storePhone" | "storeEmail" | "currency" | "taxRate" | "shippingCharge" | "shippingMarkup" | "freeShippingThreshold" | "deliveryPartners" | "enableStoreDelivery" | "enablePathao" | "pathaoSandbox" | "pathaoClientId" | "pathaoClientSecret" | "pathaoUsername" | "pathaoPassword" | "enableNcm" | "ncmSandbox" | "ncmToken" | "ncmOriginBranch" | "enableCod" | "enableEsewa" | "esewaSandbox" | "enableKhalti" | "khaltiSandbox" | "enableSctPay" | "esewaId" | "esewaSecret" | "khaltiSecret" | "sctPayKey" | "socialFacebook" | "socialInstagram" | "socialTiktok" | "socialTwitter" | "aiOpenAiKey" | "aiGeminiKey" | "crawlerApiKey" | "privacyPolicy" | "termsAndConditions" | "heroTitle" | "heroSubtitle" | "heroImage" | "feature1Title" | "feature1Sub" | "feature2Title" | "feature2Sub" | "feature3Title" | "feature3Sub" | "updatedAt", ExtArgs["result"]["systemSetting"]>
 
 export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemSetting"
@@ -1429,6 +1645,15 @@ export type $SystemSettingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     crawlerApiKey: string | null
     privacyPolicy: string | null
     termsAndConditions: string | null
+    heroTitle: string | null
+    heroSubtitle: string | null
+    heroImage: string | null
+    feature1Title: string | null
+    feature1Sub: string | null
+    feature2Title: string | null
+    feature2Sub: string | null
+    feature3Title: string | null
+    feature3Sub: string | null
     updatedAt: Date
   }, ExtArgs["result"]["systemSetting"]>
   composites: {}
@@ -1844,6 +2069,15 @@ export interface SystemSettingFieldRefs {
   readonly crawlerApiKey: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly privacyPolicy: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly termsAndConditions: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroTitle: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroSubtitle: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly heroImage: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature1Title: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature1Sub: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature2Title: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature2Sub: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature3Title: Prisma.FieldRef<"SystemSetting", 'String'>
+  readonly feature3Sub: Prisma.FieldRef<"SystemSetting", 'String'>
   readonly updatedAt: Prisma.FieldRef<"SystemSetting", 'DateTime'>
 }
     

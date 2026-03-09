@@ -2088,6 +2088,15 @@ export const SystemSettingScalarFieldEnum = {
   crawlerApiKey: 'crawlerApiKey',
   privacyPolicy: 'privacyPolicy',
   termsAndConditions: 'termsAndConditions',
+  heroTitle: 'heroTitle',
+  heroSubtitle: 'heroSubtitle',
+  heroImage: 'heroImage',
+  feature1Title: 'feature1Title',
+  feature1Sub: 'feature1Sub',
+  feature2Title: 'feature2Title',
+  feature2Sub: 'feature2Sub',
+  feature3Title: 'feature3Title',
+  feature3Sub: 'feature3Sub',
   updatedAt: 'updatedAt'
 } as const
 
@@ -2350,7 +2359,16 @@ export const SystemSettingOrderByRelevanceFieldEnum = {
   aiGeminiKey: 'aiGeminiKey',
   crawlerApiKey: 'crawlerApiKey',
   privacyPolicy: 'privacyPolicy',
-  termsAndConditions: 'termsAndConditions'
+  termsAndConditions: 'termsAndConditions',
+  heroTitle: 'heroTitle',
+  heroSubtitle: 'heroSubtitle',
+  heroImage: 'heroImage',
+  feature1Title: 'feature1Title',
+  feature1Sub: 'feature1Sub',
+  feature2Title: 'feature2Title',
+  feature2Sub: 'feature2Sub',
+  feature3Title: 'feature3Title',
+  feature3Sub: 'feature3Sub'
 } as const
 
 export type SystemSettingOrderByRelevanceFieldEnum = (typeof SystemSettingOrderByRelevanceFieldEnum)[keyof typeof SystemSettingOrderByRelevanceFieldEnum]

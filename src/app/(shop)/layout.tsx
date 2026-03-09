@@ -1,20 +1,19 @@
 import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
-
+import StorefrontChatbot from "@/components/chat/storefront-chatbot";
 export default function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-
-      {/* Main Content Area specific to Shop */}
-      <main className="grow container mx-auto px-4 py-6">{children}</main>
-
-      {/* Footer is now specific to Shop pages */}
+      <main className="flex-1">{children}</main>
       <Footer />
-    </>
+
+      {/* ADD THIS LINE */}
+      <StorefrontChatbot />
+    </div>
   );
 }

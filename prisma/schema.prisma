@@ -429,6 +429,17 @@ model SystemSetting {
   crawlerApiKey      String?
   privacyPolicy      String? @db.MediumText
   termsAndConditions String? @db.MediumText
+  // Storefront CMS
+  heroTitle          String? @default("Spring Collection 2025")
+  heroSubtitle       String? @default("Elevate Your Everyday Style")
+  heroImage          String? @db.Text
 
-  updatedAt DateTime @updatedAt
+  // ✅ DYNAMIC FEATURES (NEW)
+  feature1Title String?  @default("Nationwide Delivery")
+  feature1Sub   String?  @default("Delivered right to your doorstep")
+  feature2Title String?  @default("Quality Guarantee")
+  feature2Sub   String?  @default("100% authentic top-tier products")
+  feature3Title String?  @default("Fast Checkout")
+  feature3Sub   String?  @default("Seamless payments & tracking")
+  updatedAt     DateTime @updatedAt
 }

@@ -19,6 +19,16 @@ import {
   Info,
   Globe,
   Percent,
+  LayoutTemplate,
+  Mail,
+  Server,
+  Zap,
+  AtSign,
+  Key,
+  Check,
+  User,
+  Star,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
@@ -40,6 +50,30 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
       storeLogo: initialData?.storeLogo || "",
       currency: initialData?.currency || "NPR",
       taxRate: initialData?.taxRate ? Number(initialData.taxRate) : 0,
+
+      // CMS
+      heroTitle: initialData?.heroTitle || "Spring Collection 2025",
+      heroSubtitle: initialData?.heroSubtitle || "Elevate Your Everyday Style",
+      heroImage: initialData?.heroImage || "",
+
+      // Dynamic Features
+      feature1Title: initialData?.feature1Title || "Nationwide Delivery",
+      feature1Sub:
+        initialData?.feature1Sub || "Delivered right to your doorstep",
+      feature2Title: initialData?.feature2Title || "Quality Guarantee",
+      feature2Sub:
+        initialData?.feature2Sub || "100% authentic top-tier products",
+      feature3Title: initialData?.feature3Title || "Fast Checkout",
+      feature3Sub: initialData?.feature3Sub || "Seamless payments & tracking",
+
+      // Email
+      mailProvider: initialData?.mailProvider || "SMTP",
+      storeEmailFrom: initialData?.storeEmailFrom || "orders@store.com",
+      smtpHost: initialData?.smtpHost || "",
+      smtpPort: initialData?.smtpPort ? Number(initialData.smtpPort) : 465,
+      smtpUser: initialData?.smtpUser || "",
+      smtpPassword: initialData?.smtpPassword || "",
+      resendApiKey: initialData?.resendApiKey || "",
 
       // Socials
       socialFacebook: initialData?.socialFacebook || "",
@@ -90,8 +124,8 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
     },
   });
 
-  // Logo Upload Handler
-  const onDrop = useCallback(
+  // --- DROPZONES ---
+  const onDropLogo = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
       if (file) {
@@ -106,12 +140,42 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
     [form],
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+  const {
+    getRootProps: getLogoProps,
+    getInputProps: getLogoInputProps,
+    isDragActive: logoDrag,
+  } = useDropzone({
+    onDrop: onDropLogo,
     accept: { "image/*": [] },
     maxFiles: 1,
   });
 
+  const onDropHero = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () =>
+          form.setValue("heroImage", reader.result as string, {
+            shouldDirty: true,
+          });
+        reader.readAsDataURL(file);
+      }
+    },
+    [form],
+  );
+
+  const {
+    getRootProps: getHeroProps,
+    getInputProps: getHeroInputProps,
+    isDragActive: heroDrag,
+  } = useDropzone({
+    onDrop: onDropHero,
+    accept: { "image/*": [] },
+    maxFiles: 1,
+  });
+
+  // --- SUBMIT ---
   const onSubmit = (data: SettingsFormValues) => {
     startTransition(async () => {
       const result = await updateSettings(data);
@@ -122,9 +186,11 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
 
   const tabs = [
     { id: "general", label: "Store Details", icon: Store },
-    { id: "logistics", label: "Logistics & Delivery", icon: Truck },
+    { id: "storefront", label: "Storefront CMS", icon: LayoutTemplate },
+    { id: "logistics", label: "Logistics", icon: Truck },
     { id: "payments", label: "Payments", icon: CreditCard },
-    { id: "integrations", label: "AI & Integrations", icon: Sparkles },
+    { id: "email", label: "Email config", icon: Mail },
+    { id: "integrations", label: "Integrations", icon: Sparkles },
   ];
 
   return (
@@ -155,13 +221,13 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed bg-base-200/50 p-2 overflow-x-auto whitespace-nowrap scrollbar-hide rounded-2xl">
+      <div className="tabs tabs-boxed bg-base-200/50 p-2 overflow-x-auto whitespace-nowrap scrollbar-hide rounded-2xl flex flex-nowrap">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setActiveTab(t.id)}
-            className={`tab tab-lg transition-all rounded-xl ${activeTab === t.id ? "bg-base-100 shadow-sm font-bold text-primary" : "font-medium opacity-70 hover:opacity-100"}`}
+            className={`tab tab-lg transition-all rounded-xl shrink-0 ${activeTab === t.id ? "bg-base-100 shadow-sm font-bold text-primary" : "font-medium opacity-70 hover:opacity-100"}`}
           >
             <t.icon size={16} className="mr-2" /> {t.label}
           </button>
@@ -265,14 +331,14 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
                   Store Logo
                 </h2>
                 <div
-                  {...getRootProps()}
+                  {...getLogoProps()}
                   className={`relative w-40 h-40 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
-                    isDragActive
+                    logoDrag
                       ? "border-primary bg-primary/5"
                       : "border-base-300 hover:border-primary/50 hover:bg-base-200/50"
                   }`}
                 >
-                  <input {...getInputProps()} />
+                  <input {...getLogoInputProps()} />
                   {form.watch("storeLogo") ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -328,6 +394,198 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
                     </span>
                   </label>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB CONTENT: STOREFRONT CMS --- */}
+      {activeTab === "storefront" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                  <LayoutTemplate size={20} className="text-primary" /> Homepage
+                  Hero Section
+                </h2>
+                <div className="space-y-4">
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Hero Title (Main Heading)
+                    </label>
+                    <input
+                      {...form.register("heroTitle")}
+                      className="input input-bordered lg:text-lg font-bold"
+                      placeholder="e.g. Spring Collection 2025"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-sm">
+                      Hero Subtitle
+                    </label>
+                    <textarea
+                      {...form.register("heroSubtitle")}
+                      className="textarea textarea-bordered h-24 text-sm"
+                      placeholder="e.g. Elevate Your Everyday Style"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                  <Star size={20} className="text-warning" /> Store Value
+                  Propositions
+                </h2>
+                <div className="space-y-6">
+                  {/* Feature 1 */}
+                  <div className="p-4 bg-base-200/50 rounded-2xl border border-base-200 space-y-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
+                        1
+                      </div>
+                      <h3 className="font-bold">Feature One</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Title
+                        </label>
+                        <input
+                          {...form.register("feature1Title")}
+                          className="input input-sm input-bordered"
+                          placeholder="Nationwide Delivery"
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Subtitle
+                        </label>
+                        <input
+                          {...form.register("feature1Sub")}
+                          className="input input-sm input-bordered"
+                          placeholder="Delivered right to your doorstep"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature 2 */}
+                  <div className="p-4 bg-base-200/50 rounded-2xl border border-base-200 space-y-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
+                        2
+                      </div>
+                      <h3 className="font-bold">Feature Two</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Title
+                        </label>
+                        <input
+                          {...form.register("feature2Title")}
+                          className="input input-sm input-bordered"
+                          placeholder="Quality Guarantee"
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Subtitle
+                        </label>
+                        <input
+                          {...form.register("feature2Sub")}
+                          className="input input-sm input-bordered"
+                          placeholder="100% authentic top-tier products"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature 3 */}
+                  <div className="p-4 bg-base-200/50 rounded-2xl border border-base-200 space-y-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+                        3
+                      </div>
+                      <h3 className="font-bold">Feature Three</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Title
+                        </label>
+                        <input
+                          {...form.register("feature3Title")}
+                          className="input input-sm input-bordered"
+                          placeholder="Fast Checkout"
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label font-bold text-xs opacity-70">
+                          Subtitle
+                        </label>
+                        <input
+                          {...form.register("feature3Sub")}
+                          className="input input-sm input-bordered"
+                          placeholder="Seamless payments & tracking"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-6">
+                <h2 className="text-lg font-bold mb-4 text-left">
+                  Hero Background Image
+                </h2>
+                <div
+                  {...getHeroProps()}
+                  className={`relative w-full h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
+                    heroDrag
+                      ? "border-primary bg-primary/5"
+                      : "border-base-300 hover:border-primary/50 hover:bg-base-200/50"
+                  }`}
+                >
+                  <input {...getHeroInputProps()} />
+                  {form.watch("heroImage") ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={form.watch("heroImage") || ""}
+                      alt="Hero"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center opacity-40">
+                      <ImageIcon size={32} />
+                      <span className="text-xs mt-2 font-bold text-center px-4">
+                        Upload Landscape Banner
+                        <br />
+                        (1920x1080 recommended)
+                      </span>
+                    </div>
+                  )}
+                </div>
+                {form.watch("heroImage") && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      form.setValue("heroImage", "", { shouldDirty: true })
+                    }
+                    className="btn btn-xs btn-ghost text-error mt-4 w-full"
+                  >
+                    Remove Background
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -668,6 +926,258 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
                     />
                   </label>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB CONTENT: EMAIL CONFIG --- */}
+      {activeTab === "email" && (
+        <div className="animate-in fade-in zoom-in-95 duration-200">
+          <div className="card bg-base-100 shadow-sm border border-base-200">
+            <div className="card-body p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-base-content/5">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Email Configuration</h2>
+                  <p className="text-sm opacity-60 mt-1">
+                    Manage how your store sends receipts and notifications.
+                  </p>
+                </div>
+              </div>
+
+              {/* Global Setting */}
+              <div className="form-control mb-10 max-w-md">
+                <label className="label font-bold text-sm">
+                  Sender Email Address (From)
+                </label>
+                <div className="relative">
+                  <AtSign
+                    className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40"
+                    size={18}
+                  />
+                  <input
+                    type="email"
+                    {...form.register("storeEmailFrom")}
+                    className="input input-bordered w-full pl-12 rounded-xl h-12"
+                    placeholder="orders@yourdomain.com"
+                  />
+                </div>
+                <label className="label">
+                  <span className="label-text-alt opacity-60">
+                    Customers will see emails coming from this address.
+                  </span>
+                </label>
+              </div>
+
+              {/* Provider Selection */}
+              <h3 className="font-bold mb-4 text-sm uppercase tracking-wider opacity-60">
+                Select Email Provider
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {/* SMTP Card */}
+                <div
+                  onClick={() =>
+                    form.setValue("mailProvider", "SMTP", { shouldDirty: true })
+                  }
+                  className={`relative cursor-pointer p-6 rounded-2xl border-2 transition-all flex gap-5 items-start group ${form.watch("mailProvider") === "SMTP" ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20" : "border-base-200 hover:border-base-300 bg-base-50"}`}
+                >
+                  <div
+                    className={`p-4 rounded-xl transition-colors ${form.watch("mailProvider") === "SMTP" ? "bg-primary text-white" : "bg-base-200 text-base-content/60 group-hover:bg-base-300"}`}
+                  >
+                    <Server size={28} />
+                  </div>
+                  <div className="flex-1 pr-6">
+                    <h4 className="font-bold text-lg mb-1 text-base-content">
+                      Standard SMTP
+                    </h4>
+                    <p className="text-sm opacity-70 leading-relaxed">
+                      Use your existing cPanel, Gmail, Outlook, or AWS SES email
+                      server credentials.
+                    </p>
+                  </div>
+                  {form.watch("mailProvider") === "SMTP" && (
+                    <div className="absolute top-5 right-5 bg-primary text-white rounded-full p-1 shadow-sm">
+                      <Check size={16} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+
+                {/* RESEND Card */}
+                <div
+                  onClick={() =>
+                    form.setValue("mailProvider", "RESEND", {
+                      shouldDirty: true,
+                    })
+                  }
+                  className={`relative cursor-pointer p-6 rounded-2xl border-2 transition-all flex gap-5 items-start group ${form.watch("mailProvider") === "RESEND" ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20" : "border-base-200 hover:border-base-300 bg-base-50"}`}
+                >
+                  <div
+                    className={`p-4 rounded-xl transition-colors ${form.watch("mailProvider") === "RESEND" ? "bg-primary text-white" : "bg-base-200 text-base-content/60 group-hover:bg-base-300"}`}
+                  >
+                    <Zap size={28} />
+                  </div>
+                  <div className="flex-1 pr-6">
+                    <h4 className="font-bold text-lg mb-1 text-base-content">
+                      Resend API
+                    </h4>
+                    <p className="text-sm opacity-70 leading-relaxed">
+                      Modern, developer-friendly email API designed for high
+                      deliverability at scale.
+                    </p>
+                  </div>
+                  {form.watch("mailProvider") === "RESEND" && (
+                    <div className="absolute top-5 right-5 bg-primary text-white rounded-full p-1 shadow-sm">
+                      <Check size={16} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="divider opacity-30"></div>
+
+              {/* Provider Specific Settings */}
+              <div className="bg-base-200/40 p-6 md:p-8 rounded-4xl border border-base-200 shadow-inner">
+                {form.watch("mailProvider") === "SMTP" && (
+                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex items-center gap-3 border-b border-base-300 pb-3">
+                      <Server size={22} className="text-primary" />
+                      <h3 className="font-bold text-xl">SMTP Credentials</h3>
+                    </div>
+
+                    <div className="alert alert-info bg-info/10 border-info/20 text-info-content rounded-2xl p-5 flex gap-4 shadow-sm">
+                      <Info size={24} className="shrink-0 text-info mt-1" />
+                      <div>
+                        <p className="font-bold text-base mb-1">
+                          Using a free Gmail account?
+                        </p>
+                        <p className="opacity-90 text-sm leading-relaxed">
+                          You cannot use your standard password here. Go to your
+                          Google Account Settings &rarr; Security &rarr; 2-Step
+                          Verification &rarr; <strong>App Passwords</strong> to
+                          generate a secure 16-character code, then paste it in
+                          the password field below.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">
+                          SMTP Host
+                        </label>
+                        <div className="relative">
+                          <Globe
+                            className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40"
+                            size={18}
+                          />
+                          <input
+                            {...form.register("smtpHost")}
+                            className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary"
+                            placeholder="smtp.gmail.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">
+                          SMTP Port
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            {...form.register("smtpPort")}
+                            className="input input-bordered w-full rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary"
+                            placeholder="465"
+                          />
+                        </div>
+                        <label className="label">
+                          <span className="label-text-alt opacity-60 font-medium">
+                            Commonly 465 (SSL) or 587 (TLS)
+                          </span>
+                        </label>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">
+                          SMTP Username
+                        </label>
+                        <div className="relative">
+                          <User
+                            className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40"
+                            size={18}
+                          />
+                          <input
+                            {...form.register("smtpUser")}
+                            className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary"
+                            placeholder="your.email@gmail.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label font-bold text-sm">
+                          SMTP Password / App Password
+                        </label>
+                        <div className="relative">
+                          <Key
+                            className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40"
+                            size={18}
+                          />
+                          <input
+                            type="password"
+                            {...form.register("smtpPassword")}
+                            className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary"
+                            placeholder="••••••••••••••••"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {form.watch("mailProvider") === "RESEND" && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex items-center gap-3 border-b border-base-300 pb-3">
+                      <Zap size={22} className="text-primary" />
+                      <h3 className="font-bold text-xl">Resend Integration</h3>
+                    </div>
+
+                    <p className="text-base opacity-80 leading-relaxed">
+                      To start sending highly deliverable emails, get your API
+                      key from the{" "}
+                      <a
+                        href="https://resend.com"
+                        target="_blank"
+                        className="text-primary font-bold hover:underline"
+                      >
+                        Resend Dashboard
+                      </a>{" "}
+                      and paste it below.
+                    </p>
+
+                    <div className="form-control max-w-xl">
+                      <label className="label font-bold text-sm">
+                        Resend API Key
+                      </label>
+                      <div className="relative">
+                        <Key
+                          className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40"
+                          size={18}
+                        />
+                        <input
+                          type="password"
+                          {...form.register("resendApiKey")}
+                          className="input input-bordered w-full pl-12 rounded-xl h-12 font-mono text-sm shadow-sm focus:border-primary"
+                          placeholder="re_123456789..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
